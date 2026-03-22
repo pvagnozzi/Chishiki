@@ -1,0 +1,16 @@
+[extend]
+useDefault = true
+
+[allowlist]
+  description = "Allowlisted paths"
+  paths = [
+    '''\.github/''',
+    '''scripts/''',
+    '''containers/''',
+  ]
+  stopwords = [
+    "test",
+    "example",
+    "dummy",
+    "placeholder",
+  ]

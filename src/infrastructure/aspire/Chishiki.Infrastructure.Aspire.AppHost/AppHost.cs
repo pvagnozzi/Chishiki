@@ -61,7 +61,7 @@ builder.AddDockerfile("chishiki-host", "../../../../", "src/backend/Chishiki.Hos
     .WaitFor(postgres);
 
 // ── API Web ──────────────────────────────────────────────────────────────────
-builder.AddDockerfile("chishiki-api-web", "../../../../", "src/backend/Chishiki.API.Web/Dockerfile")
+var apiWeb = builder.AddDockerfile("chishiki-api-web", "../../../../", "src/backend/Chishiki.API.Web/Dockerfile")
     .WithHttpEndpoint(port: 8080, targetPort: 8080, name: "http")
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
     .WithEnvironment("ASPNETCORE_HTTP_PORTS", "8080")
@@ -71,5 +71,82 @@ builder.AddDockerfile("chishiki-api-web", "../../../../", "src/backend/Chishiki.
     .WaitFor(keycloak)
     .WaitFor(qdrant)
     .WaitFor(ollama);
+
+// ── Security scanners (opt-in via CHISHIKI_SECURITY_PROFILE=true) ────────────
+if (builder.Configuration["CHISHIKI_SECURITY_PROFILE"] == "true")
+{
+    // SAST: Semgrep — static analysis across all source files
+    builder.AddDockerfile("semgrep", "../../../../containers/semgrep")
+           .WithBindMount("../../../../", "/src", isReadOnly: true)
+           .WithVolume("scan-semgrep-output", "/output");
+
+    // SAST: SonarQube — multi-language code quality and security
+    builder.AddDockerfile("sonarqube", "../../../../containers/sonarqube")
+           .WithHttpEndpoint(port: 9000, targetPort: 9000, name: "http")
+           .WithEnvironment("SONAR_JDBC_URL", "jdbc:postgresql://postgresql:5432/sonarqube")
+           .WithEnvironment("SONAR_JDBC_USERNAME", "chishiki")
+           .WithEnvironment("SONAR_JDBC_PASSWORD", "chishiki")
+           .WithVolume("sonarqube-data", "/opt/sonarqube/data")
+           .WithVolume("sonarqube-logs", "/opt/sonarqube/logs")
+           .WithVolume("sonarqube-extensions", "/opt/sonarqube/extensions")
+           .WaitFor(postgres);
+
+    // SCA: OWASP Dependency-Check — NuGet package CVE scanning
+    builder.AddDockerfile("dependency-check", "../../../../containers/dependency-check")
+           .WithBindMount("../../../../", "/src", isReadOnly: true)
+           .WithVolume("scan-dependency-check-output", "/output");
+
+    // SCA + containers: Trivy — filesystem and image vulnerability scanning
+    builder.AddDockerfile("trivy", "../../../../containers/trivy")
+           .WithBindMount("/var/run/docker.sock", "/var/run/docker.sock", isReadOnly: true)
+           .WithBindMount("../../../../", "/src", isReadOnly: true)
+           .WithVolume("scan-trivy-output", "/output");
+
+    // Secret scanning: gitleaks — detect secrets in git history and working tree
+    builder.AddDockerfile("gitleaks", "../../../../containers/gitleaks")
+           .WithBindMount("../../../../", "/path", isReadOnly: true)
+           .WithVolume("scan-gitleaks-output", "/output");
+
+    // SBOM generation: Syft — produce CycloneDX SBOM from source and images
+    builder.AddDockerfile("syft", "../../../../containers/syft")
+           .WithBindMount("/var/run/docker.sock", "/var/run/docker.sock", isReadOnly: true)
+           .WithBindMount("../../../../", "/src", isReadOnly: true)
+           .WithVolume("scan-syft-output", "/output");
+
+    // SCA: Grype — vulnerability scan against Syft SBOM and filesystem
+    builder.AddDockerfile("grype", "../../../../containers/grype")
+           .WithBindMount("/var/run/docker.sock", "/var/run/docker.sock", isReadOnly: true)
+           .WithBindMount("../../../../", "/src", isReadOnly: true)
+           .WithVolume("scan-grype-output", "/output");
+
+    // Binary analysis: BinSkim — PE/ELF binary security checks on build output
+    builder.AddDockerfile("binskim", "../../../../containers/binskim")
+           .WithBindMount("../../../../", "/src", isReadOnly: true)
+           .WithVolume("scan-binskim-output", "/output");
+
+    // DAST: Nuclei — template-driven HTTP vulnerability probes
+    builder.AddDockerfile("nuclei", "../../../../containers/nuclei")
+           .WithEnvironment("NUCLEI_TARGET", "http://chishiki-api-web:8080")
+           .WithVolume("scan-nuclei-output", "/output")
+           .WaitFor(apiWeb);
+
+    // DAST: SQLMap — automated SQL injection detection
+    builder.AddDockerfile("sqlmap", "../../../../containers/sqlmap")
+           .WithEnvironment("SQLMAP_TARGET", "http://chishiki-api-web:8080")
+           .WithVolume("scan-sqlmap-output", "/output")
+           .WaitFor(apiWeb)
+           .WaitFor(postgres);
+
+    // DAST: OWASP ZAP — active web application security scanner
+    builder.AddDockerfile("zap", "../../../../containers/zap")
+           .WithHttpEndpoint(port: 8090, targetPort: 8090, name: "http")
+           .WaitFor(apiWeb);
+
+    // Fuzzing: ffuf — HTTP endpoint fuzzing with common wordlist
+    builder.AddDockerfile("ffuf", "../../../../containers/ffuf")
+           .WithEnvironment("FFUF_TARGET", "http://chishiki-api-web:8080/FUZZ")
+           .WithVolume("scan-ffuf-output", "/output")
+           .WaitFor(apiWeb);
+}
 
 builder.Build().Run();

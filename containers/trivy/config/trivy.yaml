@@ -1,0 +1,9 @@
+exit-code: 0
+format: json
+output: /output/trivy.json
+severity:
+  - CRITICAL
+  - HIGH
+  - MEDIUM
+  - LOW
+  - UNKNOWN

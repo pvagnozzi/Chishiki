@@ -1,0 +1,2 @@
+output:
+  - "cyclonedx-json=/output/syft-sbom.json"

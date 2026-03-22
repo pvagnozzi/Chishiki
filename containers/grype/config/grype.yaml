@@ -1,0 +1,6 @@
+output: json
+file: /output/grype.json
+quiet: false
+fail-on-severity: ""
+db:
+  auto-update: true

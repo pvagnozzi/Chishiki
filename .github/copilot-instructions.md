@@ -2,14 +2,18 @@
 
 ## Repository context
 
-- This repository is a `.NET 10` solution (`Chishiki.slnx`) with a distributed backend and supporting infrastructure organized under `src/`.
+- This repository is a `.NET 10` solution (`Chishiki.slnx`) — a **developer hub** platform for managing and distributing GitHub Copilot customization assets (project templates, agents, hooks, instructions, skills, collections) via a dedicated MCP server, with an integrated security analysis and exploit-test pipeline.
 - The `src/` tree is split into four top-level areas — `backend/`, `frontend/`, `infrastructure/`, and `shared/` — each described in **Source and tests layout** below.
 - The main runtime pieces are:
   - `src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.AppHost` — local Aspire orchestration
-  - `src/backend/Chishiki.API.Web` — ASP.NET Core minimal API
-  - `src/backend/Chishiki.Host` — Orleans silo host
+  - `src/backend/Chishiki.API.Web` — ASP.NET Core minimal API (gateway)
+  - `src/backend/Chishiki.Host` — Orleans silo host (grain state)
+  - `src/backend/Chishiki.Hub` — Developer Hub MCP server *(planned)*
+  - `src/backend/Chishiki.Security` — Security analysis orchestration service *(planned)*
   - `src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.ServiceDefaults` — shared Aspire service defaults
   - `src/shared/Chishiki.Core` and `src/shared/clustering/*` — global cross-layer domain and clustering libraries
+  - `src/shared/Chishiki.Hub.Contracts` — Hub DTOs and interfaces *(planned)*
+  - `src/shared/Chishiki.Security.Contracts` — Security finding types *(planned)*
 - Tests live under `tests/`, mirroring the `src/` structure exactly; see **Testing conventions** below.
 
 ## Build and run commands
@@ -79,6 +83,8 @@ dotnet test .\Chishiki.slnx --filter "TestCategory=E2E"
   - Ollama (`containers/ollama`)
   - the Orleans host (`src/backend/Chishiki.Host/Dockerfile`)
   - the API (`src/backend/Chishiki.API.Web/Dockerfile`)
+  - the Hub MCP server (`src/backend/Chishiki.Hub/Dockerfile`) *(planned)*
+  - security scanners under the `security` launch profile *(planned — see **Security analysis**)*
 - Service startup order is encoded with `.WaitFor(...)` in `AppHost.cs`, so treat AppHost as the authoritative local-development topology.
 
 ### API and host split
@@ -123,7 +129,9 @@ src/
 ├── backend/
 │   ├── shared/                    ← code shared across backend services
 │   ├── Chishiki.API.Web/          ← ASP.NET Core minimal API
-│   └── Chishiki.Host/             ← Orleans silo host
+│   ├── Chishiki.Host/             ← Orleans silo host
+│   ├── Chishiki.Hub/              ← Developer Hub MCP server  *(planned)*
+│   └── Chishiki.Security/         ← Security analysis orchestration  *(planned)*
 ├── frontend/
 │   └── shared/                    ← code shared across frontend apps
 ├── infrastructure/
@@ -133,6 +141,8 @@ src/
 │       └── Chishiki.Infrastructure.Aspire.ServiceDefaults/
 └── shared/                        ← global cross-layer libraries
     ├── Chishiki.Core/
+    ├── Chishiki.Hub.Contracts/    ← Hub DTOs and interfaces  *(planned)*
+    ├── Chishiki.Security.Contracts/ ← Security finding types  *(planned)*
     └── clustering/
         ├── Chishiki.Clustering/
         ├── Chishiki.Clustering.Client/
@@ -164,7 +174,12 @@ tests/
 │   ├── Chishiki.API.Web.E2ETests/
 │   ├── Chishiki.Host.UnitTests/
 │   ├── Chishiki.Host.IntegrationTests/
-│   └── Chishiki.Host.E2ETests/
+│   ├── Chishiki.Host.E2ETests/
+│   ├── Chishiki.Hub.UnitTests/
+│   ├── Chishiki.Hub.IntegrationTests/
+│   ├── Chishiki.Hub.E2ETests/
+│   ├── Chishiki.Security.UnitTests/
+│   └── Chishiki.Security.IntegrationTests/
 ├── frontend/
 │   └── shared/
 ├── infrastructure/
@@ -175,6 +190,8 @@ tests/
 └── shared/
     ├── Chishiki.Core.UnitTests/
     ├── Chishiki.Core.IntegrationTests/
+    ├── Chishiki.Hub.Contracts.UnitTests/
+    ├── Chishiki.Security.Contracts.UnitTests/
     └── clustering/
         ├── Chishiki.Clustering.UnitTests/
         └── Chishiki.Clustering.IntegrationTests/
@@ -301,6 +318,127 @@ public class WeatherForecastApiTests
 - Health endpoints are also development-only in `ServiceDefaults/Extensions.cs`.
 - Preserve that environment-gated behavior unless the repo intentionally changes its exposure policy.
 
+## Developer Hub
+
+Chishiki is a **developer hub** — a self-contained platform for managing and distributing GitHub Copilot customization assets via a dedicated MCP server. The hub is the primary product surface of the repository.
+
+### Hub resource taxonomy
+
+| Resource | Storage location | Description |
+|---|---|---|
+| **Templates** | `hub/templates/` | Project scaffolding templates (.NET, frontend, infra) |
+| **Agents** | `.github/agents/` | Copilot agent definition files (`.chatmode.md`) |
+| **Hooks** | `.github/hooks.json` | Copilot session hooks (logging, scanning, license checks) |
+| **Instructions** | `.github/instructions/` | Language and domain-specific coding instructions |
+| **Skills** | `.github/skills/` | Reusable agent skills (`SKILL.md`) |
+| **Collections** | `hub/collections/` | Curated bundles: a named set of agents + instructions + skills |
+
+### Hub MCP server (`Chishiki.Hub`)
+
+- Lives at `src/backend/Chishiki.Hub` — an ASP.NET Core minimal API with MCP-compatible HTTP transport.
+- Registered in `.mcp.json` under key `hub` once implemented (HTTP transport, `http://localhost:5010/mcp`).
+- Contracts shared with other services live in `src/shared/Chishiki.Hub.Contracts`.
+- Hub resource state is persisted in PostgreSQL (via EF Core) with Orleans grains as the caching layer.
+
+**MCP tools exposed by the Hub:**
+
+| Tool | Description |
+|---|---|
+| `list_resources` | List resources of a given type (templates / agents / hooks / instructions / skills / collections) |
+| `get_resource` | Retrieve the full content of a named resource |
+| `create_resource` | Scaffold a new resource from a built-in template |
+| `apply_collection` | Enable all assets in a named collection for the current workspace |
+| `scaffold_project` | Generate a new project from a named template into a target directory |
+| `search_resources` | Full-text search across resource descriptions and tags |
+
+### Hub conventions
+
+- Every resource file must carry a YAML front-matter block with `name`, `description`, `tags`, and `version`.
+- Collections are YAML manifests in `hub/collections/<name>.yaml` that reference resource names by type and key.
+- The Hub service is development-only; it has no production deployment target.
+- When a new skill or agent is added to `.github/`, also register it in the hub via a seed file in `hub/seed/`.
+
+## Security analysis and exploit testing
+
+Chishiki integrates open source/free security tooling to scan source code, NuGet dependencies, and container images for vulnerabilities, and converts findings into executable NUnit security tests.
+
+### Integrated scanners
+
+| Tool | Type | Docker image | What it scans |
+|---|---|---|---|
+| **Semgrep** | SAST | `semgrep/semgrep` | Source code — rules from `semgrep.dev/r` |
+| **SecurityCodeScan** | SAST (Roslyn) | NuGet analyzer, runs in `dotnet build` | C# source code |
+| **SonarQube Community** | SAST + metrics | `sonarqube:community` | Multi-language source quality and security |
+| **OWASP Dependency-Check** | SCA | `owasp/dependency-check` | NuGet package CVEs |
+| **Trivy** | SCA + containers | `aquasec/trivy` | Container images, filesystem, NuGet |
+| **gitleaks** | Secret scanning | `zricethezav/gitleaks` | Git history and working tree |
+
+All scanners run as Docker containers registered in `AppHost.cs` under the `security` launch profile so they are **not** started in the default dev stack.
+
+### Running security scans locally
+
+```powershell
+# Start only the security scanner containers
+dotnet run --project .\src\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppHost -- --launch-profile security
+```
+
+Tests with category `Security` can be run independently:
+
+```powershell
+dotnet test .\Chishiki.slnx --filter "TestCategory=Security"
+```
+
+### Security finding model (`Chishiki.Security.Contracts`)
+
+```csharp
+public record SecurityFinding(
+    string        Tool,
+    Severity      Severity,      // Critical | High | Medium | Low | Info
+    string        RuleId,
+    string        Title,
+    string        Description,
+    string        FilePath,
+    int?          Line,
+    string?       Cve,
+    string?       Remediation
+);
+```
+
+### Exploit test generation pattern
+
+When a finding has a known exploit pattern the security service (`Chishiki.Security`) generates a NUnit test that:
+
+1. **Reproduces** the exploit with a representative payload.
+2. Is initially **red** (expected to fail) — the test documents the vulnerability.
+3. Turns **green** once the fix is applied and stays in the suite as a regression guard.
+4. Carries `[Category("Security")]` (combinable with `Unit`, `Integration`, or `E2E`).
+5. Lives under `tests/{area}/security/` mirroring the source tree.
+
+```csharp
+[TestFixture, Category("Security"), Category("Unit")]
+public class SqlInjectionSecurityTests
+{
+    [Test]
+    [Description("SEC-0042 — raw string interpolation in SQL query (Semgrep rule sqli-formatstring)")]
+    public void BuildQuery_WithUntrustedInput_ShouldParameterize()
+    {
+        const string maliciousInput = "' OR '1'='1";
+
+        var query = QueryBuilder.Build(maliciousInput);
+
+        Assert.That(query.CommandText, Does.Not.Contain(maliciousInput));
+        Assert.That(query.Parameters,  Has.Count.GreaterThan(0));
+    }
+}
+```
+
+### Security conventions
+
+- Security test classes follow the naming `{TestedClass}SecurityTests`.
+- Every generated test must reference the originating finding ID in its `[Description]` attribute.
+- Findings that have no automated exploit pattern are tracked as GitHub issues with label `security-finding`.
+- Scanner raw output is **not** committed; only generated test files and finding metadata (persisted to PostgreSQL via `Chishiki.Security`) are kept.
+
 ## Existing Copilot and MCP setup
 
 - The repository already has a substantial `.github/instructions/` and `.github/agents/` library. Before adding task-specific guidance, check whether an existing instruction file or agent already covers the language or domain you are working in.
@@ -386,3 +524,6 @@ scripts/
 - When adding or changing source code, immediately create or update the corresponding test projects under `tests/` following the **Testing conventions** section. Unit, Integration, and E2E test projects must be kept in sync with their source counterpart.
 - `src/frontend/` is the intended location for frontend projects; structure it following the same `shared/` + topic subfolder convention described in **Source and tests layout**.
 - When adding a new developer script, create it in all three platform folders (`windows/`, `linux/`, `macos/`) under the same topic subfolder, and update `scripts/README.md`.
+- When adding a new skill or agent to `.github/`, add the corresponding seed entry under `hub/seed/` so the hub database stays in sync with the file system.
+- Security scanners are **never** started in the default `dotnet run` profile; always gate them behind the `security` launch profile in AppHost.
+- Every new public API surface (controller action, grain method, MCP tool) must have at minimum a unit test and, where applicable, a security test if the input is user-controlled.
