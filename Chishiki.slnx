@@ -1,6 +1,8 @@
 <Solution>
   <Folder Name="/docs/" />
-  <Folder Name="/solution/" />
+  <Folder Name="/solution/">
+    <File Path=".github/copilot-instructions.md" />
+  </Folder>
   <Folder Name="/src/" />
   <Folder Name="/src/backend/">
     <Project Path="src/backend/Chishiki.API.Web/Chishiki.API.Web.csproj" />

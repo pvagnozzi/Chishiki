@@ -1,0 +1,129 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+
+    // ── Build ─────────────────────────────────────────────────────────────────
+    {
+      "label": "build",
+      "detail": "Build the full solution",
+      "type": "shell",
+      "command": "dotnet build ${workspaceFolder}/Chishiki.slnx --configuration Debug",
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "silent", "panel": "shared", "close": true },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build: API Web",
+      "detail": "Build Chishiki.API.Web only",
+      "type": "shell",
+      "command": "dotnet build ${workspaceFolder}/src/backend/Chishiki.API.Web/Chishiki.API.Web.csproj",
+      "group": "build",
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build: Orleans Host",
+      "detail": "Build Chishiki.Host only",
+      "type": "shell",
+      "command": "dotnet build ${workspaceFolder}/src/backend/Chishiki.Host/Chishiki.Host.csproj",
+      "group": "build",
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build: AppHost",
+      "detail": "Build the Aspire AppHost only",
+      "type": "shell",
+      "command": "dotnet build ${workspaceFolder}/src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.AppHost/Chishiki.Infrastructure.Aspire.AppHost.csproj",
+      "group": "build",
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": "$msCompile"
+    },
+
+    // ── Test ──────────────────────────────────────────────────────────────────
+    {
+      "label": "test",
+      "detail": "Run the full test suite",
+      "type": "shell",
+      "command": "dotnet test ${workspaceFolder}/Chishiki.slnx --logger console;verbosity=minimal",
+      "group": { "kind": "test", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test: unit",
+      "detail": "Run only unit tests (Category=Unit)",
+      "type": "shell",
+      "command": "dotnet test ${workspaceFolder}/Chishiki.slnx --filter TestCategory=Unit --logger console;verbosity=minimal",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test: integration",
+      "detail": "Run only integration tests (Category=Integration)",
+      "type": "shell",
+      "command": "dotnet test ${workspaceFolder}/Chishiki.slnx --filter TestCategory=Integration --logger console;verbosity=minimal",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "problemMatcher": "$msCompile"
+    },
+
+    // ── Run (no debugger) ─────────────────────────────────────────────────────
+    {
+      "label": "run: AppHost",
+      "detail": "Start the full stack via Aspire AppHost (no debugger)",
+      "type": "shell",
+      "command": "dotnet run --project ${workspaceFolder}/src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.AppHost/Chishiki.Infrastructure.Aspire.AppHost.csproj",
+      "group": "none",
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Building...",
+          "endsPattern": "Aspire dashboard"
+        }
+      }
+    },
+    {
+      "label": "run: API Web (watch)",
+      "detail": "Start API Web with hot-reload (dotnet watch)",
+      "type": "shell",
+      "command": "dotnet watch run --project ${workspaceFolder}/src/backend/Chishiki.API.Web/Chishiki.API.Web.csproj",
+      "group": "none",
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "isBackground": true,
+      "problemMatcher": "$msCompile"
+    },
+
+    // ── Infrastructure (docker-compose) ───────────────────────────────────────
+    {
+      "label": "infra: start",
+      "detail": "Start infrastructure services (postgres, redis, keycloak, …) via docker-compose",
+      "type": "shell",
+      "command": "docker compose -f ${workspaceFolder}/.devcontainer/docker-compose.yml up -d postgresql redis keycloak prometheus grafana qdrant ollama",
+      "group": "none",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "infra: stop",
+      "detail": "Stop infrastructure services (use before running Aspire AppHost)",
+      "type": "shell",
+      "command": "docker compose -f ${workspaceFolder}/.devcontainer/docker-compose.yml stop postgresql redis keycloak prometheus grafana qdrant ollama",
+      "group": "none",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "infra: logs",
+      "detail": "Tail docker-compose service logs",
+      "type": "shell",
+      "command": "docker compose -f ${workspaceFolder}/.devcontainer/docker-compose.yml logs -f --tail=100",
+      "group": "none",
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

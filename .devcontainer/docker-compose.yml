@@ -1,0 +1,158 @@
+# =============================================================================
+# Chishiki — DevContainer + Infrastructure
+#
+# Services on the 'chishiki_dev' network (accessible by service name):
+#   devcontainer — VS Code development environment  (with Docker socket)
+#   postgresql   — PostgreSQL 17 + pgvector         port 5432
+#   redis        — Redis 7 (AOF + RDB)              port 6379
+#   keycloak     — Keycloak OIDC                    port 8180 → 8080
+#   prometheus   — Prometheus metrics               port 9090
+#   grafana      — Grafana dashboards               port 3000
+#   qdrant       — Qdrant vector store              port 6333/6334
+#   ollama       — Ollama LLM inference             port 11434
+#
+# The devcontainer connects to all services via their service names as
+# hostnames (e.g. redis:6379, postgresql:5432) — matching the Aspire
+# container naming convention and Chishiki.Host fallback values.
+# =============================================================================
+
+services:
+
+  # ── Development container ─────────────────────────────────────────────────
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/dotnet:1-10.0
+    volumes:
+      - ..:/workspace:cached
+      - /var/run/docker.sock:/var/run/docker.sock   # Docker-outside-of-Docker
+      - vscode-extensions:/home/vscode/.vscode-server/extensions
+    extra_hosts:
+      - "host.docker.internal:host-gateway"          # reach host from devcontainer (Linux)
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DOTNET_ENVIRONMENT: Development
+      ConnectionStrings__redis: "redis:6379"
+      ConnectionStrings__postgresql: "Host=postgresql;Port=5432;Database=chishiki;Username=chishiki;Password=chishiki"
+    networks:
+      - chishiki_dev
+    command: sleep infinity
+
+  # ── PostgreSQL 17 + pgvector ──────────────────────────────────────────────
+  postgresql:
+    build:
+      context: ../containers/postgresql
+    environment:
+      POSTGRES_USER: chishiki
+      POSTGRES_PASSWORD: chishiki
+      POSTGRES_DB: chishiki
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+    networks:
+      - chishiki_dev
+    restart: unless-stopped
+
+  # ── Redis 7 ───────────────────────────────────────────────────────────────
+  redis:
+    build:
+      context: ../containers/redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - chishiki_dev
+    restart: unless-stopped
+
+  # ── Keycloak OIDC ─────────────────────────────────────────────────────────
+  keycloak:
+    build:
+      context: ../containers/keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: "jdbc:postgresql://postgresql:5432/keycloak"
+      KC_DB_USERNAME: chishiki
+      KC_DB_PASSWORD: chishiki
+    ports:
+      - "8180:8080"
+    networks:
+      - chishiki_dev
+    depends_on:
+      - postgresql
+    restart: unless-stopped
+
+  # ── Prometheus ────────────────────────────────────────────────────────────
+  prometheus:
+    build:
+      context: ../containers/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus-data:/prometheus
+    networks:
+      - chishiki_dev
+    restart: unless-stopped
+
+  # ── Grafana ───────────────────────────────────────────────────────────────
+  grafana:
+    build:
+      context: ../containers/grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - chishiki_dev
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # ── Qdrant (vector search) ────────────────────────────────────────────────
+  qdrant:
+    build:
+      context: ../containers/qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant-data:/qdrant/storage
+      - qdrant-snapshots:/qdrant/snapshots
+    networks:
+      - chishiki_dev
+    restart: unless-stopped
+
+  # ── Ollama (LLM inference) ────────────────────────────────────────────────
+  ollama:
+    build:
+      context: ../containers/ollama
+    environment:
+      OLLAMA_DEFAULT_MODEL: nomic-embed-text
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - chishiki_dev
+    restart: unless-stopped
+
+# ── Shared network ────────────────────────────────────────────────────────────
+networks:
+  chishiki_dev:
+    name: chishiki_dev
+
+# ── Named volumes ─────────────────────────────────────────────────────────────
+volumes:
+  postgresql-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+  qdrant-data:
+  qdrant-snapshots:
+  ollama-data:
+  vscode-extensions:

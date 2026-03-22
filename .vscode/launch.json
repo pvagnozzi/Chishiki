@@ -1,0 +1,75 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+
+    // ── Aspire AppHost ───────────────────────────────────────────────────────
+    // Launches the full Aspire orchestration. The AppHost will try to create
+    // Docker containers via the mounted socket (DooD). Stop compose infra
+    // first with the "infra: stop" task to avoid port conflicts.
+    {
+      "name": "🚀 Aspire AppHost",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.AppHost/Chishiki.Infrastructure.Aspire.AppHost.csproj",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPIRE_ALLOW_UNSECURED_TRANSPORT": "true",
+        "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "http://localhost:18889",
+        "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "http://localhost:20000"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "uriFormat": "http://localhost:15888"
+      }
+    },
+
+    // ── API Web ───────────────────────────────────────────────────────────────
+    // Debugs only the ASP.NET Core API. Infrastructure from docker-compose.
+    {
+      "name": "🌐 API Web",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/src/backend/Chishiki.API.Web/Chishiki.API.Web.csproj",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://+:8080",
+        "ConnectionStrings__redis": "redis:6379",
+        "ConnectionStrings__postgresql": "Host=postgresql;Port=5432;Database=chishiki;Username=chishiki;Password=chishiki"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "Now listening on:\\s+(https?://\\S+)"
+      }
+    },
+
+    // ── Orleans Silo Host ─────────────────────────────────────────────────────
+    // Debugs only the Orleans silo. Infrastructure from docker-compose.
+    {
+      "name": "🏰 Orleans Host",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/src/backend/Chishiki.Host/Chishiki.Host.csproj",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings__redis": "redis:6379",
+        "ConnectionStrings__postgresql": "Host=postgresql;Port=5432;Database=chishiki;Username=chishiki;Password=chishiki"
+      }
+    },
+
+    // ── Attach to running process ─────────────────────────────────────────────
+    {
+      "name": "🔍 Attach to .NET process",
+      "type": "dotnet",
+      "request": "attach"
+    }
+  ],
+
+  "compounds": [
+    // ── Both backend services in parallel ─────────────────────────────────────
+    {
+      "name": "🎯 API Web + Orleans Host",
+      "configurations": ["🌐 API Web", "🏰 Orleans Host"],
+      "stopAll": true
+    }
+  ]
+}

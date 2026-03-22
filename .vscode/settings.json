@@ -1,0 +1,80 @@
+{
+  // ── .NET / C# ───────────────────────────────────────────────────────────────
+  "dotnet.defaultSolution": "Chishiki.slnx",
+  "csharp.maxProjectFileCountForDiagnosticAnalysis": 50,
+
+  // ── Editor ──────────────────────────────────────────────────────────────────
+  "editor.formatOnSave": true,
+  "editor.rulers": [120],
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+
+  // ── Language-specific formatting ─────────────────────────────────────────────
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csdevkit",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[powershell]": {
+    "editor.defaultFormatter": "ms-vscode.powershell"
+  },
+
+  // ── File associations ────────────────────────────────────────────────────────
+  "files.associations": {
+    "*.slnx":     "xml",
+    "Dockerfile": "dockerfile",
+    "*.omp.json": "json"
+  },
+
+  // ── File watcher exclusions ──────────────────────────────────────────────────
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.git/objects/**": true,
+    "**/bin/**": true,
+    "**/obj/**": true,
+    "**/.vs/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bin": true,
+    "**/obj": true
+  },
+
+  // ── Terminal ─────────────────────────────────────────────────────────────────
+  "terminal.integrated.defaultProfile.linux": "bash",
+
+  // ── Docker ───────────────────────────────────────────────────────────────────
+  "docker.dockerodeOptions": {
+    "socketPath": "/var/run/docker.sock"
+  },
+
+  // ── Error Lens ───────────────────────────────────────────────────────────────
+  "errorLens.enabledDiagnosticLevels": ["error", "warning"],
+
+  // ── Icons ────────────────────────────────────────────────────────────────────
+  "workbench.iconTheme": "material-icon-theme",
+
+  // ── Spell checker ────────────────────────────────────────────────────────────
+  "cSpell.words": [
+    "Chishiki", "Orleans", "Aspire", "Keycloak",
+    "Qdrant", "Ollama", "pgvector", "ohmyposh",
+    "csdevkit", "OTLP", "OTEL", "grafana",
+    "silo", "dnx", "uvx", "winget"
+  ]
+}
