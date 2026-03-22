@@ -1,0 +1,6 @@
+@Chishiki.API.Web_HostAddress = http://localhost:5205
+
+GET {{Chishiki.API.Web_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

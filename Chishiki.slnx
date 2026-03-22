@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/docs/" />
+  <Folder Name="/solution/" />
+  <Folder Name="/src/" />
+  <Folder Name="/src/backend/">
+    <Project Path="src/backend/Chishiki.API.Web/Chishiki.API.Web.csproj" />
+    <Project Path="src/backend/Chishiki.Host/Chishiki.Host.csproj" Id="c39edbe9-fa1b-4b45-b546-59113c28a55e" />
+  </Folder>
+  <Folder Name="/src/frontend/" />
+  <Folder Name="/src/infrastructure/" />
+  <Folder Name="/src/infrastructure/aspire/">
+    <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.AppHost/Chishiki.Infrastructure.Aspire.AppHost.csproj" />
+    <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.ServiceDefaults/Chishiki.Infrastructure.Aspire.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/src/shared/">
+    <Project Path="src/shared/Chishiki.Core/Chishiki.Core.csproj" Id="d7cd2757-3cfe-4054-98f2-806ae310e067" />
+  </Folder>
+  <Folder Name="/src/shared/clustering/">
+    <Project Path="src/shared/clustering/Chishiki.Clustering.Client/Chishiki.Clustering.Client.csproj" />
+    <Project Path="src/shared/clustering/Chishiki.Clustering.Server/Chishiki.Clustering.Server.csproj" />
+    <Project Path="src/shared/clustering/Chishiki.Clustering/Chishiki.Clustering.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+</Solution>

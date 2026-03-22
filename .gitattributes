@@ -1,0 +1,135 @@
+# ============================================================
+#  Chishiki — .gitattributes
+#  Enforces consistent line endings and diff strategies
+# ============================================================
+
+# ──────────────────────────────────────────────────
+#  Global default: auto-detect & normalize on commit
+# ──────────────────────────────────────────────────
+* text=auto eol=lf
+
+# ──────────────────────────────────────────────────
+#  Shell scripts — MUST be LF (critical for Docker)
+# ──────────────────────────────────────────────────
+*.sh        text eol=lf
+*.bash      text eol=lf
+*.zsh       text eol=lf
+
+# ──────────────────────────────────────────────────
+#  Windows scripts — CRLF
+# ──────────────────────────────────────────────────
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+*.ps1       text eol=crlf
+*.psm1      text eol=crlf
+*.psd1      text eol=crlf
+
+# ──────────────────────────────────────────────────
+#  C# / .NET source — LF (cross-platform)
+# ──────────────────────────────────────────────────
+*.cs        text eol=lf
+*.csx       text eol=lf
+*.vb        text eol=lf
+*.fs        text eol=lf
+*.fsx       text eol=lf
+
+# ──────────────────────────────────────────────────
+#  Project / Solution files
+# ──────────────────────────────────────────────────
+*.csproj    text eol=lf
+*.fsproj    text eol=lf
+*.vbproj    text eol=lf
+*.slnx      text eol=lf
+*.sln       text eol=lf
+*.props     text eol=lf
+*.targets   text eol=lf
+*.ruleset   text eol=lf
+*.editorconfig text eol=lf
+*.globalconfig text eol=lf
+Directory.Build.props   text eol=lf
+Directory.Packages.props text eol=lf
+
+# ──────────────────────────────────────────────────
+#  Configuration / Data
+# ──────────────────────────────────────────────────
+*.json      text eol=lf
+*.yaml      text eol=lf
+*.yml       text eol=lf
+*.toml      text eol=lf
+*.ini       text eol=lf
+*.conf      text eol=lf
+*.config    text eol=lf
+*.xml       text eol=lf
+*.xsd       text eol=lf
+*.xslt      text eol=lf
+
+# ──────────────────────────────────────────────────
+#  Documentation
+# ──────────────────────────────────────────────────
+*.md        text eol=lf
+*.mdx       text eol=lf
+*.rst       text eol=lf
+*.txt       text eol=lf
+*.csv       text eol=lf
+
+# ──────────────────────────────────────────────────
+#  Dockerfile
+# ──────────────────────────────────────────────────
+Dockerfile  text eol=lf
+*.dockerfile text eol=lf
+.dockerignore text eol=lf
+
+# ──────────────────────────────────────────────────
+#  Web
+# ──────────────────────────────────────────────────
+*.html      text eol=lf
+*.htm       text eol=lf
+*.css       text eol=lf
+*.scss      text eol=lf
+*.js        text eol=lf
+*.ts        text eol=lf
+*.jsx       text eol=lf
+*.tsx       text eol=lf
+
+# ──────────────────────────────────────────────────
+#  Binary — never diff / never mangle
+# ──────────────────────────────────────────────────
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.svg       text eol=lf
+*.woff      binary
+*.woff2     binary
+*.ttf       binary
+*.otf       binary
+*.eot       binary
+*.pdf       binary
+*.zip       binary
+*.tar.gz    binary
+*.tgz       binary
+*.7z        binary
+*.exe       binary
+*.dll       binary
+*.pdb       binary
+*.nupkg     binary
+*.snupkg    binary
+*.pfx       binary
+*.p12       binary
+*.pem       binary -diff
+
+# ──────────────────────────────────────────────────
+#  Diff strategies
+# ──────────────────────────────────────────────────
+*.cs        diff=csharp
+*.json      diff=json
+
+# ──────────────────────────────────────────────────
+#  GitHub Linguist — statistics overrides
+# ──────────────────────────────────────────────────
+containers/**   linguist-documentation
+docs/**         linguist-documentation
+infrastructure/** linguist-documentation
+.github/**      linguist-documentation
+*.md            linguist-documentation

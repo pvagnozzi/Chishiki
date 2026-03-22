@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Chishiki.Host": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

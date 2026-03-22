@@ -1,0 +1,47 @@
+# CODEOWNERS
+# ============================================================
+#  Chishiki — Code Ownership
+#  Format: <path pattern> <@owner> [<@owner> ...]
+#  Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# ============================================================
+
+# ── Default: all files require maintainer review ────────────
+*                                       @your-org/maintainers
+
+# ── Core Backend ────────────────────────────────────────────
+src/backend/Chishiki.API.Web/**         @your-org/backend
+src/backend/Chishiki.Host/**            @your-org/backend
+
+# ── Shared Libraries ────────────────────────────────────────
+src/shared/**                           @your-org/backend
+
+# ── Infrastructure / Aspire ─────────────────────────────────
+src/infrastructure/**                   @your-org/platform
+containers/**                           @your-org/platform
+infrastructure/**                       @your-org/platform
+
+# ── Observability ───────────────────────────────────────────
+containers/prometheus/**                @your-org/platform
+containers/grafana/**                   @your-org/platform
+
+# ── Authentication ──────────────────────────────────────────
+containers/keycloak/**                  @your-org/security
+
+# ── Security sensitive files ────────────────────────────────
+.github/hooks/**                        @your-org/security
+SECURITY.md                             @your-org/security
+
+# ── CI/CD & Tooling ─────────────────────────────────────────
+.github/workflows/**                    @your-org/platform
+.mcp.json                               @your-org/platform
+
+# ── Documentation ───────────────────────────────────────────
+docs/**                                 @your-org/maintainers
+README.md                               @your-org/maintainers
+CONTRIBUTING.md                         @your-org/maintainers
+CHANGELOG.md                            @your-org/maintainers
+
+# ── Config standards ────────────────────────────────────────
+.editorconfig                           @your-org/maintainers
+.gitattributes                          @your-org/maintainers
+.gitignore                              @your-org/maintainers

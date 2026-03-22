@@ -1,0 +1,62 @@
+{
+  "inputs": [
+    {
+      "id": "postgres-connection",
+      "type": "promptString",
+      "description": "PostgreSQL local connection string",
+      "default": "postgresql://postgres:postgres@localhost:5432/chishiki"
+    }
+  ],
+  "servers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "microsoft-learn": {
+      "type": "http",
+      "url": "https://learn.microsoft.com/api/mcp"
+    },
+    "azure": {
+      "type": "stdio",
+      "command": "dnx",
+      "args": [
+        "Azure.Mcp",
+        "--source",
+        "https://api.nuget.org/v3/index.json",
+        "--yes",
+        "--",
+        "azmcp",
+        "server",
+        "start"
+      ]
+    },
+    "nuget": {
+      "type": "stdio",
+      "command": "dnx",
+      "args": [
+        "NuGet.Mcp.Server",
+        "--source",
+        "https://api.nuget.org/v3/index.json",
+        "--yes"
+      ]
+    },
+    "fetch": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [ "mcp-server-fetch" ]
+    },
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "mcp-server-sequential-thinking"
+    },
+    "postgres": {
+      "type": "stdio",
+      "command": "mcp-server-postgres",
+      "args": [ "${input:postgres-connection}" ]
+    },
+    "memory": {
+      "type": "stdio",
+      "command": "mcp-server-memory"
+    }
+  }
+}
