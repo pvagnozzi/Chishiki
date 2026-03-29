@@ -1,0 +1,6 @@
+type: Agent
+resources:
+  - path: .github/agents/dotnet-api.chatmode.md
+  - path: .github/agents/aspire-dev.chatmode.md
+  - path: .github/agents/code-reviewer.chatmode.md
+  - path: .github/agents/security-analyzer.chatmode.md

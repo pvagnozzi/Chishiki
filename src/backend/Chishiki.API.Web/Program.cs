@@ -1,3 +1,6 @@
+// Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
@@ -45,3 +48,6 @@ record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
+
+/// <summary>Exposes the implicit top-level Program class so integration tests can reference it via WebApplicationFactory.</summary>
+public partial class Program { }

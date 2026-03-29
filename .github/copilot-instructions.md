@@ -514,6 +514,58 @@ scripts/
 | Linux    | apt/dnf/pacman | `--install`   |
 | macOS    | Homebrew   | `--install`       |
 
+## C# coding standards
+
+### Copyright header
+
+Every `.cs` source file (excluding generated `obj/` files) **must** begin with the following copyright block, placed before any `using` directives or `namespace` declarations:
+
+```csharp
+// Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+```
+
+### XML documentation
+
+Every `public` and `internal` type (class, struct, record, enum, interface, delegate) and every `public` or `internal` member (constructor, method, property, field, event) **must** carry XML documentation comments:
+
+| Tag | Usage |
+|---|---|
+| `<summary>` | Required on every type and member — one-line description of purpose |
+| `<param name="…">` | Required for every constructor or method parameter |
+| `<returns>` | Required when the return type is not `void`, `Task`, or `ValueTask` |
+| `<exception cref="…">` | Document every exception a method may intentionally throw |
+| `<remarks>` | Optional supplementary detail that does not fit in `<summary>` |
+| `<inheritdoc/>` | Use on overrides and explicit interface implementations instead of duplicating the base XML |
+
+### Modern .NET logging
+
+Use the **`[LoggerMessage]` source-generator** pattern for all logging. Never use string interpolation (`$"..."`) or raw string concatenation in log arguments.
+
+Rules:
+- Declare `[LoggerMessage]`-decorated `partial` methods directly on the owning class, which must itself be declared `partial`.
+- The `ILogger<T>` field is resolved automatically by the source generator — no manual logger pass-through needed.
+- Message template holes (`{ParameterName}`) must match method parameter names exactly (case-insensitive).
+- Exception parameters must be the **first** parameter in the method signature.
+- Assign event IDs only for high-frequency or operationally significant messages.
+
+```csharp
+// Correct — source-generated partial logging methods
+internal sealed partial class MyService
+{
+    private readonly ILogger<MyService> _logger;
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Processing item {ItemId}")]
+    private partial void LogProcessingItem(int itemId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Item {ItemId} skipped: {Reason}")]
+    private partial void LogItemSkipped(int itemId, string reason);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to process item {ItemId}")]
+    private partial void LogProcessingFailed(Exception ex, int itemId);
+}
+```
+
 ## Working assumptions for future sessions
 
 - Prefer the Aspire AppHost workflow when you need the full stack locally.

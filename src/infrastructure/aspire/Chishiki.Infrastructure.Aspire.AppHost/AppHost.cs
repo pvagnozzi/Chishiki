@@ -1,3 +1,6 @@
+// Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 // ── PostgreSQL + pgvector ────────────────────────────────────────────────────
@@ -71,6 +74,15 @@ var apiWeb = builder.AddDockerfile("chishiki-api-web", "../../../../", "src/back
     .WaitFor(keycloak)
     .WaitFor(qdrant)
     .WaitFor(ollama);
+
+// ── Hub MCP server ───────────────────────────────────────────────────────────
+builder.AddDockerfile("chishiki-hub", "../../../../", "src/backend/Chishiki.Hub/Dockerfile")
+    .WithHttpEndpoint(port: 5010, targetPort: 5010, name: "http")
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
+    .WithEnvironment("ASPNETCORE_HTTP_PORTS", "5010")
+    .WithEnvironment("ASPNETCORE_URLS", "http://+:5010")
+    .WithEnvironment("HUB_ROOT", "/hub-root")
+    .WithBindMount("../../../../", "/hub-root", isReadOnly: true);
 
 // ── Security scanners (opt-in via CHISHIKI_SECURITY_PROFILE=true) ────────────
 if (builder.Configuration["CHISHIKI_SECURITY_PROFILE"] == "true")

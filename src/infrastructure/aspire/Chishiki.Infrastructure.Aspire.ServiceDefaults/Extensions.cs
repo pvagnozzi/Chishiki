@@ -1,3 +1,6 @@
+// Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -14,11 +17,19 @@ namespace Microsoft.Extensions.Hosting
     // Adds common Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
     // This project should be referenced by each service project in your solution.
     // To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
+    /// <summary>Provides extension methods that configure shared Aspire service defaults.</summary>
     public static class Extensions
     {
         private const string HealthEndpointPath = "/health";
         private const string AlivenessEndpointPath = "/alive";
 
+        /// <summary>
+        /// Registers service discovery, HTTP resilience, health checks, and OpenTelemetry
+        /// on <paramref name="builder"/>.
+        /// </summary>
+        /// <typeparam name="TBuilder">Host application builder type.</typeparam>
+        /// <param name="builder">The builder to configure.</param>
+        /// <returns>The same <paramref name="builder"/> for chaining.</returns>
         public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
         {
             builder.ConfigureOpenTelemetry();
@@ -42,6 +53,10 @@ namespace Microsoft.Extensions.Hosting
             return builder;
         }
 
+        /// <summary>Configures OpenTelemetry logging, metrics, and tracing on <paramref name="builder"/>.</summary>
+        /// <typeparam name="TBuilder">Host application builder type.</typeparam>
+        /// <param name="builder">The builder to configure.</param>
+        /// <returns>The same <paramref name="builder"/> for chaining.</returns>
         public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
         {
             builder.Logging.AddOpenTelemetry(logging =>
@@ -77,6 +92,10 @@ namespace Microsoft.Extensions.Hosting
             return builder;
         }
 
+        /// <summary>Registers OTLP and Azure Monitor exporters based on environment configuration.</summary>
+        /// <typeparam name="TBuilder">Host application builder type.</typeparam>
+        /// <param name="builder">The builder to configure.</param>
+        /// <returns>The same <paramref name="builder"/> for chaining.</returns>
         private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
         {
             var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
@@ -95,6 +114,10 @@ namespace Microsoft.Extensions.Hosting
             return builder;
         }
 
+        /// <summary>Registers the default liveness health check on <paramref name="builder"/>.</summary>
+        /// <typeparam name="TBuilder">Host application builder type.</typeparam>
+        /// <param name="builder">The builder to configure.</param>
+        /// <returns>The same <paramref name="builder"/> for chaining.</returns>
         public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
         {
             builder.Services.AddHealthChecks()
@@ -104,6 +127,9 @@ namespace Microsoft.Extensions.Hosting
             return builder;
         }
 
+        /// <summary>Maps <c>/health</c>, <c>/alive</c>, and <c>/metrics</c> endpoints on the web application.</summary>
+        /// <param name="app">The web application to configure.</param>
+        /// <returns>The same <paramref name="app"/> for chaining.</returns>
         public static WebApplication MapDefaultEndpoints(this WebApplication app)
         {
             // Adding health checks endpoints to applications in non-development environments has security implications.

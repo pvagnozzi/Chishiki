@@ -1,5 +1,7 @@
 <Solution>
-  <Folder Name="/docs/" />
+  <Folder Name="/docs/">
+    <File Path="docs/implementation-plan.md" />
+  </Folder>
   <Folder Name="/solution/">
     <File Path=".github/copilot-instructions.md" />
   </Folder>
@@ -7,6 +9,7 @@
   <Folder Name="/src/backend/">
     <Project Path="src/backend/Chishiki.API.Web/Chishiki.API.Web.csproj" />
     <Project Path="src/backend/Chishiki.Host/Chishiki.Host.csproj" Id="c39edbe9-fa1b-4b45-b546-59113c28a55e" />
+    <Project Path="src/backend/Chishiki.Hub/Chishiki.Hub.csproj" />
   </Folder>
   <Folder Name="/src/frontend/" />
   <Folder Name="/src/infrastructure/" />
@@ -16,6 +19,8 @@
   </Folder>
   <Folder Name="/src/shared/">
     <Project Path="src/shared/Chishiki.Core/Chishiki.Core.csproj" Id="d7cd2757-3cfe-4054-98f2-806ae310e067" />
+    <Project Path="src/shared/Chishiki.Hub.Contracts/Chishiki.Hub.Contracts.csproj" />
+    <Project Path="src/shared/Chishiki.Security.Contracts/Chishiki.Security.Contracts.csproj" />
   </Folder>
   <Folder Name="/src/shared/clustering/">
     <Project Path="src/shared/clustering/Chishiki.Clustering.Client/Chishiki.Clustering.Client.csproj" />
@@ -23,4 +28,23 @@
     <Project Path="src/shared/clustering/Chishiki.Clustering/Chishiki.Clustering.csproj" />
   </Folder>
   <Folder Name="/tests/" />
+  <Folder Name="/tests/backend/">
+    <Project Path="tests/backend/Chishiki.API.Web.IntegrationTests/Chishiki.API.Web.IntegrationTests.csproj" />
+    <Project Path="tests/backend/Chishiki.API.Web.UnitTests/Chishiki.API.Web.UnitTests.csproj" />
+    <Project Path="tests/backend/Chishiki.Hub.UnitTests/Chishiki.Hub.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/infrastructure/" />
+  <Folder Name="/tests/infrastructure/aspire/">
+    <Project Path="tests/infrastructure/aspire/Chishiki.Infrastructure.Aspire.ServiceDefaults.UnitTests/Chishiki.Infrastructure.Aspire.ServiceDefaults.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/shared/">
+    <Project Path="tests/shared/Chishiki.Core.UnitTests/Chishiki.Core.UnitTests.csproj" />
+    <Project Path="tests/shared/Chishiki.Hub.Contracts.UnitTests/Chishiki.Hub.Contracts.UnitTests.csproj" />
+    <Project Path="tests/shared/Chishiki.Security.Contracts.UnitTests/Chishiki.Security.Contracts.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/shared/clustering/">
+    <Project Path="tests/shared/clustering/Chishiki.Clustering.Client.UnitTests/Chishiki.Clustering.Client.UnitTests.csproj" />
+    <Project Path="tests/shared/clustering/Chishiki.Clustering.Server.UnitTests/Chishiki.Clustering.Server.UnitTests.csproj" />
+    <Project Path="tests/shared/clustering/Chishiki.Clustering.UnitTests/Chishiki.Clustering.UnitTests.csproj" />
+  </Folder>
 </Solution>

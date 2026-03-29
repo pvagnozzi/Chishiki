@@ -1,0 +1,11 @@
+---
+name: dotnet-backend
+description: Curated set of agents, instructions, and skills for .NET backend development with C#, ASP.NET Core, and Orleans.
+tags: ["dotnet", "backend", "csharp", "aspnet", "orleans"]
+version: "1.0.0"
+---
+- Skill/csharp-async
+- Skill/csharp-xunit
+- Skill/ef-core
+- Skill/dotnet-best-practices
+- Instruction/csharp

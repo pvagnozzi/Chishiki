@@ -57,6 +57,10 @@
     "memory": {
       "type": "stdio",
       "command": "mcp-server-memory"
+    },
+    "hub": {
+      "type": "http",
+      "url": "http://localhost:5010/mcp"
     }
   }
 }
