@@ -1,6 +1,0 @@
-rate-limit: 25
-bulk-size: 25
-severity:
-  - critical
-  - high
-  - medium

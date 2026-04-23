@@ -1,50 +1,31 @@
 <Solution>
+
+  <!-- ── Repository files ──────────────────────────────────────────────── -->
   <Folder Name="/docs/">
     <File Path="docs/implementation-plan.md" />
   </Folder>
-  <Folder Name="/solution/">
-    <File Path=".github/copilot-instructions.md" />
+
+  <Folder Name="/solution/" />
+
+  <Folder Name="/solution/instructions/" />
+
+  <!-- ── src/mcp ── MCP Servers ────────────────────────────────────────── -->
+  <Folder Name="/src/mcp/">
+    <File Path="src/mcp/README.md" />
+    <Project Path="src/mcp/Chishiki.MCP.Host/Chishiki.MCP.Host.csproj" Id="d99ae567-f48e-46e3-87bc-14ae40f35dc2" />
   </Folder>
   <Folder Name="/src/" />
-  <Folder Name="/src/backend/">
-    <Project Path="src/backend/Chishiki.API.Web/Chishiki.API.Web.csproj" />
-    <Project Path="src/backend/Chishiki.Host/Chishiki.Host.csproj" Id="c39edbe9-fa1b-4b45-b546-59113c28a55e" />
-    <Project Path="src/backend/Chishiki.Hub/Chishiki.Hub.csproj" />
-  </Folder>
-  <Folder Name="/src/frontend/" />
-  <Folder Name="/src/infrastructure/" />
-  <Folder Name="/src/infrastructure/aspire/">
+
+  <!-- ── src/infrastructure ── Aspire AppHost + ServiceDefaults ──────── -->
+  <Folder Name="/src/infrastructure/">
+    <File Path="src/infrastructure/README.md" />
     <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.AppHost/Chishiki.Infrastructure.Aspire.AppHost.csproj" />
     <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.ServiceDefaults/Chishiki.Infrastructure.Aspire.ServiceDefaults.csproj" />
   </Folder>
+
+  <!-- ── src/shared ── Cross-cutting Primitives ───────────────────────── -->
   <Folder Name="/src/shared/">
-    <Project Path="src/shared/Chishiki.Core/Chishiki.Core.csproj" Id="d7cd2757-3cfe-4054-98f2-806ae310e067" />
-    <Project Path="src/shared/Chishiki.Hub.Contracts/Chishiki.Hub.Contracts.csproj" />
-    <Project Path="src/shared/Chishiki.Security.Contracts/Chishiki.Security.Contracts.csproj" />
+    <File Path="src/shared/README.md" />
   </Folder>
-  <Folder Name="/src/shared/clustering/">
-    <Project Path="src/shared/clustering/Chishiki.Clustering.Client/Chishiki.Clustering.Client.csproj" />
-    <Project Path="src/shared/clustering/Chishiki.Clustering.Server/Chishiki.Clustering.Server.csproj" />
-    <Project Path="src/shared/clustering/Chishiki.Clustering/Chishiki.Clustering.csproj" />
-  </Folder>
-  <Folder Name="/tests/" />
-  <Folder Name="/tests/backend/">
-    <Project Path="tests/backend/Chishiki.API.Web.IntegrationTests/Chishiki.API.Web.IntegrationTests.csproj" />
-    <Project Path="tests/backend/Chishiki.API.Web.UnitTests/Chishiki.API.Web.UnitTests.csproj" />
-    <Project Path="tests/backend/Chishiki.Hub.UnitTests/Chishiki.Hub.UnitTests.csproj" />
-  </Folder>
-  <Folder Name="/tests/infrastructure/" />
-  <Folder Name="/tests/infrastructure/aspire/">
-    <Project Path="tests/infrastructure/aspire/Chishiki.Infrastructure.Aspire.ServiceDefaults.UnitTests/Chishiki.Infrastructure.Aspire.ServiceDefaults.UnitTests.csproj" />
-  </Folder>
-  <Folder Name="/tests/shared/">
-    <Project Path="tests/shared/Chishiki.Core.UnitTests/Chishiki.Core.UnitTests.csproj" />
-    <Project Path="tests/shared/Chishiki.Hub.Contracts.UnitTests/Chishiki.Hub.Contracts.UnitTests.csproj" />
-    <Project Path="tests/shared/Chishiki.Security.Contracts.UnitTests/Chishiki.Security.Contracts.UnitTests.csproj" />
-  </Folder>
-  <Folder Name="/tests/shared/clustering/">
-    <Project Path="tests/shared/clustering/Chishiki.Clustering.Client.UnitTests/Chishiki.Clustering.Client.UnitTests.csproj" />
-    <Project Path="tests/shared/clustering/Chishiki.Clustering.Server.UnitTests/Chishiki.Clustering.Server.UnitTests.csproj" />
-    <Project Path="tests/shared/clustering/Chishiki.Clustering.UnitTests/Chishiki.Clustering.UnitTests.csproj" />
-  </Folder>
+
 </Solution>

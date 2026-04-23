@@ -8,4 +8,8 @@
     <UserSecretsId>c965bc15-72cc-47a9-be0d-041684f80851</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\mcp\Chishiki.MCP.Host\Chishiki.MCP.Host.csproj" />
+  </ItemGroup>
+
 </Project>

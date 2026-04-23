@@ -138,10 +138,10 @@ curl http://localhost:8080/metrics
 
 ```powershell
 # API only
-dotnet run --project .\src\backend\Chishiki.API.Web\Chishiki.API.Web.csproj
+dotnet run --project .\src\api\Chishiki.API.Web\Chishiki.API.Web.csproj
 
 # Orleans Silo only
-dotnet run --project .\src\backend\Chishiki.Host\Chishiki.Host.csproj
+dotnet run --project .\src\engine\Chishiki.Host\Chishiki.Host.csproj
 
 # Build entire solution
 dotnet build .\Chishiki.slnx
@@ -154,41 +154,52 @@ dotnet build .\Chishiki.slnx
 ```
 chishiki/
 ├── 📂 src/
-│   ├── 📂 backend/
-│   │   ├── Chishiki.API.Web/          # ASP.NET Core Minimal API
-│   │   └── Chishiki.Host/             # Orleans Silo Host
-│   ├── 📂 infrastructure/
-│   │   └── aspire/
-│   │       ├── AppHost/               # Aspire orchestration root
-│   │       └── ServiceDefaults/       # Shared OTel / health / resilience
-│   └── 📂 shared/
-│       ├── Chishiki.Core/             # Domain library
-│       └── clustering/
-│           ├── Chishiki.Clustering/         # Clustering interfaces
-│           ├── Chishiki.Clustering.Client/  # Orleans client
-│           └── Chishiki.Clustering.Server/  # Orleans server
+│   ├── 📂 api/
+│   │   └── Chishiki.API.Web/              # ASP.NET Core Minimal API
+│   ├── 📂 engine/
+│   │   ├── Chishiki.Host/                 # Orleans Silo Host
+│   │   └── 📂 clustering/
+│   │       ├── Chishiki.Clustering/           # Grain interface contracts
+│   │       ├── Chishiki.Clustering.Client/    # Orleans client extensions
+│   │       ├── Chishiki.Clustering.Server/    # Silo-side grain registration
+│   │       ├── Chishiki.Hub/                  # Developer Hub MCP server
+│   │       └── Chishiki.Hub.Contracts/        # Hub DTOs + IHubResourceService
+│   ├── 📂 security/
+│   │   └── Chishiki.Security.Contracts/   # Security finding types + IScannerService
+│   ├── 📂 shared/
+│   │   ├── Chishiki.Abstractions/         # Result<T>, Error, PagedResult<T>
+│   │   └── Chishiki.Core/                 # DDD primitives (Entity, AggregateRoot…)
+│   └── 📂 infrastructure/
+│       └── aspire/
+│           ├── AppHost/                   # Aspire orchestration root
+│           └── ServiceDefaults/           # Shared OTel / health / resilience
 │
-├── 📂 containers/                     # Docker images & configs
-│   ├── grafana/                       # Dashboards + provisioning
-│   ├── keycloak/                      # Realm + custom theme
-│   ├── ollama/                        # LLM entrypoint script
-│   ├── postgresql/                    # pgvector init scripts
-│   ├── prometheus/                    # Scrape config
-│   ├── qdrant/                        # Vector DB config
-│   └── redis/                         # AOF + RDB config
+├── 📂 tests/                              # Mirrors src/ topic layout
+│   ├── api/
+│   ├── engine/clustering/
+│   ├── security/
+│   ├── shared/
+│   └── infrastructure/
 │
-├── 📂 infrastructure/
-│   ├── containers/                    # Docker Compose (dev)
-│   └── helm/                          # Kubernetes Helm charts
+├── 📂 containers/                         # Docker images & configs
+│   ├── grafana/                           # Dashboards + provisioning
+│   ├── keycloak/                          # Realm + custom theme
+│   ├── ollama/                            # LLM entrypoint script
+│   ├── postgresql/                        # pgvector init scripts
+│   ├── prometheus/                        # Scrape config
+│   ├── qdrant/                            # Vector DB config
+│   └── redis/                             # AOF + RDB config
 │
-├── 📂 docs/                           # Architecture & ADRs
-├── 📂 tests/                          # Test projects (TBD)
+├── 📂 docs/                               # Architecture & ADRs
+├── 📂 hub/                                # Hub seed data & templates
+│   ├── seed/
+│   └── templates/
 │
-├── .editorconfig                      # Coding standards
-├── .gitattributes                     # Line ending rules
-├── .gitignore                         # Build & secret exclusions
-├── .mcp.json                          # MCP server configuration
-├── Chishiki.slnx                      # Solution file (.NET 10 format)
+├── .editorconfig                          # Coding standards
+├── .gitattributes                         # Line ending rules
+├── .gitignore                             # Build & secret exclusions
+├── .mcp.json                              # MCP server configuration
+├── Chishiki.slnx                          # Solution file (.NET 10 format)
 └── README.md
 ```
 

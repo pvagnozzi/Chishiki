@@ -54,46 +54,16 @@ var ollama = builder.AddDockerfile("ollama", "../../../../containers/ollama")
     .WithEnvironment("OLLAMA_DEFAULT_MODEL", "nomic-embed-text")
     .WithVolume("ollama-data", "/root/.ollama");
 
-// ── Orleans Silo Host ────────────────────────────────────────────────────────
-builder.AddDockerfile("chishiki-host", "../../../../", "src/backend/Chishiki.Host/Dockerfile")
-    .WithEndpoint(port: 11111, targetPort: 11111, name: "silo", scheme: "tcp")
-    .WithEndpoint(port: 30000, targetPort: 30000, name: "gateway", scheme: "tcp")
-    .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
-    .WithEnvironment("ConnectionStrings__redis", "redis:6379")
-    .WaitFor(redis)
-    .WaitFor(postgres);
-
-// ── API Web ──────────────────────────────────────────────────────────────────
-var apiWeb = builder.AddDockerfile("chishiki-api-web", "../../../../", "src/backend/Chishiki.API.Web/Dockerfile")
-    .WithHttpEndpoint(port: 8080, targetPort: 8080, name: "http")
-    .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
-    .WithEnvironment("ASPNETCORE_HTTP_PORTS", "8080")
-    .WithEnvironment("ASPNETCORE_URLS", "http://+:8080")
-    .WaitFor(postgres)
-    .WaitFor(redis)
-    .WaitFor(keycloak)
-    .WaitFor(qdrant)
-    .WaitFor(ollama);
-
-// ── Hub MCP server ───────────────────────────────────────────────────────────
-builder.AddDockerfile("chishiki-hub", "../../../../", "src/backend/Chishiki.Hub/Dockerfile")
-    .WithHttpEndpoint(port: 5010, targetPort: 5010, name: "http")
-    .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
-    .WithEnvironment("ASPNETCORE_HTTP_PORTS", "5010")
-    .WithEnvironment("ASPNETCORE_URLS", "http://+:5010")
-    .WithEnvironment("HUB_ROOT", "/hub-root")
-    .WithBindMount("../../../../", "/hub-root", isReadOnly: true);
-
 // ── Security scanners (opt-in via CHISHIKI_SECURITY_PROFILE=true) ────────────
 if (builder.Configuration["CHISHIKI_SECURITY_PROFILE"] == "true")
 {
     // SAST: Semgrep — static analysis across all source files
-    builder.AddDockerfile("semgrep", "../../../../containers/semgrep")
+    _ = builder.AddDockerfile("semgrep", "../../../../containers/semgrep")
            .WithBindMount("../../../../", "/src", isReadOnly: true)
            .WithVolume("scan-semgrep-output", "/output");
 
     // SAST: SonarQube — multi-language code quality and security
-    builder.AddDockerfile("sonarqube", "../../../../containers/sonarqube")
+    _ = builder.AddDockerfile("sonarqube", "../../../../containers/sonarqube")
            .WithHttpEndpoint(port: 9000, targetPort: 9000, name: "http")
            .WithEnvironment("SONAR_JDBC_URL", "jdbc:postgresql://postgresql:5432/sonarqube")
            .WithEnvironment("SONAR_JDBC_USERNAME", "chishiki")
@@ -104,61 +74,61 @@ if (builder.Configuration["CHISHIKI_SECURITY_PROFILE"] == "true")
            .WaitFor(postgres);
 
     // SCA: OWASP Dependency-Check — NuGet package CVE scanning
-    builder.AddDockerfile("dependency-check", "../../../../containers/dependency-check")
+    _ = builder.AddDockerfile("dependency-check", "../../../../containers/dependency-check")
            .WithBindMount("../../../../", "/src", isReadOnly: true)
            .WithVolume("scan-dependency-check-output", "/output");
 
     // SCA + containers: Trivy — filesystem and image vulnerability scanning
-    builder.AddDockerfile("trivy", "../../../../containers/trivy")
+    _ = builder.AddDockerfile("trivy", "../../../../containers/trivy")
            .WithBindMount("/var/run/docker.sock", "/var/run/docker.sock", isReadOnly: true)
            .WithBindMount("../../../../", "/src", isReadOnly: true)
            .WithVolume("scan-trivy-output", "/output");
 
     // Secret scanning: gitleaks — detect secrets in git history and working tree
-    builder.AddDockerfile("gitleaks", "../../../../containers/gitleaks")
+    _ = builder.AddDockerfile("gitleaks", "../../../../containers/gitleaks")
            .WithBindMount("../../../../", "/path", isReadOnly: true)
            .WithVolume("scan-gitleaks-output", "/output");
 
     // SBOM generation: Syft — produce CycloneDX SBOM from source and images
-    builder.AddDockerfile("syft", "../../../../containers/syft")
+    _ = builder.AddDockerfile("syft", "../../../../containers/syft")
            .WithBindMount("/var/run/docker.sock", "/var/run/docker.sock", isReadOnly: true)
            .WithBindMount("../../../../", "/src", isReadOnly: true)
            .WithVolume("scan-syft-output", "/output");
 
     // SCA: Grype — vulnerability scan against Syft SBOM and filesystem
-    builder.AddDockerfile("grype", "../../../../containers/grype")
+    _ = builder.AddDockerfile("grype", "../../../../containers/grype")
            .WithBindMount("/var/run/docker.sock", "/var/run/docker.sock", isReadOnly: true)
            .WithBindMount("../../../../", "/src", isReadOnly: true)
            .WithVolume("scan-grype-output", "/output");
 
     // Binary analysis: BinSkim — PE/ELF binary security checks on build output
-    builder.AddDockerfile("binskim", "../../../../containers/binskim")
+    _ = builder.AddDockerfile("binskim", "../../../../containers/binskim")
            .WithBindMount("../../../../", "/src", isReadOnly: true)
            .WithVolume("scan-binskim-output", "/output");
 
     // DAST: Nuclei — template-driven HTTP vulnerability probes
-    builder.AddDockerfile("nuclei", "../../../../containers/nuclei")
+    _ = builder.AddDockerfile("nuclei", "../../../../containers/nuclei")
            .WithEnvironment("NUCLEI_TARGET", "http://chishiki-api-web:8080")
-           .WithVolume("scan-nuclei-output", "/output")
-           .WaitFor(apiWeb);
+           .WithVolume("scan-nuclei-output", "/output");
 
     // DAST: SQLMap — automated SQL injection detection
-    builder.AddDockerfile("sqlmap", "../../../../containers/sqlmap")
+    _ = builder.AddDockerfile("sqlmap", "../../../../containers/sqlmap")
            .WithEnvironment("SQLMAP_TARGET", "http://chishiki-api-web:8080")
            .WithVolume("scan-sqlmap-output", "/output")
-           .WaitFor(apiWeb)
            .WaitFor(postgres);
 
     // DAST: OWASP ZAP — active web application security scanner
-    builder.AddDockerfile("zap", "../../../../containers/zap")
-           .WithHttpEndpoint(port: 8090, targetPort: 8090, name: "http")
-           .WaitFor(apiWeb);
+    _ = builder.AddDockerfile("zap", "../../../../containers/zap")
+           .WithHttpEndpoint(port: 8090, targetPort: 8090, name: "http");
 
     // Fuzzing: ffuf — HTTP endpoint fuzzing with common wordlist
-    builder.AddDockerfile("ffuf", "../../../../containers/ffuf")
+    _ = builder.AddDockerfile("ffuf", "../../../../containers/ffuf")
            .WithEnvironment("FFUF_TARGET", "http://chishiki-api-web:8080/FUZZ")
-           .WithVolume("scan-ffuf-output", "/output")
-           .WaitFor(apiWeb);
+           .WithVolume("scan-ffuf-output", "/output");
 }
+
+// ── Chishiki MCP Host ────────────────────────────────────────────────────────
+builder.AddProject<Projects.Chishiki_MCP_Host>("chishiki-mcp")
+    .WithHttpEndpoint(port: 5010, name: "http");
 
 builder.Build().Run();
