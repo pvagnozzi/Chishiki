@@ -7,7 +7,9 @@
 
   <Folder Name="/solution/" />
 
-  <Folder Name="/solution/instructions/" />
+  <Folder Name="/solution/instructions/">
+    <File Path=".github/copilot-instructions.md" />
+  </Folder>
 
   <!-- ── src/mcp ── MCP Servers ────────────────────────────────────────── -->
   <Folder Name="/src/mcp/">
@@ -26,6 +28,11 @@
   <!-- ── src/shared ── Cross-cutting Primitives ───────────────────────── -->
   <Folder Name="/src/shared/">
     <File Path="src/shared/README.md" />
+  </Folder>
+  <Folder Name="/src/shared/core/">
+    <Project Path="src/shared/core/Chishiki.Core/Chishiki.Core.csproj" Id="c90e4349-3920-452e-bdfc-9e7913596ff6" />
+    <Project Path="src/shared/core/Chishiki.Data.EFCore/Chishiki.Data.EFCore.csproj" Id="3d6b1185-b409-44e9-931b-912b9d392394" />
+    <Project Path="src/shared/core/Chishiki.Data/Chishiki.Data.csproj" Id="50d94f6a-16fb-4cab-a1ca-e78305be1052" />
   </Folder>
 
 </Solution>
