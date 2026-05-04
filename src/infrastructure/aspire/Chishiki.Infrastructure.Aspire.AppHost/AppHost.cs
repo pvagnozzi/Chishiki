@@ -1,6 +1,26 @@
+﻿// -----------------------------------------------------------------------------
+// File:        AppHost.cs
+// Author:      Piergiorgio Vagnozzi
+// Description: Aspire AppHost entry point — declares and wires all Chishiki infrastructure containers and services.
+// Created:     2026-04-26
+// Modified:    2026-05-04
+// -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
-
+// --------- ----------
+/// <summary>Aspire AppHost that orchestrates all Chishiki infrastructure services.</summary>
+/// <remarks>
+/// This application uses Aspire to declare and wire:
+/// - PostgreSQL with pgvector extension for vector search
+/// - Redis for caching and Orleans persistence
+/// - Keycloak for OIDC authentication
+/// - Prometheus for metrics collection
+/// - Grafana for visualization
+/// - Qdrant for vector database (RAG pipelines)
+/// - Ollama for local LLM inference (embeddings)
+/// - Optional security scanners (SAST, DAST, SCA, secrets, SBOM) when CHISHIKI_SECURITY_PROFILE=true
+/// - Chishiki MCP Host server
+/// </remarks>
 var builder = DistributedApplication.CreateBuilder(args);
 
 // ── PostgreSQL + pgvector ────────────────────────────────────────────────────

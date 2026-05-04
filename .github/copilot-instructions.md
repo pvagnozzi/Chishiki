@@ -13,6 +13,7 @@
 - [🔨 Build, Test and Run](#-build-test-and-run)
 - [📐 Design Principles](#-design-principles)
 - [📁 File Header Convention](#-file-header-convention)
+- [📝 XML Documentation](#-xml-documentation)
 - [🧩 MCP Tool Conventions](#-mcp-tool-conventions)
 - [🌾 Orleans Grain Conventions](#-orleans-grain-conventions)
 - [📚 Kernel Memory Integration](#-kernel-memory-integration)
@@ -160,7 +161,7 @@ dotnet run --project .\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppH
 | Grafana | http://localhost:3000 |
 | Keycloak | http://localhost:8180 |
 
-> 💡 Infrastructure containers use `builder.AddDockerfile("name", "../../../../containers/<name>")` in `AppHost.cs` —
+> 💡 Infrastructure containers use `builder.AddDockerfile("name", '../../../../containers/<name>')` in `AppHost.cs` —
 > not Aspire built-in helpers. The root `.mcp.json` registers the MCP server for VS 2026 / GitHub Copilot.
 
 ---
@@ -198,6 +199,8 @@ src/mcp/Chishiki.MCP.Host/
 
 ## 📁 File Header Convention
 
+> 🚫 **Mandatory** — every `.cs` file without exception must start with this header. PRs missing it will be rejected.
+
 Every `.cs` file **must** begin with this exact header:
 
 ```csharp
@@ -216,8 +219,62 @@ Every `.cs` file **must** begin with this exact header:
 **Rules:**
 - `File:` matches the physical filename including extension.
 - `Description:` is a single clear sentence — never blank, never "TODO".
-- `Modified:` is updated on every meaningful change.
+- `Modified:` is updated on every meaningful change to the file.
+- All text is in **English** — no other languages.
 - The three copyright lines are verbatim — do not alter them.
+- Auto-generated files under `obj/` are exempt.
+
+### Standardization of File Headers
+
+- All files in **Chishiki.Core** and **Chishiki.Data** must adhere to the standard file header format.
+- Ensure XML documentation is complete for all members in these files.
+
+---
+
+## 📝 XML Documentation
+
+> 🚫 **Mandatory** — every type, member, and parameter **must** carry an XML doc comment. No exceptions.
+
+### Rules
+
+| Target | Requirement |
+|---|---|
+| Classes / interfaces / records / enums | `<summary>` — one clear sentence describing purpose |
+| Public & internal methods | `<summary>` + `<param>` for every parameter + `<returns>` if non-void |
+| Private methods (incl. `[LoggerMessage]` partials) | `<summary>` — one sentence |
+| Properties | `<summary>` — one sentence |
+| Constructor parameters (primary constructors) | Document on the class `<summary>` if self-evident; otherwise add `<param>` |
+| Exceptions thrown | `<exception cref="ExType">` when explicitly thrown |
+| `CancellationToken` parameters | `<param name="cancellationToken">Token to observe for cancellation.</param>` |
+
+### Examples
+
+```csharp
+/// <summary>Provides a disposable base class with structured logging for managed and unmanaged resource cleanup.</summary>
+public abstract partial class Disposable : IDisposable
+{
+    /// <summary>Gets the logger used to emit disposal diagnostics.</summary>
+    protected ILogger Logger { get; }
+
+    /// <summary>Releases managed resources. Override to dispose owned <see cref="IDisposable"/> members.</summary>
+    protected virtual void DisposeManaged() { }
+
+    /// <summary>Releases unmanaged resources. Override only when holding raw OS handles.</summary>
+    protected virtual void DisposeUnmanaged() { }
+}
+```
+
+```csharp
+/// <summary>Returns version and build metadata for the running Chishiki MCP server.</summary>
+/// <param name="cancellationToken">Token to observe for cancellation.</param>
+/// <returns>JSON object with <c>name</c>, <c>version</c>, <c>framework</c>, and <c>buildTime</c> fields.</returns>
+public Task<string> GetServerInfoAsync(CancellationToken cancellationToken = default) { ... }
+```
+
+- All doc text is in **English**.
+- `<summary>` must be a complete sentence ending with a period.
+- Never leave `<summary>` empty or with placeholder text such as "TODO".
+- Use `<see cref="..."/>` to cross-reference types and members.
 
 ---
 
@@ -244,7 +301,7 @@ Tools and prompts are auto-discovered via `WithToolsFromAssembly()` + `WithPromp
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------- 
 
 using System.ComponentModel;
 using System.Text.Json;
@@ -412,6 +469,7 @@ internal static partial class Log
 ## 🎨 Code Style
 
 - Follow `.editorconfig` — max line length **120**.
+- All comments and documentation are written in **English**.
 - File-scoped namespaces: `namespace Chishiki.MCP.Host.Tools;`
 - Primary constructors for DI.
 - Expression-bodied members for single-line implementations.
@@ -419,6 +477,10 @@ internal static partial class Log
 - Prefer `System.Text.Json` over `Newtonsoft.Json` everywhere.
 - `System` usings sorted first (`dotnet_sort_system_directives_first = true`).
 - No `this.` qualifier unless required for disambiguation.
+
+### Namespace Standardization
+
+- All namespaces must follow the format `Chishiki.<Layer>.<Subdomain>` (e.g., `Chishiki.Data.Abstractions`, `Chishiki.Data.Specifications`, `Chishiki.Core`).
 
 ---
 
@@ -445,3 +507,5 @@ dotnet test .\Chishiki.slnx --filter "FullyQualifiedName~RagQueryTools"
 - Orleans clustering on K8s uses the Redis provider.
 - Health probes: `/health` (readiness) and `/alive` (liveness) — wired by `ServiceDefaults`, referenced in every deployment manifest.
 - Resource naming: `chishiki-<service>` (e.g., `chishiki-mcp`, `chishiki-engine`, `chishiki-api`).
+
+---

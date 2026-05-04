@@ -1,6 +1,13 @@
+﻿// -----------------------------------------------------------------------------
+// File:        ChishikiSystemTools.cs
+// Author:      Piergiorgio Vagnozzi
+// Description: MCP tools exposing system-level metadata and capability information for the Chishiki MCP server.
+// Created:     2026-04-26
+// Modified:    2026-05-04
+// -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
-
+// -----------------------------------------------------------------------------
 using System.ComponentModel;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
@@ -8,17 +15,20 @@ using ModelContextProtocol.Server;
 
 namespace Chishiki.MCP.Host.Tools;
 
-/// <summary>
-/// MCP tools exposing system-level information about the Chishiki MCP server.
+/// <summary>MCP tools exposing system-level information about the Chishiki MCP server.</summary>
+/// <remarks>
 /// These are starter tools; domain-specific tools (Hub, RAG, Security) will be
 /// added in subsequent development phases.
-/// </summary>
+/// </remarks>
+/// <param name="logger">Logger injected by the DI container.</param>
 [McpServerToolType]
 internal sealed partial class ChishikiSystemTools(ILogger<ChishikiSystemTools> logger)
 {
+    /// <summary>Emits a debug log entry when an MCP tool is invoked.</summary>
     [LoggerMessage(Level = LogLevel.Debug, Message = "MCP tool '{ToolName}' invoked")]
     private partial void LogToolInvoked(string toolName);
 
+    /// <summary>Emits a debug log entry when an MCP tool completes successfully.</summary>
     [LoggerMessage(Level = LogLevel.Debug, Message = "MCP tool '{ToolName}' completed successfully")]
     private partial void LogToolCompleted(string toolName);
 
