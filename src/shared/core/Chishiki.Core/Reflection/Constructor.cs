@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 using System.Linq.Expressions;
 
-namespace Chishiki.Core;
+namespace Chishiki.Reflection;
 
 /// <summary>Provides compiled constructor invocation for creating instances of type <typeparamref name="TResult"/> with a single argument.</summary>
 /// <typeparam name="T1">The type of the first constructor argument.</typeparam>

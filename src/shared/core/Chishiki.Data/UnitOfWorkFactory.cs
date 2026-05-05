@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        UnitOfWorkFactory.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Abstract factory for creating Unit of Work instances.
@@ -11,7 +11,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-using Chishiki.Core;
+using Chishiki;
 using Chishiki.Data.Abstractions;
 
 namespace Chishiki.Data;

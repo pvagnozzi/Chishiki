@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Chishiki.Core;
+namespace Chishiki.Configuration;
 
 /// <summary>Extension methods for <see cref="IConfiguration"/> and <see cref="IServiceProvider"/> providing typed configuration binding.</summary>
 public static class ConfigurationExtensions

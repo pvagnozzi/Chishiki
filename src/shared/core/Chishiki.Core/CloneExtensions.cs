@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 using System.Text.Json;
 
-namespace Chishiki.Core;
+namespace Chishiki;
 
 /// <summary>Extension methods for deep-cloning objects via JSON serialization.</summary>
 public static class ExtensionMethods

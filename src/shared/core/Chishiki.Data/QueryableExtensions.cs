@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        QueryableExtensions.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Extension methods for LINQ query operations on IQueryable.
@@ -8,13 +8,14 @@
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
-using Chishiki.Core;
+using Chishiki;
 using System.Linq.Expressions;
 using Chishiki.Data.Specifications;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Diagnostics;
 using Chishiki.Data.Models;
+using Chishiki.Reflection;
 
 namespace Chishiki.Data;
 

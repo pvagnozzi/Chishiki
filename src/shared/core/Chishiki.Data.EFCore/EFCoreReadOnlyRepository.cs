@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EFCoreReadOnlyRepository.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: EF Core implementation of a read-only repository using DbContext.
@@ -8,7 +8,7 @@
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
-using Chishiki.Core;
+using Chishiki;
 using Chishiki.Data.Abstractions;
 using Chishiki.Data.Models;
 using Chishiki.Data.Specifications;

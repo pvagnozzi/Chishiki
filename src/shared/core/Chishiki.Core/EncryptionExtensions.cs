@@ -11,7 +11,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Chishiki.Core;
+namespace Chishiki;
 
 /// <summary>Extension methods for AES-based string encryption and decryption.</summary>
 public static class EncryptionExtension

@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 using System.Diagnostics;
 
-namespace Chishiki.Core;
+namespace Chishiki;
 
 /// <summary>Extension methods for <see cref="IDictionary{TKey, TValue}"/> providing safe value retrieval.</summary>
 public static class DictionaryExtensions

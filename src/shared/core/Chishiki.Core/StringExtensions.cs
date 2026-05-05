@@ -8,7 +8,7 @@
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
-namespace Chishiki.Core;
+namespace Chishiki;
 
 /// <summary>Extension methods for string manipulation including capitalization and GUID conversion.</summary>
 public static class StringExtensions

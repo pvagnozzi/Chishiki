@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        DataSeeder.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Abstract base class for seeding initial data into repositories.
@@ -8,7 +8,7 @@
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
-using Chishiki.Core;
+using Chishiki.Services;
 using Chishiki.Data.Abstractions;
 using Chishiki.Data.Models;
 using Microsoft.Extensions.Logging;

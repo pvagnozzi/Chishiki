@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        AnnotationExtensions.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Extension methods for reading annotation attributes and building property settings metadata.
@@ -8,7 +8,7 @@
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
-using Chishiki.Core;
+using Chishiki.Reflection;
 using Chishiki.Data.Query;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;

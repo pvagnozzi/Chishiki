@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 using System.Security.Claims;
 
-namespace Chishiki.Core;
+namespace Chishiki;
 
 /// <summary>
 /// Claims Extensions.

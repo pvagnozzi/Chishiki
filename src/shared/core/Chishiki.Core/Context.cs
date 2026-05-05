@@ -8,7 +8,7 @@
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
-namespace Chishiki.Core;
+namespace Chishiki;
 
 /// <summary>Base record implementation for application context objects carrying request-scoped data.</summary>
 public record Context : IContext;

@@ -33,6 +33,7 @@
     <Project Path="src/shared/core/Chishiki.Core/Chishiki.Core.csproj" Id="c90e4349-3920-452e-bdfc-9e7913596ff6" />
     <Project Path="src/shared/core/Chishiki.Data.EFCore/Chishiki.Data.EFCore.csproj" Id="3d6b1185-b409-44e9-931b-912b9d392394" />
     <Project Path="src/shared/core/Chishiki.Data/Chishiki.Data.csproj" Id="50d94f6a-16fb-4cab-a1ca-e78305be1052" />
+    <Project Path="src/shared/core/Chishiki.Mapping/Chishiki.Mapping.csproj" Id="19db25c1-89e9-4354-b4cd-236688e100a1" />
   </Folder>
 
 </Solution>

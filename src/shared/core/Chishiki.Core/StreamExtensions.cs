@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 using System.Text;
 
-namespace Chishiki.Core;
+namespace Chishiki;
 
 /// <summary>Extension methods for streams and byte arrays providing string/byte encoding conversions.</summary>
 public static class StreamExtensions

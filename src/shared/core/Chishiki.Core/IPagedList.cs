@@ -8,7 +8,7 @@
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
-namespace Chishiki.Core;
+namespace Chishiki;
 
 /// <summary>Represents a paginated list result set with metadata about page count and total items.</summary>
 /// <typeparam name="T">The type of items in the paginated list.</typeparam>

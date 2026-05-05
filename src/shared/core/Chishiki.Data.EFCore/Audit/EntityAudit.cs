@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EntityAudit.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Audit entity that records changes to other entities with user ID, entity name, ID, action, and property changes.
@@ -9,7 +9,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
-using Chishiki.Core;
+using Chishiki;
 using Chishiki.Data.Audit;
 using Chishiki.Data.EFCore.Models;
 using System.ComponentModel.DataAnnotations;

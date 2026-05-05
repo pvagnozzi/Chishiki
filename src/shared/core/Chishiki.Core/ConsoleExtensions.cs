@@ -11,7 +11,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace Chishiki.Core;
+namespace Chishiki;
 
 /// <summary>Extension methods for colored console output and JSON pretty-printing.</summary>
 public static class ConsoleExtensions

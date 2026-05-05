@@ -11,7 +11,7 @@
 
 using Microsoft.Extensions.Logging;
 
-namespace Chishiki.Core;
+namespace Chishiki.Logging;
 
 /// <summary>Marker interface for components that expose a structured logger.</summary>
 public interface ILoggable

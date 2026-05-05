@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 using System.Reflection;
 
-namespace Chishiki.Core;
+namespace Chishiki;
 
 /// <summary>Extension methods for Assembly resource management and embedded text retrieval.</summary>
 public static class ResourceExtensions

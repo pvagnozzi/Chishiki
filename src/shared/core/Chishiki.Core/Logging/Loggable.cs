@@ -11,7 +11,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Chishiki.Core;
+namespace Chishiki.Logging;
 
 /// <summary>Abstract base class implementing <see cref="ILoggable"/> with lazy logger creation via <see cref="ILoggerFactory"/>.</summary>
 /// <param name="logger">Optional logger used to record diagnostic and operational messages. Defaults to <see cref="NullLogger.Instance"/> when not provided.</param>

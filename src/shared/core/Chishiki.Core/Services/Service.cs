@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 using Microsoft.Extensions.Logging;
 
-namespace Chishiki.Core;
+namespace Chishiki.Services;
 
 /// <summary>Concrete implementation of a service providing structured logging and asynchronous resource cleanup.</summary>
 /// <remarks>

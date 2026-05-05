@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EFBaseEntity.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Abstract base entity class for all EF Core entities with Id, CreatedOn, and UpdatedOn properties.
@@ -9,7 +9,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
-using Chishiki.Core;
+using Chishiki;
 using Chishiki.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

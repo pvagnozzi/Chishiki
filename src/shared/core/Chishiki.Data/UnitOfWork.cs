@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        UnitOfWork.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Abstract base class implementing the Unit of Work pattern with async disposal.
@@ -8,7 +8,7 @@
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
-using Chishiki.Core;
+using Chishiki;
 using Chishiki.Data.Abstractions;
 using Chishiki.Data.Audit;
 using Chishiki.Data.Models;

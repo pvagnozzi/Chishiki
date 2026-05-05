@@ -8,7 +8,7 @@
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
-namespace Chishiki.Core;
+namespace Chishiki.Configuration;
 
 /// <summary>Exception thrown when configuration is missing, invalid, or cannot be loaded.</summary>
 /// <param name="message">The exception message describing the configuration issue.</param>

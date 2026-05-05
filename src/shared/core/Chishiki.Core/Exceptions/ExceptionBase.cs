@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 using System.Diagnostics.CodeAnalysis;
 
-namespace Chishiki.Core;
+namespace Chishiki.Exceptions;
 
 /// <summary>Abstract base exception class providing correlation identifier tracking for distributed systems.</summary>
 /// <param name="message">The exception message.</param>

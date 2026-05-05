@@ -12,7 +12,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Chishiki.Core;
+namespace Chishiki.Reflection;
 
 /// <summary>Extension methods for reflection-based type inspection, type classification, and method invocation.</summary>
 public static class ReflectionExtensions
