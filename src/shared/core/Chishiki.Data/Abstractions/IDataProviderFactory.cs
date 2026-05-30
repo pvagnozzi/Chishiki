@@ -10,14 +10,10 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Abstractions;
 
-/// <summary>
-/// Data provider factory interface.
-/// </summary>
+/// <summary>Data provider factory interface.</summary>
 public interface IDataProviderFactory : IDisposable
 {
-    /// <summary>
-    /// Creates the data provider.
-    /// </summary>
+    /// <summary>Creates the data provider. .</summary>
     /// <returns>Data provider.</returns>
     IDataProvider CreateDataProvider();
 }

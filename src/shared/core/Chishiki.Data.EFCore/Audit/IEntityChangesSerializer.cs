@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        IEntityChangesSerializer.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Interface for serializing entity changes to audit records.
@@ -14,14 +14,10 @@ using Chishiki.Data.Audit;
 
 namespace Chishiki.Data.EFCore.Audit;
 
-/// <summary>
-/// Serializer interface for handling and persisting entity audit changes.
-/// </summary>
+/// <summary>Serializer interface for handling and persisting entity audit changes.</summary>
 public interface IEntityChangesSerializer
 {
-    /// <summary>
-    /// Handles and persists a collection of audit entity changes asynchronously.
-    /// </summary>
+    /// <summary>Handles and persists a collection of audit entity changes asynchronously. .</summary>
     /// <typeparam name="TEntityAudit">The audit entity type implementing IEntityAudit.</typeparam>
     /// <param name="unitOfWork">The unit of work to use for persisting audit records.</param>
     /// <param name="changes">The collection of audit entities to persist.</param>

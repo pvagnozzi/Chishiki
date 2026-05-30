@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EFCoreUnitOfWork.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: EF Core implementation of the Unit of Work pattern wrapping a DbContext.
@@ -14,8 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Chishiki.Data.EFCore;
 
-/// <summary>EF Core Unit of Work that coordinates repository instances over a shared <see cref="DbContext"/> and
-/// flushes all pending changes in a single <c>SaveChangesAsync</c> call.</summary>
+/// <summary>EF Core Unit of Work that coordinates repository instances over a shared <see cref="DbContext"/> and flushes all pending changes in a single <c>SaveChangesAsync</c> call.</summary>
 internal sealed partial class EFCoreUnitOfWork(
     DbContext context,
     IRepositoryMapper repositoryMapper,

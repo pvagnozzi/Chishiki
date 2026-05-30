@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        PropertyAudit.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Immutable record representing a property audit entry with property name and old/new values.
@@ -13,9 +13,7 @@ using Chishiki.Data.Audit;
 
 namespace Chishiki.Data.EFCore.Audit;
 
-/// <summary>
-/// Immutable audit record representing a change to a single entity property with old and new values.
-/// </summary>
+/// <summary>Immutable audit record representing a change to a single entity property with old and new values.</summary>
 /// <param name="PropertyName">The name of the property that was changed.</param>
 /// <param name="OldValue">The value of the property before the change, or null if not available.</param>
 /// <param name="NewValue">The value of the property after the change, or null if not available.</param>

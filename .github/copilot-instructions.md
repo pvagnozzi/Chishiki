@@ -4,10 +4,15 @@
 > **Model Context Protocol (MCP) server**, built on **.NET 10**, **Microsoft Orleans**, **.NET Aspire**,
 > and **Microsoft Kernel Memory**. Designed for on-premises or Azure deployment, including **Kubernetes**.
 
+> Pi users should start from the repo-local guidance in `skills/chishiki-repo-conventions/SKILL.md` and its
+> reference files. Those Pi resources are the maintained conversion of these repository conventions for Pi-based
+> workflows.
+
 ---
 
 ## 📋 Table of Contents
 
+- [🤖 Pi Guidance](#-pi-guidance)
 - [🏗️ Architecture](#-architecture)
 - [🗂️ Repository Layout](#-repository-layout)
 - [🔨 Build, Test and Run](#-build-test-and-run)
@@ -16,6 +21,7 @@
 - [📝 XML Documentation](#-xml-documentation)
 - [🧩 MCP Tool Conventions](#-mcp-tool-conventions)
 - [🌾 Orleans Grain Conventions](#-orleans-grain-conventions)
+- [👷 Worker Pattern: External Long-Running Services](#-worker-pattern-external-long-running-services)
 - [📚 Kernel Memory Integration](#-kernel-memory-integration)
 - [🪵 Logging](#-logging)
 - [💉 Dependency Injection](#-dependency-injection)
@@ -23,6 +29,19 @@
 - [🎨 Code Style](#-code-style)
 - [🧪 Testing](#-testing)
 - [☸️ Kubernetes](#-kubernetes)
+
+---
+
+## 🤖 Pi Guidance
+
+If you are working in this repository with Pi, prefer these repo-local resources first:
+
+- `skills/chishiki-repo-conventions/SKILL.md`
+- `skills/chishiki-repo-conventions/references/architecture-layout-and-build.md`
+- `skills/chishiki-repo-conventions/references/csharp-conventions.md`
+
+They capture the Pi-compatible version of the repository conventions, including the current project layout, build
+commands, file header format, and XML documentation expectations.
 
 ---
 
@@ -361,31 +380,252 @@ internal sealed partial class RagQueryTools(
 
 ## 🌾 Orleans Grain Conventions
 
+### Architecture: Distributed Event-Driven Streaming
+
+The system follows a strict streaming-first architecture:
+
+```
+Client → Orleans Grain → (trigger worker) → Worker (Ollama) → Kafka topic (llm-tokens)
+  → Orleans Streams (Kafka provider) → Grain (subscriber) → Client
+```
+
+**Core principles:**
+- Orleans grains are **orchestration and state holders only**
+- Long-running I/O (LLM calls) **MUST NOT** execute inside grains
+- All worker ↔ grain communication uses **Orleans Streams backed by Kafka**
+- System is **streaming-first** (token-by-token), not batch-based
+
+### Grain Rules
+
 - **Grain interfaces** in `Chishiki.Clustering` — no implementation, no infra dependencies.
 - **Implementations** in `Chishiki.Clustering.Server`.
 - **Client helpers** (`IGrainFactory` extensions) in `Chishiki.Clustering.Client`.
 - Use `IGrainWithStringKey` or `IGrainWithGuidKey` — choose one per domain, never mix.
-- All grain methods: `Task<T>` or `ValueTask<T>` — no synchronous grain methods.
+- **All grain methods: `Task<T>` or `ValueTask<T>`** — no synchronous grain methods.
+- Grains that receive stream events **MUST be marked with `[Reentrant]`**.
 - Grain state stored in Redis (`[StorageName("Default")]`).
 - Cluster: `ClusterId = "chishiki-cluster"`, `ServiceId = "chishiki"`, Silo `11111`, Gateway `30000`.
 
+### Streaming Configuration
+
+```csharp
+// In grain OnActivateAsync:
+var streamProvider = GetStreamProvider("kafka-stream");
+var stream = streamProvider.GetStream<LlmToken>("llm-tokens", this.GetPrimaryKeyAsGuid());
+await stream.SubscribeAsync<LlmToken>(OnTokenReceivedAsync);
+```
+
+**Grain token buffer:**
+```csharp
+private Dictionary<Guid, StringBuilder> _tokenBuffers = new();
+
+private Task OnTokenReceivedAsync(LlmToken token)
+{
+    if (!_tokenBuffers.ContainsKey(token.JobId))
+        _tokenBuffers[token.JobId] = new();
+
+    _tokenBuffers[token.JobId].Append(token.Text);
+    return Task.CompletedTask;
+}
+
+public Task<string> GetResultAsync(Guid jobId) => 
+    Task.FromResult(_tokenBuffers.GetValueOrDefault(jobId)?.ToString() ?? "");
+```
+
+### Message Contract
+
+```csharp
+/// <summary>Represents a single LLM token streamed from Ollama via Kafka.</summary>
+public record LlmToken
+{
+    /// <summary>Gets the grain ID that requested this token.</summary>
+    public Guid GrainId { get; init; }
+
+    /// <summary>Gets the unique job ID for this streaming session.</summary>
+    public Guid JobId { get; init; }
+
+    /// <summary>Gets the token text content.</summary>
+    public string Text { get; init; }
+}
+```
+
+### Example Grain Implementation
+
 ```csharp
 // Grain interface — Chishiki.Clustering
-public interface IDocumentGrain : IGrainWithStringKey
+public interface ILlmJobGrain : IGrainWithGuidKey
 {
-    Task<DocumentStatus> GetStatusAsync();
-    Task IngestAsync(IngestDocumentRequest request, CancellationToken ct = default);
+    Task<Guid> StartJobAsync(string prompt, CancellationToken ct = default);
+    Task<string> GetResultAsync(Guid jobId);
 }
 
 // Grain implementation — Chishiki.Clustering.Server
-internal sealed partial class DocumentGrain(
-    [PersistentState("document")] IPersistentState<DocumentState> state,
-    IKernelMemory memory,
-    ILogger<DocumentGrain> logger) : Grain, IDocumentGrain
+[Reentrant]
+internal sealed partial class LlmJobGrain(
+    [PersistentState("llm-job")] IPersistentState<LlmJobState> state,
+    ILogger<LlmJobGrain> logger) : Grain, ILlmJobGrain
 {
-    // ...
+    private Dictionary<Guid, StringBuilder> _tokenBuffers = new();
+
+    public override async Task OnActivateAsync(CancellationToken cancellationToken)
+    {
+        var streamProvider = GetStreamProvider("kafka-stream");
+        var stream = streamProvider.GetStream<LlmToken>("llm-tokens", this.GetPrimaryKeyAsGuid());
+        await stream.SubscribeAsync<LlmToken>(OnTokenReceivedAsync);
+        await base.OnActivateAsync(cancellationToken);
+    }
+
+    public Task<Guid> StartJobAsync(string prompt, CancellationToken ct = default)
+    {
+        var jobId = Guid.NewGuid();
+        _tokenBuffers[jobId] = new();
+        Log.JobStarted(Logger, jobId);
+        // Trigger worker via separate grain call or event
+        return Task.FromResult(jobId);
+    }
+
+    public Task<string> GetResultAsync(Guid jobId) =>
+        Task.FromResult(_tokenBuffers.GetValueOrDefault(jobId)?.ToString() ?? "");
+
+    private Task OnTokenReceivedAsync(LlmToken token)
+    {
+        if (!_tokenBuffers.ContainsKey(token.JobId))
+            _tokenBuffers[token.JobId] = new();
+        _tokenBuffers[token.JobId].Append(token.Text);
+        return Task.CompletedTask;
+    }
 }
 ```
+
+### Kafka Configuration Rules
+
+- Topic name: **`llm-tokens`**
+- Message key **MUST be `GrainId`** to preserve per-grain ordering
+- Expect **at-least-once delivery** → handle duplicates safely via idempotent token buffering
+- Configure `PubSubStore` (required for Orleans Streams)
+
+---
+
+## 👷 Worker Pattern: External Long-Running Services
+
+Workers execute **outside Orleans grains** and handle heavy I/O workloads (Ollama calls, processing, etc.).
+
+### Architecture
+
+```
+Job Request (Grain)
+    ↓
+Worker Service (BackgroundService)
+    ├─ Poll/listen for job requests
+    ├─ Call Ollama (OllamaSharp) with streaming
+    ├─ Emit each token to Kafka immediately
+    └─ (Optional) Grain gets notified when complete
+```
+
+### Worker Implementation Rules
+
+- **Do NOT inherit from `Grain`** — use `BackgroundService` or separate service class.
+- **Must be fully async** — no `.Wait()`, `.Result`, or `Thread.Sleep`.
+- **Communicate with grains via:**
+  - Kafka (primary for token streaming)
+  - Orleans `IGrainFactory` for metadata/state updates
+  - Never direct grain calls for heavy work
+- **Stream tokens incrementally** — emit each LLM token to Kafka immediately, not aggregated.
+- **Inject dependencies via primary constructor** — `ILogger<T>`, `IKernelMemory`, Ollama client, `IProducer<>`, etc.
+- **Handle backpressure** — implement exponential backoff if Kafka is slow.
+
+### Example Worker Implementation
+
+```csharp
+// Worker interface — Chishiki.Clustering (message contract)
+public record LlmJobRequest
+{
+    public Guid GrainId { get; init; }
+    public Guid JobId { get; init; }
+    public string Prompt { get; init; }
+    public string Model { get; init; } = "llama2";
+}
+
+// Worker implementation — Chishiki.Engine (or separate service)
+internal sealed partial class OllamaStreamingWorker(
+    ILogger<OllamaStreamingWorker> logger,
+    OllamaApiClient ollamaClient,
+    IProducer<Guid, LlmToken> kafkaProducer,
+    IChannel<LlmJobRequest> jobQueue) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await foreach (var request in jobQueue.Reader.ReadAllAsync(stoppingToken))
+        {
+            try
+            {
+                Log.ProcessingJob(logger, request.JobId);
+
+                var response = ollamaClient.GenerateStreamAsync(
+                    request.Model,
+                    request.Prompt,
+                    cancellationToken: stoppingToken);
+
+                var tokenCount = 0;
+                await foreach (var chunk in response)
+                {
+                    var token = new LlmToken
+                    {
+                        GrainId = request.GrainId,
+                        JobId = request.JobId,
+                        Text = chunk.Response
+                    };
+
+                    var message = new Message<Guid, LlmToken>
+                    {
+                        Key = request.GrainId,
+                        Value = token
+                    };
+
+                    await kafkaProducer.ProduceAsync("llm-tokens", message, stoppingToken);
+                    tokenCount++;
+                    Log.TokenEmitted(logger, request.JobId, tokenCount);
+                }
+
+                Log.JobCompleted(logger, request.JobId, tokenCount);
+            }
+            catch (Exception ex)
+            {
+                Log.JobFailed(logger, request.JobId, ex);
+            }
+        }
+    }
+}
+```
+
+### Worker Configuration in Aspire
+
+```csharp
+// In AppHost.cs:
+var chishiki = builder.AddProject<Chishiki.Host>("chishiki-engine")
+    .WithReference(kafka)
+    .WithReference(ollama)
+    .WithExternalHttpEndpoints();
+
+var worker = builder.AddProject<Chishiki.Worker>("chishiki-worker")
+    .WithReference(kafka)
+    .WithReference(ollama)
+    .WithReference(chishiki);
+
+var mcp = builder.AddProject<Chishiki.MCP.Host>("chishiki-mcp")
+    .WithReference(chishiki);
+```
+
+### Worker Constraints (Strict)
+
+- ✅ Use `IChannel<T>` or Kafka topic for job requests
+- ✅ Emit each token to Kafka immediately (no buffering)
+- ✅ Use `await foreach` for streaming responses
+- ✅ Always forward `CancellationToken`
+- ✅ Log job lifecycle (start, token emission, completion, failure)
+- ❌ Never call grain methods inside token loop
+- ❌ Never buffer full response before emitting
+- ❌ Never use synchronous I/O
 
 ---
 

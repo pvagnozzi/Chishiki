@@ -14,41 +14,31 @@ using Chishiki.Data.Models;
 
 namespace Chishiki.Data.Specifications;
 
-/// <summary>
-/// Specification interface.
-/// </summary>
+/// <summary>Specification interface.</summary>
 /// <typeparam name="TKey">The type of the key.</typeparam>
 /// <typeparam name="TEntity">The type of the entity.</typeparam>
 public interface ISpecification<TKey, TEntity>
     where TEntity : IEntity<TKey>
 {
-    /// <summary>
-    /// Gets the where filter.
-    /// </summary>
+    /// <summary>Gets the where filter. .</summary>
     /// <value>
     /// The where.
     /// </value>
     Expression<Func<TEntity, bool>>? Where { get; }
 
-    /// <summary>
-    /// Gets the includes.
-    /// </summary>
+    /// <summary>Gets the includes. .</summary>
     /// <value>
     /// The includes.
     /// </value>
     IIncludeExpression[] Includes { get; }
 
-    /// <summary>
-    /// Gets the filters.
-    /// </summary>
+    /// <summary>Gets the filters. .</summary>
     /// <value>
     /// The filters.
     /// </value>
     IFilterConditionExpression[] Filters { get; }
 
-    /// <summary>
-    /// Gets the sort.
-    /// </summary>
+    /// <summary>Gets the sort. .</summary>
     /// <value>
     /// The sort.
     /// </value>

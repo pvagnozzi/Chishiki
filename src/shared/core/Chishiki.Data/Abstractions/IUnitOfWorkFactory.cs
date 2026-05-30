@@ -10,15 +10,11 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Abstractions;
 
-/// <summary>
-/// Unit of work factory interface.
-/// </summary>
+/// <summary>Unit of work factory interface.</summary>
 /// <seealso cref="IDisposable" />
 public interface IUnitOfWorkFactory : IDisposable
 {
-    /// <summary>
-    /// Creates the unit of work.
-    /// </summary>
+    /// <summary>Creates the unit of work. .</summary>
     /// <returns></returns>
     IUnitOfWork CreateUnitOfWork();
 }

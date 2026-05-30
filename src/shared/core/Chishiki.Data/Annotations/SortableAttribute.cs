@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        SortableAttribute.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Attribute marking properties as sortable in query specifications.
@@ -10,24 +10,18 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Annotations;
 
-/// <summary>
-/// Sortable attribute.
-/// </summary>
+/// <summary>Sortable attribute.</summary>
 /// <seealso cref="System.Attribute" />
 [AttributeUsage(AttributeTargets.Property)]
 public class SortableAttribute(bool sortable = false, string? sortExpression = null) : Attribute
 {
-    /// <summary>
-    /// Gets or sets a value indicating whether this <see cref="SortableAttribute"/> is sortable.
-    /// </summary>
+    /// <summary>Gets or sets a value indicating whether this <see cref="SortableAttribute"/> is sortable. .</summary>
     /// <value>
     ///   <c>true</c> if sortable; otherwise, <c>false</c>.
     /// </value>
     public bool Sortable { get; set; } = sortable;
 
-    /// <summary>
-    /// Gets or sets the sort expression.
-    /// </summary>
+    /// <summary>Gets or sets the sort expression. .</summary>
     /// <value>
     /// The sort expression.
     /// </value>

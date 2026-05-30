@@ -18,14 +18,10 @@ using Chishiki.Exceptions;
 
 namespace Chishiki.Data;
 
-/// <summary>
-/// Repository extensions.
-/// </summary>
+/// <summary>Repository extensions.</summary>
 public static class RepositoryExtensions
 {
-    /// <summary>
-    /// Finds the first entity matching the filter expression or returns null asynchronously.
-    /// </summary>
+    /// <summary>Finds the first entity matching the filter expression or returns null asynchronously. .</summary>
     /// <typeparam name="TKey">The type of the entity key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="repository">The read-only repository.</param>
@@ -38,9 +34,7 @@ public static class RepositoryExtensions
         where TEntity : class, IEntity<TKey> =>
         repository.FirstOrDefaultAsync(new Specification<TKey, TEntity>(expression), cancellationToken);
 
-    /// <summary>
-    /// Finds the first entity matching the filter expression from the unit of work or returns null asynchronously.
-    /// </summary>
+    /// <summary>Finds the first entity matching the filter expression from the unit of work or returns null asynchronously. .</summary>
     /// <typeparam name="TKey">The type of the entity key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="unitOfWork">The unit of work.</param>
@@ -56,9 +50,7 @@ public static class RepositoryExtensions
         return await repository.FirstOrDefaultAsync(expression, cancellationToken);
     }
 
-    /// <summary>
-    /// Retrieves all entities matching the filter expression asynchronously.
-    /// </summary>
+    /// <summary>Retrieves all entities matching the filter expression asynchronously. .</summary>
     /// <typeparam name="TKey">The type of the entity key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="repository">The read-only repository.</param>
@@ -71,9 +63,7 @@ public static class RepositoryExtensions
         where TEntity : class, IEntity<TKey> =>
         repository.ListAsync(new Specification<TKey, TEntity>(expression), cancellationToken);
 
-    /// <summary>
-    /// Retrieves all entities matching the filter expression from the unit of work asynchronously.
-    /// </summary>
+    /// <summary>Retrieves all entities matching the filter expression from the unit of work asynchronously. .</summary>
     /// <typeparam name="TKey">The type of the entity key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="unitOfWork">The unit of work.</param>
@@ -89,9 +79,7 @@ public static class RepositoryExtensions
         return await repository.ListAsync(expression, cancellationToken);
     }
 
-    /// <summary>
-    /// Retrieves a paginated list of entities matching the filter expression asynchronously.
-    /// </summary>
+    /// <summary>Retrieves a paginated list of entities matching the filter expression asynchronously. .</summary>
     /// <typeparam name="TKey">The type of the entity key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="repository">The read-only repository.</param>
@@ -106,9 +94,7 @@ public static class RepositoryExtensions
         where TEntity : class, IEntity<TKey> =>
         repository.ListPagedAsync(new PagedSpecification<TKey, TEntity>(expression, pageIndex: pageIndex, pageSize: pageSize), cancellationToken);
 
-    /// <summary>
-    /// Inserts a master entity and its detail records asynchronously.
-    /// </summary>
+    /// <summary>Inserts a master entity and its detail records asynchronously. .</summary>
     /// <typeparam name="TKey">The type of the entity key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="unitOfWork">The unit of work.</param>
@@ -124,9 +110,7 @@ public static class RepositoryExtensions
         await deleteDetail(entity, cancellationToken);
     }
 
-    /// <summary>
-    /// Inserts multiple entities asynchronously.
-    /// </summary>
+    /// <summary>Inserts multiple entities asynchronously. .</summary>
     /// <typeparam name="TKey">The type of the entity key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="unitOfWork">The unit of work.</param>
@@ -139,9 +123,7 @@ public static class RepositoryExtensions
         await repository.AddRangeAsync(entities, cancellationToken);
     }
 
-    /// <summary>
-    /// Deletes a master entity and its related detail records asynchronously.
-    /// </summary>
+    /// <summary>Deletes a master entity and its related detail records asynchronously. .</summary>
     /// <typeparam name="TKey">The type of the entity key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="unitOfWork">The unit of work.</param>
@@ -159,9 +141,7 @@ public static class RepositoryExtensions
         await masterRepository.DeleteByIdAsync(id, cancellationToken);
     }
 
-    /// <summary>
-    /// Deletes multiple entities asynchronously.
-    /// </summary>
+    /// <summary>Deletes multiple entities asynchronously. .</summary>
     /// <typeparam name="TKey">The type of the entity key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="unitOfWork">The unit of work.</param>
@@ -174,10 +154,7 @@ public static class RepositoryExtensions
         await repository.DeleteRangeAsync(entities, cancellationToken);
     }
 
-    /// <summary>
-    /// Updates entities by comparing new entities with existing entities asynchronously.
-    /// Automatically inserts new entities, updates changed entities, and deletes removed entities.
-    /// </summary>
+    /// <summary>Updates entities by comparing new entities with existing entities asynchronously. Automatically inserts new entities, updates changed entities, and deletes removed entities. .</summary>
     /// <typeparam name="TKey">The type of the entity key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="unitOfWork">The unit of work.</param>

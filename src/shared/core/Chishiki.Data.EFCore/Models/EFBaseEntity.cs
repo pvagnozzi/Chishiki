@@ -9,46 +9,35 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
-using Chishiki;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Chishiki.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace Chishiki.Data.EFCore.Models;
 
-/// <summary>
-/// Abstract base entity for all EF Core entities with generic key type, providing Id, CreatedOn, and UpdatedOn audit properties.
-/// </summary>
+/// <summary>Abstract base entity for all EF Core entities with generic key type, providing Id, CreatedOn, and UpdatedOn audit properties.</summary>
 /// <typeparam name="TKey">The type of the entity's primary key.</typeparam>
 // ReSharper disable once InconsistentNaming
 public abstract class EFBaseEntity<TKey> : IEntityWithDates<TKey>, IEquatable<IEntity<TKey>>
 {
-    /// <summary>
-    /// Gets the entity's primary key identifier.
-    /// </summary>
+    /// <summary>Gets the entity's primary key identifier. .</summary>
     [Key]
     [DisplayName("Id")]
     public virtual TKey Id { get; protected internal set; } = default!;
 
-    /// <summary>
-    /// Gets the date and time in UTC when this entity was created.
-    /// </summary>
+    /// <summary>Gets the date and time in UTC when this entity was created. .</summary>
     [Required]
     [DisplayName("Created On")]
     public DateTimeOffset CreatedOn { get; protected internal set; } = DateTimeOffset.UtcNow;
 
-    /// <summary>
-    /// Gets the date and time in UTC when this entity was last updated.
-    /// </summary>
+    /// <summary>Gets the date and time in UTC when this entity was last updated. .</summary>
     [Required]
     [DisplayName("Updated On")]
     public DateTimeOffset UpdatedOn { get; protected internal set; } = DateTimeOffset.UtcNow;
 
-    /// <summary>
-    /// Determines whether the specified object is equal to the current entity by comparing primary keys.
-    /// </summary>
+    /// <summary>Determines whether the specified object is equal to the current entity by comparing primary keys. .</summary>
     /// <param name="obj">The object to compare with the current entity.</param>
     /// <returns>True if the specified object is an entity with the same primary key; otherwise false.</returns>
     public override bool Equals(object? obj)
@@ -57,28 +46,20 @@ public abstract class EFBaseEntity<TKey> : IEntityWithDates<TKey>, IEquatable<IE
         return other is not null && ((IEquatable<IEntity<TKey>>)this).Equals(other);
     }
 
-    /// <summary>
-    /// Returns a hash code for this entity based on its primary key.
-    /// </summary>
+    /// <summary>Returns a hash code for this entity based on its primary key. .</summary>
     /// <returns>A hash code suitable for use in hashing algorithms and data structures.</returns>
     public override int GetHashCode() => Id?.GetHashCode() ?? -1;
 
-    /// <summary>
-    /// Indicates whether the current entity is equal to another entity of the same type by comparing primary keys.
-    /// </summary>
+    /// <summary>Indicates whether the current entity is equal to another entity of the same type by comparing primary keys. .</summary>
     /// <param name="other">The entity to compare with this entity.</param>
     /// <returns>True if both entities have the same primary key; otherwise false.</returns>
     bool IEquatable<IEntity<TKey>>.Equals(IEntity<TKey>? other) => other is not null && (Id?.Equals(other.Id) ?? false);
 }
 
-/// <summary>
-/// Extension methods for configuring EF Core entities that inherit from EFBaseEntity.
-/// </summary>
+/// <summary>Extension methods for configuring EF Core entities that inherit from EFBaseEntity.</summary>
 public static class EFBaseEntityExtensions
 {
-    /// <summary>
-    /// Configures an entity type with audit tracking properties (Id, CreatedOn, UpdatedOn) for the model builder.
-    /// </summary>
+    /// <summary>Configures an entity type with audit tracking properties (Id, CreatedOn, UpdatedOn) for the model builder. .</summary>
     /// <typeparam name="TKey">The type of the entity's primary key.</typeparam>
     /// <typeparam name="TEntity">The entity type to configure.</typeparam>
     /// <param name="modelBuilder">The model builder to configure.</param>
@@ -107,9 +88,7 @@ public static class EFBaseEntityExtensions
         return modelBuilder;
     }
 
-    /// <summary>
-    /// Fluent configuration method to set the entity's primary key identifier.
-    /// </summary>
+    /// <summary>Fluent configuration method to set the entity's primary key identifier. .</summary>
     /// <typeparam name="TKey">The type of the primary key.</typeparam>
     /// <typeparam name="TEntity">The entity type.</typeparam>
     /// <param name="entity">The entity to configure.</param>
@@ -123,9 +102,7 @@ public static class EFBaseEntityExtensions
         return entity;
     }
 
-    /// <summary>
-    /// Fluent configuration method to set the entity's creation timestamp.
-    /// </summary>
+    /// <summary>Fluent configuration method to set the entity's creation timestamp. .</summary>
     /// <typeparam name="TEntity">The entity type (must use Guid as key).</typeparam>
     /// <param name="entity">The entity to configure.</param>
     /// <param name="createdOn">The value to assign to the entity's CreatedOn property.</param>
@@ -137,9 +114,7 @@ public static class EFBaseEntityExtensions
         return entity;
     }
 
-    /// <summary>
-    /// Fluent configuration method to set the entity's last update timestamp.
-    /// </summary>
+    /// <summary>Fluent configuration method to set the entity's last update timestamp. .</summary>
     /// <typeparam name="TEntity">The entity type (must use Guid as key).</typeparam>
     /// <param name="entity">The entity to configure.</param>
     /// <param name="updatedOn">The value to assign to the entity's UpdatedOn property.</param>

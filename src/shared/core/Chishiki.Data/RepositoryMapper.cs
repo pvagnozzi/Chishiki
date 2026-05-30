@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        RepositoryMapper.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Maps entity types to repository implementations for dynamic repository creation.
@@ -14,30 +14,22 @@ using Chishiki.Data.Abstractions;
 
 namespace Chishiki.Data;
 
-/// <summary>
-/// Repository mapper.
-/// </summary>
+/// <summary>Repository mapper.</summary>
 /// <seealso cref="IRepositoryMapper" />
 public class RepositoryMapper : IRepositoryMapper
 {
-    /// <summary>
-    /// The repository types
-    /// </summary>
+    /// <summary>The repository types .</summary>
     private readonly ConcurrentDictionary<Type, Type> _repositoryTypes = new();
 
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RepositoryMapper"/> class.
-    /// </summary>
+    /// <summary>Initializes a new instance of the <see cref="RepositoryMapper"/> class. .</summary>
     /// <param name="assemblies">The assemblies.</param>
     public RepositoryMapper(IEnumerable<Assembly>? assemblies = null)
     {
         _ = RegisterFromAssemblies(assemblies?.ToArray() ?? []);
     }
 
-    /// <summary>
-    /// Registers the specified repository type for the given entity type.
-    /// </summary>
+    /// <summary>Registers the specified repository type for the given entity type. .</summary>
     /// <param name="repositoryType">Type of the repository implementing IRepository.</param>
     /// <returns>This mapper instance for method chaining.</returns>
     /// <exception cref="InvalidCastException">Thrown if repositoryType does not implement IRepository interface.</exception>
@@ -48,9 +40,7 @@ public class RepositoryMapper : IRepositoryMapper
         return this;
     }
 
-    /// <summary>
-    /// Registers repositories from the specified assembly.
-    /// </summary>
+    /// <summary>Registers repositories from the specified assembly. .</summary>
     /// <param name="assembly">The assembly to scan.</param>
     /// <returns>This mapper instance for method chaining.</returns>
     public IRepositoryMapper RegisterFromAssembly(Assembly assembly)
@@ -69,9 +59,7 @@ public class RepositoryMapper : IRepositoryMapper
         return this;
     }
 
-    /// <summary>
-    /// Registers a repository type for a specific entity type.
-    /// </summary>
+    /// <summary>Registers a repository type for a specific entity type. .</summary>
     /// <param name="assemblies">The assemblies to scan for repository implementations.</param>
     /// <returns>This mapper instance for method chaining.</returns>
     public IRepositoryMapper RegisterFromAssemblies(IEnumerable<Assembly> assemblies)
@@ -84,16 +72,12 @@ public class RepositoryMapper : IRepositoryMapper
         return this;
     }
 
-    /// <summary>
-    /// Gets the repository type registered for the specified entity type.
-    /// </summary>
+    /// <summary>Gets the repository type registered for the specified entity type. .</summary>
     /// <param name="entityType">Type of the entity.</param>
     /// <returns>The registered repository type, or null if no repository is registered for the entity type.</returns>
     public Type? GetRepositoryType(Type entityType) => _repositoryTypes.GetValueOrDefault(entityType);
 
-    /// <summary>
-    /// Determines whether [is valid repository type] [the specified repository].
-    /// </summary>
+    /// <summary>Determines whether [is valid repository type] [the specified repository]. .</summary>
     /// <param name="repository">The repository.</param>
     /// <param name="keyType">Type of the key.</param>
     /// <param name="entityType">Type of the entity.</param>
@@ -102,16 +86,12 @@ public class RepositoryMapper : IRepositoryMapper
     /// </returns>
     protected virtual bool IsValidRepositoryType(Type repository, Type keyType, Type entityType) => !repository.IsGenericType;
 
-    /// <summary>
-    /// Registers the specified entity type.
-    /// </summary>
+    /// <summary>Registers the specified entity type. .</summary>
     /// <param name="entityType">Type of the entity.</param>
     /// <param name="repositoryType">Type of the repository.</param>
     private void Register(Type entityType, Type repositoryType) => _ = _repositoryTypes.TryAdd(entityType, repositoryType);
 
-    /// <summary>
-    /// Gets the type of the entity.
-    /// </summary>
+    /// <summary>Gets the type of the entity. .</summary>
     /// <param name="repositoryType">Type of the repository.</param>
     /// <returns></returns>
     private Type? GetEntityType(Type repositoryType)

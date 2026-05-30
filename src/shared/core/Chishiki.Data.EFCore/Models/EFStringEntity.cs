@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EFStringEntity.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: EF Core entity base class for entities using string as primary key.
@@ -14,15 +14,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Chishiki.Data.EFCore.Models;
 
-/// <summary>
-/// EF Core entity base class for entities using string as their primary key. Automatically generates a new Guid-based string if not explicitly set.
-/// </summary>
+/// <summary>EF Core entity base class for entities using string as their primary key. Automatically generates a new Guid-based string if not explicitly set.</summary>
 /// <seealso cref="EFBaseEntity{String}" />
 public class EFStringEntity() : EFBaseEntity<string>
 {
-    /// <summary>
-    /// Gets or sets the entity's string primary key identifier. Defaults to a Guid string representation if not explicitly set.
-    /// </summary>
+    /// <summary>Gets or sets the entity's string primary key identifier. Defaults to a Guid string representation if not explicitly set. .</summary>
     [Key]
     [Required]
     [MaxLength(64)]

@@ -10,9 +10,7 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Specifications;
 
-/// <summary>
-/// Property Expression.
-/// </summary>
+/// <summary>Property Expression.</summary>
 /// <seealso cref="IPropertyExpression" />
 public abstract record PropertyExpression(string PropertyName) : IPropertyExpression;
 

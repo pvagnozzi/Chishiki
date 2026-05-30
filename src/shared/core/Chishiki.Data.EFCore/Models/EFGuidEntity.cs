@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EFGuidEntity.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: EF Core entity base class for entities using Guid as primary key.
@@ -14,16 +14,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Chishiki.Data.EFCore.Models;
 
-/// <summary>
-/// EF Core entity base class for entities using Guid as their primary key. Automatically generates a new Guid if not explicitly set.
-/// </summary>
+/// <summary>EF Core entity base class for entities using Guid as their primary key. Automatically generates a new Guid if not explicitly set.</summary>
 /// <seealso cref="EFBaseEntity{Guid}" />
 // ReSharper disable once InconsistentNaming
 public class EFGuidEntity : EFBaseEntity<Guid>
 {
-    /// <summary>
-    /// Gets or sets the entity's Guid primary key identifier. Defaults to a new Guid if not explicitly set.
-    /// </summary>
+    /// <summary>Gets or sets the entity's Guid primary key identifier. Defaults to a new Guid if not explicitly set. .</summary>
     [Key]
     [Required]
     [DisplayName("Id")]

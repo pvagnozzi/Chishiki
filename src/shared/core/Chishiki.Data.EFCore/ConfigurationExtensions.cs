@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        ConfigurationExtensions.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: EF Core extensions for DbContext, UoW factory, and PostgreSQL database configuration.
@@ -19,14 +19,10 @@ using System.Reflection;
 
 namespace Chishiki.Data.EFCore;
 
-/// <summary>
-/// Configuration and dependency injection extensions for EF Core DbContext, Unit of Work factory, and PostgreSQL database provider.
-/// </summary>
+/// <summary>Configuration and dependency injection extensions for EF Core DbContext, Unit of Work factory, and PostgreSQL database provider.</summary>
 public static class ConfigurationExtensions
 {
-    /// <summary>
-    /// Registers the EF Core Unit of Work factory with the dependency injection container.
-    /// </summary>
+    /// <summary>Registers the EF Core Unit of Work factory with the dependency injection container. .</summary>
     /// <typeparam name="T">The DbContext type to use for the Unit of Work.</typeparam>
     /// <param name="serviceCollection">The service collection to register the factory with.</param>
     /// <returns>The service collection for method chaining.</returns>
@@ -39,9 +35,7 @@ public static class ConfigurationExtensions
             .AddScoped<IUnitOfWorkFactory, EFCoreUnitOfWorkFactory<T>>(ctx => new EFCoreUnitOfWorkFactory<T>(ctx))
             .AddScoped(ctx => ctx.GetRequiredService<IUnitOfWorkFactory>().CreateUnitOfWork());
 
-    /// <summary>
-    /// Registers the EF Core repository mapper with custom repository implementations from the specified assemblies.
-    /// </summary>
+    /// <summary>Registers the EF Core repository mapper with custom repository implementations from the specified assemblies. .</summary>
     /// <param name="services">The service collection to register the repository mapper with.</param>
     /// <param name="assemblies">The assemblies containing custom repository type implementations.</param>
     /// <returns>The service collection for method chaining.</returns>
@@ -49,9 +43,7 @@ public static class ConfigurationExtensions
     public static IServiceCollection AddEFRepositoryMapper(this IServiceCollection services, Assembly[] assemblies) =>
         services.AddSingleton<IRepositoryMapper, RepositoryMapper>(ctx => new RepositoryMapper(assemblies));
 
-    /// <summary>
-    /// Configures PostgreSQL database provider with connection string, retry policy, and migrations assembly.
-    /// </summary>
+    /// <summary>Configures PostgreSQL database provider with connection string, retry policy, and migrations assembly. .</summary>
     /// <param name="builder">The DbContext options builder.</param>
     /// <param name="connectionString">The PostgreSQL connection string.</param>
     /// <param name="migrationsAssembly">The assembly containing EF Core migrations.</param>
@@ -70,9 +62,7 @@ public static class ConfigurationExtensions
                 .MigrationsAssembly(migrationsAssembly.GetName().Name!)
                 .EnableRetryOnFailure(maxRetryCount, TimeSpan.FromSeconds(retryDelaySeconds), null));
 
-    /// <summary>
-    /// Configures PostgreSQL database provider with connection string, retry policy, and DbContext type.
-    /// </summary>
+    /// <summary>Configures PostgreSQL database provider with connection string, retry policy, and DbContext type. .</summary>
     /// <param name="builder">The DbContext options builder.</param>
     /// <param name="connectionString">The PostgreSQL connection string.</param>
     /// <param name="dbContextType">The DbContext type used to locate migrations assembly.</param>
@@ -88,9 +78,7 @@ public static class ConfigurationExtensions
         int retryDelaySeconds = 30) =>
         builder.ConfigurePostgres(connectionString, dbContextType.Assembly, maxRetryCount, retryDelaySeconds);
 
-    /// <summary>
-    /// Configures PostgreSQL database provider with connection string and retry policy using a generic type parameter.
-    /// </summary>
+    /// <summary>Configures PostgreSQL database provider with connection string and retry policy using a generic type parameter. .</summary>
     /// <typeparam name="T">The DbContext type used to locate migrations assembly.</typeparam>
     /// <param name="builder">The DbContext options builder.</param>
     /// <param name="connectionString">The PostgreSQL connection string.</param>
@@ -105,9 +93,7 @@ public static class ConfigurationExtensions
         where T : DbContext =>
         builder.ConfigurePostgres(connectionString, typeof(T), maxRetryCount, retryDelaySeconds);
 
-    /// <summary>
-    /// Adds a PostgreSQL DbContext to the dependency injection container with transient lifetime.
-    /// </summary>
+    /// <summary>Adds a PostgreSQL DbContext to the dependency injection container with transient lifetime. .</summary>
     /// <typeparam name="T">The DbContext type to add.</typeparam>
     /// <param name="services">The service collection to add the DbContext to.</param>
     /// <param name="connectionString">The PostgreSQL connection string.</param>
@@ -123,9 +109,7 @@ public static class ConfigurationExtensions
                     .UseLoggerFactory(serviceProvider.GetRequiredService<ILoggerFactory>()),
             ServiceLifetime.Transient);
 
-    /// <summary>
-    /// Adds a PostgreSQL DbContext and EF Core Unit of Work factory to the dependency injection container.
-    /// </summary>
+    /// <summary>Adds a PostgreSQL DbContext and EF Core Unit of Work factory to the dependency injection container. .</summary>
     /// <typeparam name="T">The DbContext type to add.</typeparam>
     /// <param name="services">The service collection to add the DbContext and Unit of Work to.</param>
     /// <param name="connectionString">The PostgreSQL connection string.</param>
@@ -144,9 +128,7 @@ public static class ConfigurationExtensions
         return (repositoryAssembly.Length > 0) ? result.AddEFRepositoryMapper(repositoryAssembly) : result;
     }
 
-    /// <summary>
-    /// Adds a PostgreSQL DbContext and EF Core Unit of Work factory to the dependency injection container using the DbContext's own assembly for custom repositories.
-    /// </summary>
+    /// <summary>Adds a PostgreSQL DbContext and EF Core Unit of Work factory to the dependency injection container using the DbContext's own assembly for custom repositories. .</summary>
     /// <typeparam name="T">The DbContext type to add.</typeparam>
     /// <param name="services">The service collection to add the DbContext and Unit of Work to.</param>
     /// <param name="connectionString">The PostgreSQL connection string.</param>
@@ -155,9 +137,7 @@ public static class ConfigurationExtensions
         this IServiceCollection services, string connectionString)
         where T : DbContext => services.AddPostgresDbContextWithUnitOfWork<T>(connectionString, [typeof(T).Assembly]);
 
-    /// <summary>
-    /// Applies any pending EF Core migrations to the database synchronously.
-    /// </summary>
+    /// <summary>Applies any pending EF Core migrations to the database synchronously. .</summary>
     /// <typeparam name="T">The DbContext type.</typeparam>
     /// <param name="dbContext">The DbContext instance.</param>
     /// <param name="logger">Logger instance for migration diagnostics.</param>
@@ -170,31 +150,28 @@ public static class ConfigurationExtensions
         try
         {
             var database = dbContext.Database;
-            logger.LogTrace("Migration '{DbContext}': pending migrations", dbContextName);
+            Log.MigrationCheckingPending(logger, dbContextName);
             var pendingMigrations = database.GetPendingMigrations();
 
             if (pendingMigrations.Any())
             {
-                logger.LogTrace("Migration '{DbContext}': apply {PendingMigrations}", dbContextName,
-                    pendingMigrations);
+                Log.MigrationApplying(logger, dbContextName, pendingMigrations);
                 dbContext.Database.Migrate();
-                logger.LogTrace("Migration '{DbContext}': completed", dbContextName);
+                Log.MigrationCompleted(logger, dbContextName);
             }
             else
             {
-                logger.LogTrace("Migration '{DbContext}': no migrations", dbContextName);
+                Log.MigrationNone(logger, dbContextName);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Migration '{DbContext}': {Ex}", dbContextName, ex.Message);
+            Log.MigrationFailed(logger, dbContextName, ex);
             throw;
         }
     }
 
-    /// <summary>
-    /// Applies any pending EF Core migrations to the database asynchronously.
-    /// </summary>
+    /// <summary>Applies any pending EF Core migrations to the database asynchronously. .</summary>
     /// <typeparam name="T">The DbContext type.</typeparam>
     /// <param name="dbContext">The DbContext instance.</param>
     /// <param name="logger">Logger instance for migration diagnostics.</param>
@@ -209,31 +186,28 @@ public static class ConfigurationExtensions
         try
         {
             var database = dbContext.Database;
-            logger.LogTrace("Migration '{DbContext}': pending migrations", dbContextName);
+            Log.MigrationCheckingPending(logger, dbContextName);
             var pendingMigrations = await database.GetPendingMigrationsAsync(cancellationToken);
 
             if (pendingMigrations.Any())
             {
-                logger.LogTrace("Migration '{DbContext}': apply {PendingMigrations}", dbContextName,
-                    pendingMigrations);
+                Log.MigrationApplying(logger, dbContextName, pendingMigrations);
                 await dbContext.Database.MigrateAsync(cancellationToken);
-                logger.LogTrace("Migration '{DbContext}': completed", dbContextName);
+                Log.MigrationCompleted(logger, dbContextName);
             }
             else
             {
-                logger.LogTrace("Migration '{DbContext}': no migrations", dbContextName);
+                Log.MigrationNone(logger, dbContextName);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Migration '{DbContext}': {Ex}", dbContextName, ex.Message);
+            Log.MigrationFailed(logger, dbContextName, ex);
             throw;
         }
     }
 
-    /// <summary>
-    /// Applies any pending EF Core migrations to the database by retrieving the DbContext from the service provider.
-    /// </summary>
+    /// <summary>Applies any pending EF Core migrations to the database by retrieving the DbContext from the service provider. .</summary>
     /// <typeparam name="T">The DbContext type.</typeparam>
     /// <param name="serviceProvider">The service provider to retrieve the DbContext and logger from.</param>
     // ReSharper disable once MemberCanBePrivate.Global
@@ -245,9 +219,7 @@ public static class ConfigurationExtensions
         dbContext.ApplyMigrations(logger);
     }
 
-    /// <summary>
-    /// Applies any pending EF Core migrations to the database asynchronously by retrieving the DbContext from the service provider.
-    /// </summary>
+    /// <summary>Applies any pending EF Core migrations to the database asynchronously by retrieving the DbContext from the service provider. .</summary>
     /// <typeparam name="T">The DbContext type.</typeparam>
     /// <param name="serviceProvider">The service provider to retrieve the DbContext and logger from.</param>
     /// <param name="cancellationToken">Token to observe for cancellation.</param>
@@ -259,23 +231,21 @@ public static class ConfigurationExtensions
         var migrationLogger = serviceProvider.GetRequiredService<ILogger<T>>();
         try
         {
-            migrationLogger.LogTrace("Migration '{DbContext}': started", typeof(T).FullName);
+            Log.MigrationStarted(migrationLogger, typeof(T).FullName);
             using var scope = serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<T>();
             var logger = serviceProvider.GetRequiredService<ILogger<T>>();
             await dbContext.ApplyMigrationsAsync(logger, cancellationToken);
-            migrationLogger.LogTrace("Migration '{DbContext}': completed", typeof(T).FullName);
+            Log.MigrationCompleted(migrationLogger, typeof(T).FullName);
         }
         catch (Exception ex)
         {
-            migrationLogger.LogError(ex, "Migration '{DbContext}': {Ex}", typeof(T).FullName, ex.Message);
+            Log.MigrationFailed(migrationLogger, typeof(T).FullName, ex);
             throw new InvalidOperationException($"Migration '{typeof(T).FullName}' failed", ex);
         }
     }
 
-    /// <summary>
-    /// Seeds a database table with entities if the table is empty.
-    /// </summary>
+    /// <summary>Seeds a database table with entities if the table is empty. .</summary>
     /// <typeparam name="T">The entity type.</typeparam>
     /// <param name="context">The DbContext instance.</param>
     /// <param name="dbSet">The DbSet representing the table to seed.</param>
@@ -295,9 +265,7 @@ public static class ConfigurationExtensions
         _ = await context.SaveChangesAsync(cancellationToken);
     }
 
-    /// <summary>
-    /// Gets a required connection string from the configuration, throwing an exception if not found.
-    /// </summary>
+    /// <summary>Gets a required connection string from the configuration, throwing an exception if not found. .</summary>
     /// <param name="configuration">The configuration instance.</param>
     /// <param name="name">The name of the connection string.</param>
     /// <returns>The connection string value.</returns>

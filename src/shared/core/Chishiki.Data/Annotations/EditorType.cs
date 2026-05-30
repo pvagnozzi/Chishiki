@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EditorType.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Enumeration of editor types for property editing in UI scaffolding.
@@ -10,9 +10,7 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Annotations;
 
-/// <summary>
-/// Enumerates the types of editors that can be used to edit a property.
-/// </summary>
+/// <summary>Enumerates the types of editors that can be used to edit a property.</summary>
 public enum EditorType
 {
     Text,

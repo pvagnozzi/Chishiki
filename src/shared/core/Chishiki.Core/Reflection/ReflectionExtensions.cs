@@ -61,9 +61,7 @@ public static class ReflectionExtensions
     public static bool IsBinary(this Type propertyType) =>
         propertyType == typeof(byte[]) || propertyType == typeof(Stream);
 
-    /// <summary>
-    /// Determines whether [is date time].
-    /// </summary>
+    /// <summary>Determines whether [is date time]. .</summary>
     /// <param name="propertyType">Type of the property.</param>
     /// <returns>
     ///   <c>true</c> if [is date time] [the specified property type]; otherwise, <c>false</c>.
@@ -91,9 +89,7 @@ public static class ReflectionExtensions
         propertyType == typeof(ulong) || propertyType == typeof(ulong?) ||
         propertyType == typeof(ushort) || propertyType == typeof(ushort?);
 
-    /// <summary>
-    /// Determines whether this instance is scalar.
-    /// </summary>
+    /// <summary>Determines whether this instance is scalar. .</summary>
     /// <param name="type">The type.</param>
     /// <returns>
     ///   <c>true</c> if the specified type is scalar; otherwise, <c>false</c>.

@@ -10,9 +10,7 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Specifications;
 
-/// <summary>
-/// Sort Expression.
-/// </summary>
+/// <summary>Sort Expression.</summary>
 /// <seealso cref="PropertyExpression" />
 public record SortExpression(string PropertyName, bool Descending = false) : PropertyExpression(PropertyName), ISortExpression;
 

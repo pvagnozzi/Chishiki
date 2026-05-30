@@ -16,9 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Chishiki.Data;
 
-/// <summary>
-/// Unit of work abstract class.
-/// </summary>
+/// <summary>Unit of work abstract class.</summary>
 /// <seealso cref="Disposable" />
 /// <seealso cref="IUnitOfWork" />
 /// <remarks>
@@ -28,28 +26,20 @@ namespace Chishiki.Data;
 /// <param name="loggerFactory">The logger factory.</param>
 public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILoggerFactory loggerFactory) : Disposable(null, loggerFactory), IUnitOfWork
 {
-    /// <summary>
-    /// The logger factory
-    /// </summary>
+    /// <summary>The logger factory .</summary>
     protected ILoggerFactory LoggerFactory { get; } = loggerFactory;
 
-    /// <summary>
-    /// The repository mapper
-    /// </summary>
+    /// <summary>The repository mapper .</summary>
     private readonly IRepositoryMapper _repositoryMapper = repositoryMapper;
 
-    /// <summary>
-    /// Gets the repository factory.
-    /// </summary>
+    /// <summary>Gets the repository factory. .</summary>
     /// <value>
     /// The repository factory.
     /// </value>
     private IRepositoryFactory RepositoryFactory =>
         field ??= BuildRepositoryFactory(_repositoryMapper, LoggerFactory);
 
-    /// <summary>
-    /// Gets the read only repository.
-    /// </summary>
+    /// <summary>Gets the read only repository. .</summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <returns></returns>
@@ -61,9 +51,7 @@ public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILo
         return result;
     }
 
-    /// <summary>
-    /// Gets the repository.
-    /// </summary>
+    /// <summary>Gets the repository. .</summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <returns></returns>
@@ -75,9 +63,7 @@ public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILo
         return result;
     }
 
-    /// <summary>
-    /// Saves the changes asynchronous.
-    /// </summary>
+    /// <summary>Saves the changes asynchronous. .</summary>
     /// <param name="saveAudit"></param>
     /// <param name="userId"></param>
     /// <param name="cancellationToken">The cancellation token.</param>
@@ -96,9 +82,7 @@ public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILo
         CancellationToken cancellationToken = default)
         where T : class, IEntityAudit, new() => Task.FromResult<IList<T>>([]);
 
-    /// <summary>
-    /// Disposes the resources.
-    /// </summary>
+    /// <summary>Disposes the resources. .</summary>
     protected override void DisposeManaged()
     {
         LogDisposeResources(Logger);
@@ -106,18 +90,14 @@ public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILo
         base.DisposeManaged();
     }
 
-    /// <summary>
-    /// Builds the repository factory.
-    /// </summary>
+    /// <summary>Builds the repository factory. .</summary>
     /// <param name="repositoryMapper">The repository mapper.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <returns></returns>
     protected abstract IRepositoryFactory BuildRepositoryFactory(IRepositoryMapper repositoryMapper,
         ILoggerFactory loggerFactory);
 
-    /// <summary>
-    /// Disposes the unit of work.
-    /// </summary>
+    /// <summary>Disposes the unit of work. .</summary>
     protected abstract void DisposeUnitOfWork();
 
     /// <summary>Saves the unit of work asynchronous.</summary>

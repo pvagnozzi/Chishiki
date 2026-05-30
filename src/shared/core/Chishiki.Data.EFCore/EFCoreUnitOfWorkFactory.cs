@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EFCoreUnitOfWorkFactory.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: EF Core Unit of Work factory that creates UoW instances backed by a typed DbContext.
@@ -15,9 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Chishiki.Data.EFCore;
 
-/// <summary>EF Core Unit of Work factory that creates a fresh <see cref="EfCoreUnitOfWork"/> for each
-/// call to <see cref="UnitOfWorkFactory.CreateUnitOfWork"/>, using an
-/// <see cref="IDbContextFactory{TContext}"/> to obtain isolated <see cref="DbContext"/> instances.</summary>
+/// <summary>EF Core Unit of Work factory that creates a fresh <see cref="EfCoreUnitOfWork"/> for each call to <see cref="UnitOfWorkFactory.CreateUnitOfWork"/>, using an <see cref="IDbContextFactory{TContext}"/> to obtain isolated <see cref="DbContext"/> instances.</summary>
 /// <typeparam name="TContext">The concrete <see cref="DbContext"/> type registered with the DI container.</typeparam>
 public sealed class EFCoreUnitOfWorkFactory<TContext>(IServiceProvider serviceProvider)
     : UnitOfWorkFactory(serviceProvider)

@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        QueryOperator.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Enumeration of query filter operators for property-based filtering.
@@ -10,9 +10,7 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Query;
 
-/// <summary>
-/// Query operator enumeration.
-/// </summary>
+/// <summary>Query operator enumeration.</summary>
 public enum QueryOperator
 {
     /// <summary>Is null.</summary>

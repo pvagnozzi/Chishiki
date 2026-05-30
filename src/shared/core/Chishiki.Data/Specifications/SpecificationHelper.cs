@@ -14,19 +14,13 @@ using Chishiki.Data.Query;
 
 namespace Chishiki.Data.Specifications;
 
-/// <summary>
-/// Specification helper class.
-/// </summary>
+/// <summary>Specification helper class.</summary>
 public static class SpecificationHelper
 {
-    /// <summary>
-    /// Array separator.
-    /// </summary>
+    /// <summary>Array separator. .</summary>
     private const string ArraySeparator = ",";
 
-    /// <summary>
-    /// Gets the filter condition operator from the query operator.
-    /// </summary>
+    /// <summary>Gets the filter condition operator from the query operator. .</summary>
     /// <param name="operator">Query operator.</param>
     /// <returns>Filter condition operator.</returns>
     /// <exception cref="NotImplementedException">Thrown when the operator is not implemented.</exception>
@@ -52,9 +46,7 @@ public static class SpecificationHelper
             _ => throw new NotImplementedException(),
         };
 
-    /// <summary>
-    /// Gets value and cast it to the correct type.
-    /// </summary>
+    /// <summary>Gets value and cast it to the correct type. .</summary>
     /// <param name="item">Item value.</param>
     /// <returns>Converted value.</returns>
     public static object? GetAndCastType(this IPropertyFilter item)
@@ -70,9 +62,7 @@ public static class SpecificationHelper
             : value.Split(ArraySeparator).Select(x => ConvertType(x, item.ValueType, item.TypeValueEnum)).ToArray();
     }
 
-    /// <summary>
-    /// Converts the value to the specified type.
-    /// </summary>
+    /// <summary>Converts the value to the specified type. .</summary>
     /// <param name="value">Source value.</param>
     /// <param name="type">Destination type.</param>
     /// <param name="itemTypeValue">Enum type value; mandatory if type is <see cref="QueryValueType.Enum"/>.</param>
@@ -95,9 +85,7 @@ public static class SpecificationHelper
         };
     }
 
-    /// <summary>
-    /// Converts a string value to an enum type.
-    /// </summary>
+    /// <summary>Converts a string value to an enum type. .</summary>
     /// <param name="value">String representation of the enum value.</param>
     /// <param name="itemTypeValue">Fully qualified enum type name.</param>
     /// <returns>Parsed enum value.</returns>

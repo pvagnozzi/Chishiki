@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        QueryValueType.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Enumeration of supported value types for query filter parameters.
@@ -10,9 +10,7 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Query;
 
-/// <summary>
-/// Query value type enumeration.
-/// </summary>
+/// <summary>Query value type enumeration.</summary>
 #pragma warning disable CA1720 // Identifier contains type name — intentional domain names
 public enum QueryValueType
 {

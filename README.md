@@ -195,6 +195,13 @@ chishiki/
 │   ├── seed/
 │   └── templates/
 │
+├── 📂 .github/
+│   ├── agents/                            # Custom Copilot agents
+│   ├── instructions/                      # Scoped Copilot instructions
+│   ├── skills/                            # Copilot skills catalog
+│   ├── hooks/                             # Copilot hooks + bundled hooks.json
+│   └── collections/                       # Copilot asset collection manifests
+├── 📂 skills/                             # Repo-local Pi skills and project conventions
 ├── .editorconfig                          # Coding standards
 ├── .gitattributes                         # Line ending rules
 ├── .gitignore                             # Build & secret exclusions
@@ -275,6 +282,16 @@ Contributions, issues, and feature requests are welcome!
 3. Commit your changes: `git commit -m 'feat: add amazing feature'`
 4. Push to the branch: `git push origin feat/amazing-feature`
 5. Open a Pull Request
+
+### Pi project guidance
+
+If you are working with Pi in this repository, start from:
+
+- `skills/chishiki-repo-conventions/SKILL.md`
+- `skills/chishiki-repo-conventions/references/architecture-layout-and-build.md`
+- `skills/chishiki-repo-conventions/references/csharp-conventions.md`
+
+These files are the Pi-compatible conversion of the repository's Copilot guidance and capture the current Chishiki-specific layout, build flow, file header convention, and XML documentation expectations.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 

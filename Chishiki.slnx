@@ -11,12 +11,22 @@
     <File Path=".github/copilot-instructions.md" />
   </Folder>
 
+  <Folder Name="/solution/pi/">
+    <File Path="skills/chishiki-repo-conventions/SKILL.md" />
+  </Folder>
+
+  <Folder Name="/solution/pi/references/">
+    <File Path="skills/chishiki-repo-conventions/references/architecture-layout-and-build.md" />
+    <File Path="skills/chishiki-repo-conventions/references/csharp-conventions.md" />
+  </Folder>
+
   <!-- ── src/mcp ── MCP Servers ────────────────────────────────────────── -->
   <Folder Name="/src/mcp/">
     <File Path="src/mcp/README.md" />
     <Project Path="src/mcp/Chishiki.MCP.Host/Chishiki.MCP.Host.csproj" Id="d99ae567-f48e-46e3-87bc-14ae40f35dc2" />
   </Folder>
   <Folder Name="/src/" />
+  <Folder Name="/src/cluster/" />
 
   <!-- ── src/infrastructure ── Aspire AppHost + ServiceDefaults ──────── -->
   <Folder Name="/src/infrastructure/">
@@ -29,11 +39,24 @@
   <Folder Name="/src/shared/">
     <File Path="src/shared/README.md" />
   </Folder>
+  <Folder Name="/src/shared/ai/">
+    <Project Path="src/shared/ai/Chishiki.AI.LLM.Abstractions/Chishiki.AI.LLM.Abstractions.csproj" Id="fdcb9f9c-a699-4b8c-b849-01905178992b" />
+    <Project Path="src/shared/ai/Chishiki.AI.LLM.SemanticKernel/Chishiki.AI.LLM.SemanticKernel.csproj" />
+  </Folder>
   <Folder Name="/src/shared/core/">
     <Project Path="src/shared/core/Chishiki.Core/Chishiki.Core.csproj" Id="c90e4349-3920-452e-bdfc-9e7913596ff6" />
     <Project Path="src/shared/core/Chishiki.Data.EFCore/Chishiki.Data.EFCore.csproj" Id="3d6b1185-b409-44e9-931b-912b9d392394" />
     <Project Path="src/shared/core/Chishiki.Data/Chishiki.Data.csproj" Id="50d94f6a-16fb-4cab-a1ca-e78305be1052" />
     <Project Path="src/shared/core/Chishiki.Mapping/Chishiki.Mapping.csproj" Id="19db25c1-89e9-4354-b4cd-236688e100a1" />
+    <Project Path="src/shared/core/Chishiki.Messaging/Chishiki.Messaging.csproj" Id="a3155434-8cf7-4f5f-87c6-6d384c4cb58b" />
+    <Project Path="src/shared/core/Chishiki.Serial/Chishiki.Serial.csproj" Id="471ee4df-1ba7-48be-9f45-a0c7a68dbd50" />
+  </Folder>
+  <Folder Name="/src/shared/orleans/">
+    <Project Path="src/shared/orleans/Chishiki.Orleans.Silo/Chishiki.Orleans.Silo.csproj" Id="eaf53b03-befa-4374-bc27-f360dacf14c8" />
+  </Folder>
+  <Folder Name="/src/shared/vision/">
+    <Project Path="src/shared/vision/Chishiki.Vision.Abstraction/Chishiki.Vision.Abstraction.csproj" Id="829c151a-5761-486c-8c04-f9fde6ec8ea2" />
+    <Project Path="src/shared/vision/Chishiki.Vision.OpenCV/Chishiki.Vision.OpenCV.csproj" Id="9b57dc50-7d0c-4d63-9fd0-39f372d37164" />
   </Folder>
 
 </Solution>

@@ -13,18 +13,14 @@ using Chishiki.Data.Models;
 
 namespace Chishiki.Data.Specifications;
 
-/// <summary>
-/// Paged specification.
-/// </summary>
+/// <summary>Paged specification.</summary>
 /// <typeparam name="TKey">The type of the key.</typeparam>
 /// <typeparam name="TEntity">The type of the entity.</typeparam>
 /// <seealso cref="Specification&lt;TKey, TEntity&gt;" />
 public record PagedSpecification<TKey, TEntity> : Specification<TKey, TEntity>, IPagedSpecification<TKey, TEntity>
     where TEntity : IEntity<TKey>
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PagedSpecification{TKey, TEntity}"/> class.
-    /// </summary>
+    /// <summary>Initializes a new instance of the <see cref="PagedSpecification{TKey, TEntity}"/> class. .</summary>
     /// <param name="where">The where.</param>
     /// <param name="filterExpressions">The filter expressions.</param>
     /// <param name="includeExpressions">The include expressions.</param>
@@ -43,17 +39,13 @@ public record PagedSpecification<TKey, TEntity> : Specification<TKey, TEntity>, 
         PageSize = pageSize;
     }
 
-    /// <summary>
-    /// Gets the index of the page.
-    /// </summary>
+    /// <summary>Gets the index of the page. .</summary>
     /// <value>
     /// The index of the page.
     /// </value>
     public int PageIndex { get; }
 
-    /// <summary>
-    /// Gets the size of the page.
-    /// </summary>
+    /// <summary>Gets the size of the page. .</summary>
     /// <value>
     /// The size of the page.
     /// </value>

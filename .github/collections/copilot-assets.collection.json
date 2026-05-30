@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "name": "chishiki-copilot-assets",
+  "description": "Centralized collection manifest for Copilot repository assets.",
+  "mcp": {
+    "configFile": ".mcp.json",
+    "servers": [
+      "github",
+      "hub",
+      "context7"
+    ]
+  },
+  "agents": {
+    "path": ".github/agents",
+    "pattern": "*.agent.md"
+  },
+  "instructions": {
+    "root": ".github/copilot-instructions.md",
+    "path": ".github/instructions",
+    "pattern": "*.instructions.md"
+  },
+  "skills": {
+    "path": ".github/skills",
+    "pattern": "**/SKILL.md"
+  },
+  "hooks": {
+    "bundle": ".github/hooks/hooks.json",
+    "path": ".github/hooks",
+    "pattern": "**/hooks.json"
+  }
+}

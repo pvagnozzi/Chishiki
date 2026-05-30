@@ -12,15 +12,11 @@ using Chishiki.Services;
 
 namespace Chishiki.Data.Abstractions;
 
-/// <summary>
-/// Data seeder interface.
-/// </summary>
+/// <summary>Data seeder interface.</summary>
 /// <seealso cref="IService" />
 public interface IDataSeeder : IService
 {
-    /// <summary>
-    /// Seeds the data asynchronously.
-    /// </summary>
+    /// <summary>Seeds the data asynchronously. .</summary>
     /// <param name="cancellationToken">Token to observe for cancellation.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task SeedDataAsync(CancellationToken cancellationToken = default);

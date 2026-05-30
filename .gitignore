@@ -190,3 +190,10 @@ containers/ollama/models/
 *.patch
 *.rej
 .cache/
+
+/.crew/
+/.crew
+!.crew/artifacts/
+!.crew/graphs/
+!.crew/artifacts/.gitkeep
+!.crew/graphs/.gitkeep

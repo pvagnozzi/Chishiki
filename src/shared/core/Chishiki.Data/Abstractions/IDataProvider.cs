@@ -10,14 +10,10 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Abstractions;
 
-/// <summary>
-/// Data provider interface.
-/// </summary>
+/// <summary>Data provider interface.</summary>
 public interface IDataProvider : IDisposable
 {
-    /// <summary>
-    /// Finds the first record asynchronously.
-    /// </summary>
+    /// <summary>Finds the first record asynchronously. .</summary>
     /// <param name="sql">The SQL.</param>
     /// <param name="parameters">Parameters.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
@@ -26,9 +22,7 @@ public interface IDataProvider : IDisposable
     Task<T?> FirstOrDefaultAsync<T>(string sql, object? parameters = null,
         CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Finds a single record asynchronously.
-    /// </summary>
+    /// <summary>Finds a single record asynchronously. .</summary>
     /// <param name="sql">The SQL.</param>
     /// <param name="parameters">Parameters.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
@@ -37,9 +31,7 @@ public interface IDataProvider : IDisposable
     Task<T?> SingleOrDefaultAsync<T>(string sql, object? parameters = null,
         CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Queries the asynchronous.
-    /// </summary>
+    /// <summary>Queries the asynchronous. .</summary>
     /// <typeparam name="T">Record type.</typeparam>
     /// <param name="sql">The SQL.</param>
     /// <param name="parameters">The parameters.</param>
@@ -48,9 +40,7 @@ public interface IDataProvider : IDisposable
     Task<IEnumerable<T>> ListAsync<T>(string sql, object? parameters = null,
         CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Executes the asynchronous.
-    /// </summary>
+    /// <summary>Executes the asynchronous. .</summary>
     /// <param name="sql">The SQL.</param>
     /// <param name="parameters">The parameters.</param>
     /// <param name="cancellationToken">The cancellation token.</param>

@@ -10,14 +10,10 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Specifications;
 
-/// <summary>
-/// Include Expression.
-/// </summary>
+/// <summary>Include Expression.</summary>
 public interface IIncludeExpression : IPropertyExpression
 {
-    /// <summary>
-    /// Gets the nested expressions.
-    /// </summary>
+    /// <summary>Gets the nested expressions. .</summary>
     /// <value>
     /// The nested expressions.
     /// </value>

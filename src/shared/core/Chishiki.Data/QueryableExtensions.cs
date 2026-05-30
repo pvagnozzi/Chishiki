@@ -19,19 +19,13 @@ using Chishiki.Reflection;
 
 namespace Chishiki.Data;
 
-/// <summary>
-/// Queryable extensions.
-/// </summary>
+/// <summary>Queryable extensions.</summary>
 public static class QueryableExtensions
 {
-    /// <summary>
-    /// The null expression.
-    /// </summary>
+    /// <summary>The null expression. .</summary>
     private static readonly ConstantExpression NullExpression = Expression.Constant(null);
 
-    /// <summary>
-    /// Orders ascending.
-    /// </summary>
+    /// <summary>Orders ascending. .</summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source">The source.</param>
     /// <param name="propertyName">Name of the property.</param>
@@ -41,9 +35,7 @@ public static class QueryableExtensions
     public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string propertyName) =>
         source.OrderByUsing(propertyName, "OrderBy");
 
-    /// <summary>
-    /// Orders the by descending.
-    /// </summary>
+    /// <summary>Orders the by descending. .</summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source">The source.</param>
     /// <param name="propertyName">Name of the property.</param>
@@ -53,9 +45,7 @@ public static class QueryableExtensions
     public static IOrderedQueryable<T> OrderByDescending<T>(this IQueryable<T> source, string propertyName) =>
         source.OrderByUsing(propertyName, "OrderByDescending");
 
-    /// <summary>
-    /// Then orders ascending.
-    /// </summary>
+    /// <summary>Then orders ascending. .</summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source">The source.</param>
     /// <param name="propertyName">Name of the property.</param>
@@ -65,9 +55,7 @@ public static class QueryableExtensions
     public static IOrderedQueryable<T> ThenBy<T>(this IOrderedQueryable<T> source, string propertyName) =>
         source.OrderByUsing(propertyName, "ThenBy");
 
-    /// <summary>
-    /// Then orders descending.
-    /// </summary>
+    /// <summary>Then orders descending. .</summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source">The source.</param>
     /// <param name="propertyName">Name of the property.</param>
@@ -77,9 +65,7 @@ public static class QueryableExtensions
     public static IOrderedQueryable<T> ThenByDescending<T>(this IOrderedQueryable<T> source, string propertyName) =>
         source.OrderByUsing(propertyName, "ThenByDescending");
 
-    /// <summary>
-    /// Sorts by specified sort expressions.
-    /// </summary>
+    /// <summary>Sorts by specified sort expressions. .</summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source">The source.</param>
     /// <param name="sortExpressions">The sort expressions.</param>
@@ -104,9 +90,7 @@ public static class QueryableExtensions
                 : current.ThenBy(firstSort.PropertyName));
     }
 
-    /// <summary>
-    /// Orders the queryable by the specified property name using reflection and dynamic LINQ.
-    /// </summary>
+    /// <summary>Orders the queryable by the specified property name using reflection and dynamic LINQ. .</summary>
     /// <typeparam name="T">The type of elements in the source queryable.</typeparam>
     /// <param name="source">The source queryable.</param>
     /// <param name="propertyName">Name of the property to order by. Supports nested properties with dot notation.</param>
@@ -157,9 +141,7 @@ public static class QueryableExtensions
         return (IOrderedQueryable<T>)source.Provider.CreateQuery(methodCall);
     }
 
-    /// <summary>
-    /// Filters by the specified filters.
-    /// </summary>
+    /// <summary>Filters by the specified filters. .</summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source">The source.</param>
     /// <param name="filters">The filters.</param>
@@ -173,9 +155,7 @@ public static class QueryableExtensions
             .Aggregate(source, (current, expression) => current.Where(expression));
     }
 
-    /// <summary>
-    /// Creates a MemberExpression.
-    /// </summary>
+    /// <summary>Creates a MemberExpression. .</summary>
     /// <param name="parameter">The parameter.</param>
     /// <param name="propertyName">Name of the property.</param>
     /// <returns>Member expression.</returns>
@@ -183,9 +163,7 @@ public static class QueryableExtensions
     public static Expression ToMemberExpression(this Expression parameter, string propertyName) =>
         propertyName.Split('.').Aggregate(parameter, Expression.PropertyOrField);
 
-    /// <summary>
-    /// Converts to expression.
-    /// </summary>
+    /// <summary>Converts to expression. .</summary>
     /// <typeparam name="T">Instance type.</typeparam>
     /// <param name="filterCondition">The filter condition.</param>
     /// <returns>Expression filter.</returns>
@@ -278,9 +256,7 @@ public static class QueryableExtensions
         }
     }
 
-    /// <summary>
-    /// Converts to expression.
-    /// </summary>
+    /// <summary>Converts to expression. .</summary>
     /// <param name="member">The member.</param>
     /// <param name="value">The value.</param>
     /// <param name="filterConditionOperator">The filter condition operator.</param>
@@ -339,9 +315,7 @@ public static class QueryableExtensions
     }
 
 
-    /// <summary>
-    /// Converts to CallExpression.
-    /// </summary>
+    /// <summary>Converts to CallExpression. .</summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="memberExpression">The member expression.</param>
     /// <param name="valueExpression">The value expression.</param>
@@ -382,9 +356,7 @@ public static class QueryableExtensions
         throw new InvalidDataException($"{memberType} has no suitable for method {methodName}");
     }
 
-    /// <summary>
-    /// Converts to PagedList.
-    /// </summary>
+    /// <summary>Converts to PagedList. .</summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="source">The source.</param>
@@ -401,9 +373,7 @@ public static class QueryableExtensions
         return new PagedList<TEntity>(items, count, pageNumber, pageSize);
     }
 
-    /// <summary>
-    /// Converts to PagedList async.
-    /// </summary>
+    /// <summary>Converts to PagedList async. .</summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="source">The source.</param>
@@ -427,9 +397,7 @@ public static class QueryableExtensions
         return new PagedList<TEntity>(items, count, pageNumber, pageSize);
     }
 
-    /// <summary>
-    /// Converts to paged list with select expression.
-    /// </summary>
+    /// <summary>Converts to paged list with select expression. .</summary>
     /// <param name="source">Source data.</param>
     /// <param name="selectExpression">Select expression.</param>
     /// <param name="pageSize">Page size.</param>
@@ -455,9 +423,7 @@ public static class QueryableExtensions
         return new PagedList<TResult>(mappedItems, res.TotalCount, pageNumber, pageSize);
     }
 
-    /// <summary>
-    /// Includes the specified include expression.
-    /// </summary>
+    /// <summary>Includes the specified include expression. .</summary>
     /// <typeparam name="T">Entity type</typeparam>
     /// <param name="source">The source.</param>
     /// <param name="includeExpression">The include expression.</param>
@@ -477,9 +443,7 @@ public static class QueryableExtensions
         return source;
     }
 
-    /// <summary>
-    /// Includes the specified include expressions.
-    /// </summary>
+    /// <summary>Includes the specified include expressions. .</summary>
     /// <typeparam name="T">Entity type</typeparam>
     /// <param name="source">The source.</param>
     /// <param name="includeExpressions">The include expressions.</param>
@@ -497,9 +461,7 @@ public static class QueryableExtensions
         return source;
     }
 
-    /// <summary>
-    /// Determines whether an ordering method exists in the queryable expression.
-    /// </summary>
+    /// <summary>Determines whether an ordering method exists in the queryable expression. .</summary>
     /// <typeparam name="T">The type of elements in the queryable.</typeparam>
     /// <param name="source">The source queryable.</param>
     /// <returns>True if an OrderBy or ThenBy method is found in the expression; otherwise, false.</returns>
@@ -507,9 +469,7 @@ public static class QueryableExtensions
     public static bool OrderMethodExists<T>(this IQueryable<T> source) =>
         OrderingMethodFinder.OrderMethodExists(source.Expression);
 
-    /// <summary>
-    /// Applies the specification to the query source.
-    /// </summary>
+    /// <summary>Applies the specification to the query source. .</summary>
     /// <typeparam name="TKey">The type of the entity key.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <param name="source">The source queryable.</param>
@@ -533,19 +493,13 @@ public static class QueryableExtensions
         return source;
     }
 
-    /// <summary>
-    /// Internal visitor for detecting whether an expression tree contains ordering methods (OrderBy/ThenBy).
-    /// </summary>
+    /// <summary>Internal visitor for detecting whether an expression tree contains ordering methods (OrderBy/ThenBy). .</summary>
     private sealed class OrderingMethodFinder : ExpressionVisitor
     {
-        /// <summary>
-        /// Gets a value indicating whether an ordering method was found in the visited expression.
-        /// </summary>
+        /// <summary>Gets a value indicating whether an ordering method was found in the visited expression. .</summary>
         public bool OrderingMethodFound { get; set; }
 
-        /// <summary>
-        /// Visits a method call expression and checks if it is an ordering method (OrderBy or ThenBy).
-        /// </summary>
+        /// <summary>Visits a method call expression and checks if it is an ordering method (OrderBy or ThenBy). .</summary>
         /// <param name="node">The method call expression to visit.</param>
         /// <returns>The method call expression after visiting.</returns>
         protected override Expression VisitMethodCall(MethodCallExpression node)
@@ -562,9 +516,7 @@ public static class QueryableExtensions
             return base.VisitMethodCall(node);
         }
 
-        /// <summary>
-        /// Determines if an ordering method exists in the specified expression.
-        /// </summary>
+        /// <summary>Determines if an ordering method exists in the specified expression. .</summary>
         /// <param name="expression">The expression to check.</param>
         /// <returns>True if an ordering method is found; otherwise, false.</returns>
         public static bool OrderMethodExists(Expression expression)

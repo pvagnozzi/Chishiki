@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EfEntityChangesSerializer.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: EF Core entity changes serializer for audit logging.
@@ -14,14 +14,10 @@ using Chishiki.Data.Audit;
 
 namespace Chishiki.Data.EFCore.Audit;
 
-/// <summary>
-/// Entity Framework entity changes serializer that persists entity changes to an audit table.
-/// </summary>
+/// <summary>Entity Framework entity changes serializer that persists entity changes to an audit table.</summary>
 public class EfEntityChangesSerializer : IEntityChangesSerializer
 {
-    /// <summary>
-    /// Handles and persists entity changes to the audit table asynchronously.
-    /// </summary>
+    /// <summary>Handles and persists entity changes to the audit table asynchronously. .</summary>
     /// <typeparam name="TEntityAudit">The audit entity type implementing IEntityAudit.</typeparam>
     /// <param name="unitOfWork">The unit of work to use for persisting audit records.</param>
     /// <param name="changes">The collection of audit entities to persist.</param>

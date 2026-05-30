@@ -14,9 +14,7 @@ using Chishiki.Data.Models;
 
 namespace Chishiki.Data.Specifications;
 
-/// <summary>
-/// Specification class.
-/// </summary>
+/// <summary>Specification class.</summary>
 /// <typeparam name="TKey">The type of the key.</typeparam>
 /// <typeparam name="TEntity">The type of the entity.</typeparam>
 /// <seealso cref="ISpecification&lt;TKey, TEntity&gt;" />
@@ -24,9 +22,7 @@ namespace Chishiki.Data.Specifications;
 public record Specification<TKey, TEntity> : ISpecification<TKey, TEntity>
     where TEntity : IEntity<TKey>
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Specification{TKey, TEntity}"/> class.
-    /// </summary>
+    /// <summary>Initializes a new instance of the <see cref="Specification{TKey, TEntity}"/> class. .</summary>
     /// <param name="where">The where.</param>
     /// <param name="filterExpressions">The filter expressions.</param>
     /// <param name="includeExpressions">The include expressions.</param>
@@ -43,33 +39,25 @@ public record Specification<TKey, TEntity> : ISpecification<TKey, TEntity>
         Sort = sortExpressions?.ToArray() ?? [];
     }
 
-    /// <summary>
-    /// Gets the where.
-    /// </summary>
+    /// <summary>Gets the where. .</summary>
     /// <value>
     /// The where.
     /// </value>
     public Expression<Func<TEntity, bool>>? Where { get; }
 
-    /// <summary>
-    /// Gets the filters.
-    /// </summary>
+    /// <summary>Gets the filters. .</summary>
     /// <value>
     /// The filters.
     /// </value>
     public IFilterConditionExpression[] Filters { get; }
 
-    /// <summary>
-    /// Gets the includes.
-    /// </summary>
+    /// <summary>Gets the includes. .</summary>
     /// <value>
     /// The includes.
     /// </value>
     public IIncludeExpression[] Includes { get; }
 
-    /// <summary>
-    /// Gets the sort.
-    /// </summary>
+    /// <summary>Gets the sort. .</summary>
     /// <value>
     /// The sort.
     /// </value>

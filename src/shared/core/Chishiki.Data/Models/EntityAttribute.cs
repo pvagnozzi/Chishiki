@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EntityAttribute.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Attribute for marking entity classes as soft-deletable or auditable.
@@ -10,22 +10,16 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Models;
 
-/// <summary>
-/// Entity attribute.
-/// </summary>
+/// <summary>Entity attribute.</summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
 public class EntityAttribute(bool isSoftDeletable = false, bool isAuditable = false) : Attribute
 {
 
-    /// <summary>
-    /// Gets or sets a value indicating whether this instance can be delete in the soft-way.
-    /// </summary>
+    /// <summary>Gets or sets a value indicating whether this instance can be delete in the soft-way. .</summary>
     public bool IsSoftDeletable { get; init; } = isSoftDeletable;
 
 
-    /// <summary>
-    /// Gets or sets a value indicating whether this instance is auditable.
-    /// </summary>
+    /// <summary>Gets or sets a value indicating whether this instance is auditable. .</summary>
     public bool IsAuditable { get; init; } = isAuditable;
 }
 

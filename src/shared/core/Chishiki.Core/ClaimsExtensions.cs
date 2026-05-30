@@ -12,9 +12,7 @@ using System.Security.Claims;
 
 namespace Chishiki;
 
-/// <summary>
-/// Claims Extensions.
-/// </summary>
+/// <summary>Claims Extensions.</summary>
 public static class ClaimsExtensions
 {
     /// <summary>Converts a collection of claims to a dictionary keyed by claim type.</summary>
@@ -23,17 +21,13 @@ public static class ClaimsExtensions
     public static Dictionary<string, string> ToDictionary(this IEnumerable<Claim> claims) =>
         claims.ToDictionary(x => x.Type, x => x.Value);
 
-    /// <summary>
-    /// Gets the claims dictionary from the claims principal.
-    /// </summary>
+    /// <summary>Gets the claims dictionary from the claims principal. .</summary>
     /// <param name="claimPrincipal">Claims principal.</param>
     /// <returns>Claims dictionary.</returns>
     public static Dictionary<string, string> ToClaimDictionary(this ClaimsPrincipal claimPrincipal) =>
         claimPrincipal.Claims.ToDictionary();
 
-    /// <summary>
-    /// Adds the specified claim if not exists.
-    /// </summary>
+    /// <summary>Adds the specified claim if not exists. .</summary>
     /// <param name="claims">Clamis.</param>
     /// <param name="claim">Claims to add</param>
     /// <returns>Claim result.</returns>
@@ -48,9 +42,7 @@ public static class ClaimsExtensions
         return list;
     }
 
-    /// <summary>
-    /// Adds the specified claim if not existing claim of the same type.
-    /// </summary>
+    /// <summary>Adds the specified claim if not existing claim of the same type. .</summary>
     /// <param name="claims">Source claims</param>
     /// <param name="newClaims">New claims.</param>
     /// <returns>Merged claims.</returns>

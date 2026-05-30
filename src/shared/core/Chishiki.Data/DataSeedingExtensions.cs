@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        DataSeedingExtensions.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Extension methods for CSV-based data seeding operations.
@@ -14,14 +14,10 @@ using System.Globalization;
 
 namespace Chishiki.Data;
 
-/// <summary>
-/// Provides extension methods for CSV-based data seeding operations.
-/// </summary>
+/// <summary>Provides extension methods for CSV-based data seeding operations.</summary>
 public static class DataSeedingExtensions
 {
-    /// <summary>
-    /// Imports from CSV.
-    /// </summary>
+    /// <summary>Imports from CSV. .</summary>
     /// <param name="reader">Reader.</param>
     /// <typeparam name="T">Data type.</typeparam>
     /// <returns>File rows</returns>
@@ -38,9 +34,7 @@ public static class DataSeedingExtensions
         return [.. records];
     }
 
-    /// <summary>
-    /// Imports records from a CSV-formatted string.
-    /// </summary>
+    /// <summary>Imports records from a CSV-formatted string. .</summary>
     /// <param name="csvContent">CSV content as a string.</param>
     /// <param name="delimiter">Field delimiter. Default is semicolon.</param>
     /// <typeparam name="T">The type of records to deserialize.</typeparam>

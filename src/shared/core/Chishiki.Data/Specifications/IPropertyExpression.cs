@@ -10,14 +10,10 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Specifications;
 
-/// <summary>
-/// Property Expression.
-/// </summary>
+/// <summary>Property Expression.</summary>
 public interface IPropertyExpression
 {
-    /// <summary>
-    /// Gets the name of the property.
-    /// </summary>
+    /// <summary>Gets the name of the property. .</summary>
     /// <value>
     /// The name of the property.
     /// </value>

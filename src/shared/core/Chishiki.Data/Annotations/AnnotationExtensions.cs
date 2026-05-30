@@ -18,14 +18,10 @@ using System.Reflection;
 
 namespace Chishiki.Data.Annotations;
 
-/// <summary>
-/// Annotation extensions.
-/// </summary>
+/// <summary>Annotation extensions.</summary>
 public static class AnnotationExtensions
 {
-    /// <summary>
-    /// Gets the type properties settings.
-    /// </summary>
+    /// <summary>Gets the type properties settings. .</summary>
     /// <param name="type">The type.</param>
     /// <returns></returns>
     public static PropertySettings[] GetTypePropertiesSettings(this Type type)
@@ -41,27 +37,21 @@ public static class AnnotationExtensions
         return [.. settings];
     }
 
-    /// <summary>
-    /// Gets the value.
-    /// </summary>
+    /// <summary>Gets the value. .</summary>
     /// <param name="property">The property.</param>
     /// <param name="instance">The instance.</param>
     /// <returns></returns>
     public static object? GetValue(this PropertySettings property, object? instance) =>
         property.PropertyInfo.GetValue(instance);
 
-    /// <summary>
-    /// Sets the value.
-    /// </summary>
+    /// <summary>Sets the value. .</summary>
     /// <param name="property">The property.</param>
     /// <param name="instance">The instance.</param>
     /// <param name="value">The value.</param>
     public static void SetValue(this PropertySettings property, object? instance, object? value) =>
         property.PropertyInfo.SetValue(instance, value);
 
-    /// <summary>
-    /// Gets the display value.
-    /// </summary>
+    /// <summary>Gets the display value. .</summary>
     /// <param name="property">The property.</param>
     /// <param name="instance">The instance.</param>
     /// <returns></returns>
@@ -76,9 +66,7 @@ public static class AnnotationExtensions
             : value.ToString() ?? string.Empty;
     }
 
-    /// <summary>
-    /// Gets the type of the editor.
-    /// </summary>
+    /// <summary>Gets the type of the editor. .</summary>
     /// <param name="property">The property.</param>
     /// <returns></returns>
     [DebuggerStepThrough]
@@ -96,9 +84,7 @@ public static class AnnotationExtensions
             : propertyType.IsNumeric() ? EditorType.Number : propertyType.IsDateTime() ? EditorType.DateTime : EditorType.Text;
     }
 
-    /// <summary>
-    /// Gets the property settings.
-    /// </summary>
+    /// <summary>Gets the property settings. .</summary>
     /// <param name="property">The property.</param>
     /// <returns></returns>
     public static PropertySettings GetPropertySettings(this PropertyInfo property)
@@ -131,36 +117,28 @@ public static class AnnotationExtensions
         };
     }
 
-    /// <summary>
-    /// Gets the sortable.
-    /// </summary>
+    /// <summary>Gets the sortable. .</summary>
     /// <param name="property">The property.</param>
     /// <returns></returns>
     [DebuggerStepThrough]
     public static SortableAttribute? GetSortable(this PropertyInfo property) =>
         property.GetCustomAttribute<SortableAttribute>();
 
-    /// <summary>
-    /// Gets the filterable attribute.
-    /// </summary>
+    /// <summary>Gets the filterable attribute. .</summary>
     /// <param name="property">The property.</param>
     /// <returns>The filterable attribute, or null if not present.</returns>
     [DebuggerStepThrough]
     public static FilterableAttribute? GetFilterable(this PropertyInfo property) =>
         property.GetCustomAttribute<FilterableAttribute>();
 
-    /// <summary>
-    /// Gets the display name.
-    /// </summary>
+    /// <summary>Gets the display name. .</summary>
     /// <param name="property">The property.</param>
     /// <returns></returns>
     [DebuggerStepThrough]
     public static string GetDisplayName(this PropertyInfo property) =>
         property.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? property.Name;
 
-    /// <summary>
-    /// Gets the display format.
-    /// </summary>
+    /// <summary>Gets the display format. .</summary>
     /// <param name="property">The property.</param>
     /// <returns></returns>
     [DebuggerStepThrough]
@@ -170,9 +148,7 @@ public static class AnnotationExtensions
         return (display?.DataFormatString, display?.NullDisplayText);
     }
 
-    /// <summary>
-    /// Determines whether this instance is scaffold.
-    /// </summary>
+    /// <summary>Determines whether this instance is scaffold. .</summary>
     /// <param name="propertyInfo">The property information.</param>
     /// <returns>
     ///   <c>true</c> if the specified property information is scaffold; otherwise, <c>false</c>.
@@ -181,9 +157,7 @@ public static class AnnotationExtensions
     public static bool IsScaffold(this PropertyInfo propertyInfo) =>
         propertyInfo.GetCustomAttribute<ScaffoldColumnAttribute>()?.Scaffold ?? false;
 
-    /// <summary>
-    /// Determines whether this instance is required.
-    /// </summary>
+    /// <summary>Determines whether this instance is required. .</summary>
     /// <param name="propertyInfo">The property information.</param>
     /// <returns>
     ///   <c>true</c> if the specified property information is required; otherwise, <c>false</c>.
@@ -192,9 +166,7 @@ public static class AnnotationExtensions
     public static bool IsRequired(this PropertyInfo propertyInfo) =>
         propertyInfo.GetCustomAttribute<RequiredAttribute>() != null;
 
-    /// <summary>
-    /// Determines whether this instance is key.
-    /// </summary>
+    /// <summary>Determines whether this instance is key. .</summary>
     /// <param name="propertyInfo">The property information.</param>
     /// <returns>
     ///   <c>true</c> if the specified property information is key; otherwise, <c>false</c>.
@@ -202,9 +174,7 @@ public static class AnnotationExtensions
     [DebuggerStepThrough]
     public static bool IsKey(this PropertyInfo propertyInfo) => propertyInfo.GetCustomAttribute<KeyAttribute>() != null;
 
-    /// <summary>
-    /// Determines whether this instance is visible.
-    /// </summary>
+    /// <summary>Determines whether this instance is visible. .</summary>
     /// <param name="propertyInfo">The property information.</param>
     /// <returns>
     ///   <c>true</c> if the specified property information is visible; otherwise, <c>false</c>.
@@ -212,18 +182,14 @@ public static class AnnotationExtensions
     [DebuggerStepThrough]
     public static bool IsVisible(this PropertyInfo propertyInfo) => !propertyInfo.IsScaffold();
 
-    /// <summary>
-    /// Gets the default value.
-    /// </summary>
+    /// <summary>Gets the default value. .</summary>
     /// <param name="propertyInfo">The property information.</param>
     /// <returns></returns>
     [DebuggerStepThrough]
     public static object? GetDefaultValue(this PropertyInfo propertyInfo) =>
         propertyInfo.GetCustomAttribute<DefaultValueAttribute>()?.Value;
 
-    /// <summary>
-    /// Gets the visible properties.
-    /// </summary>
+    /// <summary>Gets the visible properties. .</summary>
     /// <param name="type">The type.</param>
     /// <returns></returns>
     [DebuggerStepThrough]

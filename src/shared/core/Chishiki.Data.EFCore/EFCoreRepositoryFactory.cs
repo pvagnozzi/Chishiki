@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EFCoreRepositoryFactory.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: EF Core implementation of the repository factory that creates repository instances from a DbContext.
@@ -15,8 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Chishiki.Data.EFCore;
 
-/// <summary>EF Core repository factory that creates <see cref="EfCoreReadOnlyRepository{TKey,TEntity}"/>
-/// and <see cref="EfCoreRepository{TKey,TEntity}"/> instances bound to the provided <see cref="DbContext"/>.</summary>
+/// <summary>EF Core repository factory that creates <see cref="EfCoreReadOnlyRepository{TKey,TEntity}"/> and <see cref="EfCoreRepository{TKey,TEntity}"/> instances bound to the provided <see cref="DbContext"/>.</summary>
 /// <remarks>
 /// Custom repository types registered via <see cref="IRepositoryMapper"/> must expose a constructor with the
 /// signature <c>(DbContext context, ILogger logger)</c> to be instantiated by this factory.

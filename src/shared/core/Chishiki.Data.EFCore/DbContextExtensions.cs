@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        DbContextExtensions.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: EF Core extensions for DbContext.
@@ -18,14 +18,10 @@ using System.Transactions;
 
 namespace Chishiki.Data.EFCore;
 
-/// <summary>
-/// DbContext extensions for executing actions within a transaction scope and tracking entity changes. This class provides extension methods for the DbContext class, allowing you to execute actions within a transaction and to retrieve information about the changes made to the entities tracked by the DbContext. The ExecuteInTransactionAsync method allows you to execute an asynchronous action within a transaction scope, ensuring that the transaction is properly committed or rolled back based on the success of the action. The GetChanges methods allow you to retrieve information about the changes made to the entities, including the entity name, entity ID, change action (inserted, updated, deleted), and the properties that were changed (with their current and original values). These methods can be used for auditing purposes or to track changes in the application.
-/// </summary>
+/// <summary>DbContext extensions for executing actions within a transaction scope and tracking entity changes. This class provides extension methods for the DbContext class, allowing you to execute actions within a transaction and to retrieve information about the changes made to the entities tracked by the DbContext. The ExecuteInTransactionAsync method allows you to execute an asynchronous action within a transaction scope, ensuring that the transaction is properly committed or rolled back based on the success of the action. The GetChanges methods allow you to retrieve information about the changes made to the entities, including the entity name, entity ID, change action (inserted, updated, deleted), and the properties that were changed (with their current and original values). These methods can be used for auditing purposes or to track changes in the application.</summary>
 public static class DbContextExtensions
 {
-    /// <summary>
-    /// Executes the specified action within a transaction scope. The transaction will be committed if the action completes successfully, or rolled back if an exception is thrown.
-    /// </summary>
+    /// <summary>Executes the specified action within a transaction scope. The transaction will be committed if the action completes successfully, or rolled back if an exception is thrown. .</summary>
     /// <param name="db">The DbContext instance.</param>
     /// <param name="action">The action to execute within the transaction.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
@@ -39,9 +35,7 @@ public static class DbContextExtensions
         transaction.Complete();
     }
 
-    /// <summary>
-    /// Gets the changes made to the entities tracked by the DbContext. This method returns an enumerable of EntityChange objects, which contain information about the entity name, entity ID, change action (inserted, updated, deleted), and the properties that were changed (with their current and original values).   
-    /// </summary>
+    /// <summary>Gets the changes made to the entities tracked by the DbContext. This method returns an enumerable of EntityChange objects, which contain information about the entity name, entity ID, change action (inserted, updated, deleted), and the properties that were changed (with their current and original values). .</summary>
     /// <param name="entities">The collection of entity entries to analyze for changes.</param>
     /// <returns>An enumerable of EntityChange objects representing the changes.</returns>
     [DebuggerStepThrough]
@@ -49,18 +43,14 @@ public static class DbContextExtensions
         entities.Select(ToEntityChange).Where(x => x is not null)
             .Cast<EntityChange>();
 
-    /// <summary>
-    /// Gets the changes made to the entities tracked by the DbContext. This method returns an enumerable of EntityChange objects, which contain information about the entity name, entity ID, change action (inserted, updated, deleted), and the properties that were changed (with their current and original values).
-    /// </summary>
+    /// <summary>Gets the changes made to the entities tracked by the DbContext. This method returns an enumerable of EntityChange objects, which contain information about the entity name, entity ID, change action (inserted, updated, deleted), and the properties that were changed (with their current and original values). .</summary>
     /// <param name="dbContext">The DbContext instance.</param>
     /// <returns>An enumerable of EntityChange objects representing the changes.</returns>
     [DebuggerStepThrough]
     public static IEnumerable<EntityChange> GetChanges(this DbContext dbContext) =>
         dbContext.ChangeTracker.Entries().GetChanges();
 
-    /// <summary>
-    /// Converts an EntityEntry to an EntityChange object, which contains information about the entity name, entity ID, change action (inserted, updated, deleted), and the properties that were changed (with their current and original values). If the entity state is unchanged or detached, this method returns null.
-    /// </summary>
+    /// <summary>Converts an EntityEntry to an EntityChange object, which contains information about the entity name, entity ID, change action (inserted, updated, deleted), and the properties that were changed (with their current and original values). If the entity state is unchanged or detached, this method returns null. .</summary>
     /// <param name="entityEntry">The EntityEntry to convert.</param>
     /// <returns>An EntityChange object representing the changes, or null if the entity state is unchanged or detached.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the entity has no primary key.</exception>
@@ -102,9 +92,7 @@ public static class DbContextExtensions
         return new(entityName, entityId, changeAction, changes);
     }
 
-    /// <summary>
-    /// Creates a new PropertyChange instance representing the change in value for the specified property entry.    
-    /// </summary>
+    /// <summary>Creates a new PropertyChange instance representing the change in value for the specified property entry. .</summary>
     /// <param name="propertyEntry">The property entry containing metadata and value information for the property to be tracked. Cannot be null.</param>
     /// <returns>A PropertyChange object containing the property name, current value, and original value as strings.</returns>
     [DebuggerStepThrough]

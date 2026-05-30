@@ -19,9 +19,7 @@ namespace Chishiki;
 /// <param name="loggerFactory">Optional logger factory used to create loggers for derived types. Defaults to <c>null</c> when not provided.</param>
 public abstract partial class DisposableAsync(ILogger? logger = null, ILoggerFactory? loggerFactory = null) : Loggable(logger, loggerFactory), IAsyncDisposable
 {
-    /// <summary>
-    /// Gets a value indicating whether the object has already been disposed. This flag prevents multiple disposal attempts and ensures that disposal logic is executed only once.
-    /// </summary>
+    /// <summary>Gets a value indicating whether the object has already been disposed. This flag prevents multiple disposal attempts and ensures that disposal logic is executed only once. .</summary>
     private bool _disposedValue;
 
     /// <summary>Releases managed resources asynchronously. Override to dispose owned <see cref="IAsyncDisposable"/> or <see cref="IDisposable"/> members.</summary>

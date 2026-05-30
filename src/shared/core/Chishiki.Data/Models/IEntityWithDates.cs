@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        IEntityWithDates.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Interface for entities with automatic date tracking (CreatedOn, UpdatedOn).
@@ -10,23 +10,17 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Models;
 
-/// <summary>
-/// Interface for entities with automatic date tracking (CreatedOn, UpdatedOn).
-/// </summary>
+/// <summary>Interface for entities with automatic date tracking (CreatedOn, UpdatedOn).</summary>
 /// <typeparam name="TKey">The type of the entity's primary key.</typeparam>
 public interface IEntityWithDates<out TKey> : IEntity<TKey>
 {
-    /// <summary>
-    /// Gets the created on.
-    /// </summary>
+    /// <summary>Gets the created on. .</summary>
     /// <value>
     /// The created on.
     /// </value>
     DateTimeOffset CreatedOn { get; }
 
-    /// <summary>
-    /// Gets the updated on.
-    /// </summary>
+    /// <summary>Gets the updated on. .</summary>
     /// <value>
     /// The updated on.
     /// </value>

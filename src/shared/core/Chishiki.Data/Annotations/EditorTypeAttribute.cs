@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // File:        EditorTypeAttribute.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Attribute for specifying the editor type to use when rendering a property.
@@ -10,16 +10,12 @@
 // -----------------------------------------------------------------------------
 namespace Chishiki.Data.Annotations;
 
-/// <summary>
-/// Attribute for specifying the editor type to use when rendering a property.
-/// </summary>
+/// <summary>Attribute for specifying the editor type to use when rendering a property.</summary>
 /// <seealso cref="Attribute" />
 [AttributeUsage(AttributeTargets.Property)]
 public class EditorTypeAttribute(EditorType editorType) : Attribute
 {
-    /// <summary>
-    /// Gets the editor type.
-    /// </summary>
+    /// <summary>Gets the editor type. .</summary>
     public EditorType EditorType { get; init; } = editorType;
 }
 
