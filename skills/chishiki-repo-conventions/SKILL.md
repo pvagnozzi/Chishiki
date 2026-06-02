@@ -19,6 +19,7 @@ Pi-compatible repository guidance distilled from the existing GitHub Copilot ins
 - Follow direct user or task instructions first.
 - Prefer factual inspection of the repository over assumptions when layout or implementation details may have changed.
 - Preserve existing structure and style; make the smallest safe change that satisfies the request.
+- In C# files with clearly distinct member groups, separate sections with `#region` / `#endregion` using concise labels that match the member grouping.
 - Do not broaden edits into unsolicited refactors or cleanup.
 - Track reasoning and work in task artifacts/notes, not in ad-hoc repo-root scratch files.
 

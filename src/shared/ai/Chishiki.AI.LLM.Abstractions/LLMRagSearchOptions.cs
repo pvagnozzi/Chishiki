@@ -18,7 +18,7 @@ public sealed record LLMRagSearchOptions
     public int TopK { get; init; } = 5;
 
     /// <summary>Gets the minimum relevance score threshold in the range [0, 1]. Results below this value are discarded. Defaults to <c>0.0</c>.</summary>
-    public double MinRelevanceScore { get; init; } = 0.0;
+    public double MinRelevanceScore { get; init; }
 
     /// <summary>Gets optional metadata filters applied before the vector search. Only documents matching all pairs are considered.</summary>
     public IReadOnlyDictionary<string, string>? Filters { get; init; }

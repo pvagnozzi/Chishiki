@@ -33,15 +33,17 @@ public sealed partial class SKLLMClient(
     string providerName,
     ILogger<SKLLMClient> logger) : Service(logger), ILLMClient
 {
+    #region Properties
+
     /// <inheritdoc/>
     public string DefaultModelId => defaultModelId;
 
     /// <inheritdoc/>
     public string ProviderName => providerName;
 
-    // -------------------------------------------------------------------------
-    // Chat
-    // -------------------------------------------------------------------------
+    #endregion
+
+    #region Chat
 
     /// <inheritdoc/>
     public Task<LLMChatResponse> CompleteAsync(
@@ -63,9 +65,9 @@ public sealed partial class SKLLMClient(
         return chatClient.CompleteStreamingAsync(messages, options, cancellationToken);
     }
 
-    // -------------------------------------------------------------------------
-    // Embedding
-    // -------------------------------------------------------------------------
+    #endregion
+
+    #region Embedding
 
     /// <inheritdoc/>
     public Task<ReadOnlyMemory<float>> GenerateEmbeddingAsync(
@@ -87,9 +89,9 @@ public sealed partial class SKLLMClient(
         return embeddingClient.GenerateEmbeddingsAsync(texts, options, cancellationToken);
     }
 
-    // -------------------------------------------------------------------------
-    // RAG
-    // -------------------------------------------------------------------------
+    #endregion
+
+    #region RAG
 
     /// <inheritdoc/>
     public Task IngestAsync(string collectionName, LLMRagDocument document, CancellationToken cancellationToken = default) =>
@@ -111,9 +113,9 @@ public sealed partial class SKLLMClient(
     public Task<LLMRagAskResult> AskAsync(string collectionName, string question, LLMRagSearchOptions? searchOptions = null, LLMChatOptions? chatOptions = null, CancellationToken cancellationToken = default) =>
         ragClient.AskAsync(collectionName, question, searchOptions, chatOptions, cancellationToken);
 
-    // -------------------------------------------------------------------------
-    // Log messages
-    // -------------------------------------------------------------------------
+    #endregion
+
+    #region Log Messages
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Delegating chat to provider '{Provider}' model '{ModelId}'")]
     private partial void LogDelegatingChat(string provider, string modelId);
@@ -123,4 +125,6 @@ public sealed partial class SKLLMClient(
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Delegating embedding to provider '{Provider}' for {TextCount} text(s)")]
     private partial void LogDelegatingEmbedding(string provider, int textCount);
+
+    #endregion
 }

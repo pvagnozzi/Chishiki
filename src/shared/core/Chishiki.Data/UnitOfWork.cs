@@ -26,6 +26,8 @@ namespace Chishiki.Data;
 /// <param name="loggerFactory">The logger factory.</param>
 public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILoggerFactory loggerFactory) : Disposable(null, loggerFactory), IUnitOfWork
 {
+    #region Properties
+
     /// <summary>The logger factory .</summary>
     protected ILoggerFactory LoggerFactory { get; } = loggerFactory;
 
@@ -38,6 +40,10 @@ public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILo
     /// </value>
     private IRepositoryFactory RepositoryFactory =>
         field ??= BuildRepositoryFactory(_repositoryMapper, LoggerFactory);
+
+    #endregion
+
+    #region Repository Access
 
     /// <summary>Gets the read only repository. .</summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
@@ -63,6 +69,10 @@ public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILo
         return result;
     }
 
+    #endregion
+
+    #region Save Operations
+
     /// <summary>Saves the changes asynchronous. .</summary>
     /// <param name="saveAudit"></param>
     /// <param name="userId"></param>
@@ -74,6 +84,10 @@ public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILo
         LogSaveChangesAsyncCompleted(Logger);
     }
 
+    #endregion
+
+    #region Audit Operations
+
     public virtual Task SaveAuditsAsync<T>(IList<T> audits,
         CancellationToken cancellationToken = default)
         where T : class, IEntityAudit, new() => Task.CompletedTask;
@@ -82,6 +96,10 @@ public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILo
         CancellationToken cancellationToken = default)
         where T : class, IEntityAudit, new() => Task.FromResult<IList<T>>([]);
 
+    #endregion
+
+    #region Disposal
+
     /// <summary>Disposes the resources. .</summary>
     protected override void DisposeManaged()
     {
@@ -89,6 +107,10 @@ public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILo
         DisposeUnitOfWork();
         base.DisposeManaged();
     }
+
+    #endregion
+
+    #region Abstract Hooks
 
     /// <summary>Builds the repository factory. .</summary>
     /// <param name="repositoryMapper">The repository mapper.</param>
@@ -105,6 +127,10 @@ public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILo
     /// <returns></returns>
     protected abstract Task SaveUnitOfWorkAsync(CancellationToken cancellationToken = default);
 
+    #endregion
+
+    #region Log Messages
+
     [LoggerMessage(Level = LogLevel.Debug, Message = "GetReadOnlyRepository '{Entity}'")]
     private static partial void LogGetReadOnlyRepository(ILogger logger, Type entity);
 
@@ -119,7 +145,6 @@ public abstract partial class UnitOfWork(IRepositoryMapper repositoryMapper, ILo
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "DisposeResources")]
     private static partial void LogDisposeResources(ILogger logger);
+
+    #endregion
 }
-
-
-

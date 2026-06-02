@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // File:        ManagedResourceExample.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Example demonstrating DisposableAsync usage for managing async resources.
@@ -18,7 +18,7 @@ namespace Chishiki.MCP.Host.Resources;
 /// This is a demonstration class showing best practices for managing resources
 /// that require async cleanup (e.g., database connections, stream flushing, API graceful shutdown).
 /// </remarks>
-internal sealed partial class ManagedResourceExample : DisposableAsync
+internal sealed partial class ManagedResourceExample : AsyncDisposable
 {
     private string? _resourceName;
 

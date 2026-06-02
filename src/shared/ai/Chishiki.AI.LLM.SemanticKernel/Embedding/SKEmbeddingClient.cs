@@ -61,7 +61,7 @@ public sealed partial class SKEmbeddingClient(
         try
         {
             var results = await embeddingGenerator.GenerateAsync(texts, cancellationToken: cancellationToken);
-            IReadOnlyList<ReadOnlyMemory<float>> embeddings = results.Select(e => e.Vector).ToList();
+            IReadOnlyList<ReadOnlyMemory<float>> embeddings = [.. results.Select(e => e.Vector)];
             LogEmbeddingCompleted(texts.Count, embeddings.Count > 0 ? embeddings[0].Length : 0);
             return embeddings;
         }

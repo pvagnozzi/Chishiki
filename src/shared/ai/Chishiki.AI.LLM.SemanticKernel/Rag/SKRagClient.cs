@@ -12,11 +12,9 @@
 using System.Text;
 using System.Text.Json;
 using Chishiki.AI.LLM.Abstractions;
-using Chishiki.AI.LLM.SemanticKernel.Chat;
 using Chishiki.Services;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace Chishiki.AI.LLM.SemanticKernel.Rag;
@@ -31,14 +29,16 @@ public sealed partial class SKRagClient(
     IChatCompletionService _,  // Temporarily unused pending RAG implementation
     ILogger<SKRagClient> logger) : Service(logger), ILLMRagClient
 {
+    #region Constants
+
     private const string RagSystemPrompt =
         "You are a helpful assistant. Answer the question using ONLY the context provided below. " +
         "If the context does not contain enough information to answer, say you don't know. " +
         "Do not make up information.\n\nContext:\n{0}";
 
-    // -------------------------------------------------------------------------
-    // Ingest
-    // -------------------------------------------------------------------------
+    #endregion
+
+    #region Ingest
 
     /// <inheritdoc/>
     public Task IngestAsync(
@@ -58,9 +58,9 @@ public sealed partial class SKRagClient(
         throw new NotImplementedException("SK VectorStore integration pending - types not found in Microsoft.Extensions.VectorData.Abstractions 10.6.0");
     }
 
-    // -------------------------------------------------------------------------
-    // Delete
-    // -------------------------------------------------------------------------
+    #endregion
+
+    #region Delete
 
     /// <inheritdoc/>
     public Task DeleteAsync(
@@ -71,9 +71,9 @@ public sealed partial class SKRagClient(
         throw new NotImplementedException("SK VectorStore integration pending - types not found in Microsoft.Extensions.VectorData.Abstractions 10.6.0");
     }
 
-    // -------------------------------------------------------------------------
-    // Search
-    // -------------------------------------------------------------------------
+    #endregion
+
+    #region Search
 
     /// <inheritdoc/>
     public Task<IReadOnlyList<LLMRagSearchResult>> SearchAsync(
@@ -85,9 +85,9 @@ public sealed partial class SKRagClient(
         throw new NotImplementedException("SK VectorStore integration pending - types not found in Microsoft.Extensions.VectorData.Abstractions 10.6.0");
     }
 
-    // -------------------------------------------------------------------------
-    // Ask
-    // -------------------------------------------------------------------------
+    #endregion
+
+    #region Ask
 
     /// <inheritdoc/>
     public async Task<LLMRagAskResult> AskAsync(
@@ -100,9 +100,9 @@ public sealed partial class SKRagClient(
         throw new NotImplementedException("SK VectorStore integration pending - types not found in Microsoft.Extensions.VectorData.Abstractions 10.6.0");
     }
 
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
+    #endregion
+
+    #region Private Helpers
 
     private async Task<SKRagRecord> ToRecordAsync(LLMRagDocument doc, CancellationToken ct)
     {
@@ -130,18 +130,9 @@ public sealed partial class SKRagClient(
 
         return new LLMRagDocument(record.Id, record.Text, metadata);
     }
+    #endregion
 
-    private static string BuildContext(IReadOnlyList<LLMRagSearchResult> sources)
-    {
-        var sb = new StringBuilder();
-        for (var i = 0; i < sources.Count; i++)
-            sb.AppendLine($"[{i + 1}] {sources[i].Document.Text}");
-        return sb.ToString();
-    }
-
-    // -------------------------------------------------------------------------
-    // Log messages
-    // -------------------------------------------------------------------------
+    #region Log Messages
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Ingesting {Count} document(s) into collection '{Collection}'")]
     private partial void LogIngestStarted(string collection, int count);
@@ -166,4 +157,6 @@ public sealed partial class SKRagClient(
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "RAG ask on '{Collection}' answered ({AnswerLength} chars) from {SourceCount} source(s)")]
     private partial void LogAskCompleted(string collection, int answerLength, int sourceCount);
+
+    #endregion
 }

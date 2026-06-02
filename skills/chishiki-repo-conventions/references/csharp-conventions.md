@@ -40,6 +40,26 @@ Expected minimums:
 
 When an implementation already uses `<inheritdoc/>`, prefer documenting the abstraction/interface instead of duplicating text in every implementation.
 
+## Region Organization
+
+Use `#region` / `#endregion` in C# files when a type contains clearly distinct groups of members, for example:
+
+- `Properties`
+- `Query`
+- `Async Methods`
+- `Sync Methods`
+- `Repository Access`
+- `Save Operations`
+- `Private Helpers`
+- `Log Messages`
+
+Guidelines:
+
+- Prefer short, concrete region names.
+- Only add regions when they improve navigation; avoid wrapping every tiny member in its own region.
+- Match existing grouping patterns already used in nearby files when available.
+- Keep member order unchanged unless the task explicitly asks for a refactor.
+
 ## Logging
 
 - Use structured logging.

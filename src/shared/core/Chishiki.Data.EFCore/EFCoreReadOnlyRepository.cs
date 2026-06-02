@@ -24,14 +24,24 @@ internal partial class EFCoreReadOnlyRepository<TKey, TEntity>(DbContext context
     : IReadOnlyRepository<TKey, TEntity>
     where TEntity : class, IEntity<TKey>
 {
+    #region Properties
+
     /// <summary>Gets the underlying <see cref="DbContext"/>.</summary>
     protected DbContext Context { get; } = context;
 
     /// <summary>Gets the logger for this repository.</summary>
     protected ILogger Logger { get; } = logger;
 
+    #endregion
+
+    #region Query
+
     /// <inheritdoc/>
     public IQueryable<TEntity> AsQuery() => Context.Set<TEntity>().AsNoTracking();
+
+    #endregion
+
+    #region Async Methods
 
     /// <inheritdoc/>
     public async Task<TEntity?> GetByIdAsync(TKey key, CancellationToken cancellationToken = default)
@@ -76,6 +86,10 @@ internal partial class EFCoreReadOnlyRepository<TKey, TEntity>(DbContext context
             .ApplySpecification(specification)
             .ToPagedListAsync<TKey, TEntity>(specification.PageSize, specification.PageIndex, cancellationToken);
     }
+
+    #endregion
+
+    #region Sync Methods
 
     /// <inheritdoc/>
     public TEntity? GetById(TKey key)
@@ -122,6 +136,10 @@ internal partial class EFCoreReadOnlyRepository<TKey, TEntity>(DbContext context
         // The DbContext lifetime is managed by the Unit of Work; repositories must not dispose it.
         LogDisposed(Logger, typeof(TEntity));
 
+    #endregion
+
+    #region Log Messages
+
     [LoggerMessage(Level = LogLevel.Debug, Message = "GetById for entity '{EntityType}'")]
     private static partial void LogGetById(ILogger logger, Type entityType);
 
@@ -139,4 +157,6 @@ internal partial class EFCoreReadOnlyRepository<TKey, TEntity>(DbContext context
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Disposed read-only repository for entity '{EntityType}'")]
     private static partial void LogDisposed(ILogger logger, Type entityType);
+
+    #endregion
 }

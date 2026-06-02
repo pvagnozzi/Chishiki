@@ -11,51 +11,69 @@
 
 using System.Threading.Channels;
 using Chishiki.Vision.Abstraction;
+using Chishiki.Vision.Abstraction.Detectors.Motion;
+using Chishiki.Vision.Abstraction.Monitors;
+using Chishiki.Vision.Abstraction.Sources;
 using Microsoft.Extensions.Logging;
 
-namespace Chishiki.Vision.OpenCV;
+namespace Chishiki.Vision.Common.Monitors;
 
 /// <summary>Monitors a single <see cref="IVideoSource"/>, capturing frames at a configurable rate and passing them through an <see cref="IMotionDetector"/> via an internal bounded <see cref="Channel{T}"/> (producer/consumer pattern). The capture loop runs on its own <see cref="Task"/> and uses <see cref="PeriodicTimer"/> for accurate FPS throttling without thread blocking.</summary>
-public sealed partial class CameraMonitor : ICameraMonitor
+public abstract partial class VideoSourceMonitor : AsyncDisposable, IVideoSourceMonitor
 {
-    private readonly IVideoSource _source;
-    private readonly IMotionDetector _detector;
-    private readonly CameraMonitorOptions _options;
-    private readonly ILogger<CameraMonitor> _logger;
+    /// <summary>
+    /// Frame channel.
+    /// </summary>
     private readonly Channel<IImage> _frameChannel;
 
+    /// <summary>
+    /// Cancellation token source.
+    /// </summary>
     private CancellationTokenSource? _cts;
+
+    /// <summary>
+    /// Capture and detection tasks run concurrently: the capture task produces frames at the configured FPS and writes them to the channel, while the detection task consumes frames from the channel and runs motion detection. Both tasks observe the same cancellation token for coordinated shutdown. The channel's DropOldest policy ensures that if the producer outpaces the consumer, the oldest frame will be discarded to maintain real-time performance without blocking the capture loop.
+    /// </summary>
     private Task? _captureTask;
+
+    /// <summary>
+    /// Detection task consumes frames from the channel and runs motion detection. Observes the same cancellation token for coordinated shutdown.
+    /// </summary>
     private Task? _detectTask;
-    private bool _disposed;
 
     /// <inheritdoc/>
-    public string CameraId { get; }
+    public IVideoSource VideoSource { get; }
+
+    /// <inheritdoc/>
+    public IMotionDetector Detector { get; }
+
+    /// <inheritdoc/>
+    public VideoSourceMonitorOptions Options { get; }
 
     /// <inheritdoc/>
     public bool IsRunning => _captureTask is { IsCompleted: false };
 
+    /// <summary> Gets the video source id. </summary>
+    public string VideoSourceId => VideoSource.VideoSourceId;
+
     /// <inheritdoc/>
     public event EventHandler<MotionDetectedEventArgs>? MotionDetected;
 
-    /// <summary>Initialises a new <see cref="CameraMonitor"/> for the given camera. .</summary>
-    /// <param name="cameraId">Unique identifier for this camera.</param>
+    /// <summary>Initializes a new <see cref="VideoSourceMonitor"/> for the given camera. .</summary>
     /// <param name="source">The video source to capture from.</param>
     /// <param name="detector">The motion detector to run on each frame.</param>
     /// <param name="options">Configuration options for this monitor.</param>
     /// <param name="logger">Logger used for diagnostics.</param>
-    public CameraMonitor(
-        string cameraId,
+    protected VideoSourceMonitor(
         IVideoSource source,
         IMotionDetector detector,
-        CameraMonitorOptions options,
-        ILogger<CameraMonitor> logger)
+        VideoSourceMonitorOptions options,
+        ILogger<VideoSourceMonitor> logger)
+        : base(logger)
     {
-        CameraId = cameraId;
-        _source = source;
-        _detector = detector;
-        _options = options;
-        _logger = logger;
+        VideoSource = source;
+        Detector = detector;
+        Options = options;
 
         _frameChannel = Channel.CreateBounded<IImage>(new BoundedChannelOptions(options.ChannelCapacity)
         {
@@ -68,11 +86,10 @@ public sealed partial class CameraMonitor : ICameraMonitor
     /// <inheritdoc/>
     public Task StartAsync(CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-
+        CheckDisposed();
         if (IsRunning)
         {
-            LogAlreadyRunning(CameraId);
+            LogAlreadyRunning(Logger, VideoSourceId);
             return Task.CompletedTask;
         }
 
@@ -82,7 +99,7 @@ public sealed partial class CameraMonitor : ICameraMonitor
         _captureTask = CaptureLoopAsync(token);
         _detectTask = DetectLoopAsync(token);
 
-        LogMonitorStarted(CameraId);
+        LogMonitorStarted(Logger, VideoSourceId);
         return Task.CompletedTask;
     }
 
@@ -90,61 +107,66 @@ public sealed partial class CameraMonitor : ICameraMonitor
     public async Task StopAsync()
     {
         if (_cts is null)
+        {
             return;
+        }
 
         await _cts.CancelAsync();
         _ = _frameChannel.Writer.TryComplete();
 
         try
         {
-            if (_captureTask is not null) await _captureTask;
-            if (_detectTask is not null) await _detectTask;
+            if (_captureTask is not null)
+            {
+                await _captureTask;
+            }
+
+            if (_detectTask is not null)
+            {
+                await _detectTask;
+            }
         }
         catch (OperationCanceledException) { /* expected on graceful stop */ }
 
-        LogMonitorStopped(CameraId);
+        LogMonitorStopped(Logger, VideoSourceId);
     }
 
     /// <inheritdoc/>
-    public async ValueTask DisposeAsync()
+    protected override async ValueTask DisposeManagedAsync(CancellationToken cancellationToken = default)
     {
-        if (_disposed)
-            return;
-
-        _disposed = true;
         await StopAsync();
         _cts?.Dispose();
-        _source.Dispose();
-        _detector.Dispose();
+        VideoSource.Dispose();
+        Detector.Dispose();
+        await base.DisposeManagedAsync(cancellationToken);
     }
 
-    // -------------------------------------------------------------------------
-    // Private loops
-    // -------------------------------------------------------------------------
-
+    #region Private loops    
     /// <summary>Producer: captures frames at the configured FPS and writes them to the channel.</summary>
     /// <param name="cancellationToken">Token to observe for cancellation.</param>
     private async Task CaptureLoopAsync(CancellationToken cancellationToken)
     {
-        var interval = TimeSpan.FromSeconds(1.0 / _options.FramesPerSecond);
+        var interval = TimeSpan.FromSeconds(1.0 / Options.FramesPerSecond);
         using var timer = new PeriodicTimer(interval);
 
         try
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
-                var frame = _source.GetFrame();
+                var frame = await VideoSource.GetImageAsync(cancellationToken);
 
                 if (frame.IsEmpty())
                 {
                     frame.Dispose();
-                    LogEmptyFrameSkipped(CameraId);
+                    LogEmptyFrameSkipped(Logger, VideoSourceId);
                     continue;
                 }
 
                 // DropOldest policy ensures the channel never blocks the producer.
                 if (!_frameChannel.Writer.TryWrite(frame))
+                {
                     frame.Dispose();
+                }
             }
         }
         catch (OperationCanceledException) { /* graceful exit */ }
@@ -166,14 +188,16 @@ public sealed partial class CameraMonitor : ICameraMonitor
                 {
                     try
                     {
-                        var result = await _detector.DetectAsync(frame, cancellationToken);
+                        var result = await Detector.DetectAsync(frame, cancellationToken);
 
-                        if (!_options.RaiseOnlyOnMotion || result.HasMotion)
+                        if (!Options.RaiseOnlyOnMotion || result.HasMotion)
+                        {
                             RaiseMotionDetected(result);
+                        }
                     }
                     catch (Exception ex) when (ex is not OperationCanceledException)
                     {
-                        LogDetectionError(CameraId, ex);
+                        LogDetectionError(Logger, VideoSourceId, ex);
                     }
                 }
             }
@@ -184,29 +208,28 @@ public sealed partial class CameraMonitor : ICameraMonitor
     /// <summary>Raises the <see cref="MotionDetected"/> event on the thread pool.</summary>
     /// <param name="result">The motion detection result to publish.</param>
     private void RaiseMotionDetected(MotionDetectionResult result) =>
-        MotionDetected?.Invoke(this, new MotionDetectedEventArgs(CameraId, result));
+        MotionDetected?.Invoke(this, new MotionDetectedEventArgs(VideoSourceId, result));
+    #endregion
 
-    // -------------------------------------------------------------------------
-    // Compile-time logging
-    // -------------------------------------------------------------------------
-
+    #region Compile-time logging    
     /// <summary>Emitted when the monitor is started.</summary>
     [LoggerMessage(Level = LogLevel.Information, Message = "Camera monitor '{CameraId}' started.")]
-    private partial void LogMonitorStarted(string cameraId);
+    private static partial void LogMonitorStarted(ILogger logger, string cameraId);
 
     /// <summary>Emitted when the monitor is stopped.</summary>
     [LoggerMessage(Level = LogLevel.Information, Message = "Camera monitor '{CameraId}' stopped.")]
-    private partial void LogMonitorStopped(string cameraId);
+    private static partial void LogMonitorStopped(ILogger logger, string cameraId);
 
     /// <summary>Emitted when the monitor is already running.</summary>
     [LoggerMessage(Level = LogLevel.Warning, Message = "Camera monitor '{CameraId}' is already running.")]
-    private partial void LogAlreadyRunning(string cameraId);
+    private static partial void LogAlreadyRunning(ILogger logger, string cameraId);
 
     /// <summary>Emitted when an empty frame is received from the video source.</summary>
     [LoggerMessage(Level = LogLevel.Debug, Message = "Camera '{CameraId}': empty frame skipped.")]
-    private partial void LogEmptyFrameSkipped(string cameraId);
+    private static partial void LogEmptyFrameSkipped(ILogger logger, string cameraId);
 
     /// <summary>Emitted when motion detection raises an unexpected error.</summary>
     [LoggerMessage(Level = LogLevel.Error, Message = "Camera '{CameraId}': error during motion detection.")]
-    private partial void LogDetectionError(string cameraId, Exception ex);
+    private static partial void LogDetectionError(ILogger logger, string cameraId, Exception ex);
+    #endregion
 }

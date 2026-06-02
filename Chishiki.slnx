@@ -56,6 +56,8 @@
   </Folder>
   <Folder Name="/src/shared/vision/">
     <Project Path="src/shared/vision/Chishiki.Vision.Abstraction/Chishiki.Vision.Abstraction.csproj" Id="829c151a-5761-486c-8c04-f9fde6ec8ea2" />
+    <Project Path="src/shared/vision/Chishiki.Vision.Common/Chishiki.Vision.Common.csproj" Id="845e4b43-cf57-4764-92b8-8d5d0e46d193" />
+    <Project Path="src/shared/vision/Chishiki.Vision.Onnx/Chishiki.Vision.Onnx.csproj" />
     <Project Path="src/shared/vision/Chishiki.Vision.OpenCV/Chishiki.Vision.OpenCV.csproj" Id="9b57dc50-7d0c-4d63-9fd0-39f372d37164" />
   </Folder>
 

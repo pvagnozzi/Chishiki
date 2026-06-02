@@ -24,6 +24,8 @@ internal sealed partial class EFCoreRepository<TKey, TEntity>(DbContext context,
     : EFCoreReadOnlyRepository<TKey, TEntity>(context, logger), IRepository<TKey, TEntity>
     where TEntity : class, IEntity<TKey>
 {
+    #region Async Methods
+
     /// <inheritdoc/>
     public Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
@@ -94,6 +96,10 @@ internal sealed partial class EFCoreRepository<TKey, TEntity>(DbContext context,
         Context.Set<TEntity>().RemoveRange(entities);
     }
 
+    #endregion
+
+    #region Sync Methods
+
     /// <inheritdoc/>
     public void Add(TEntity entity) => Context.Set<TEntity>().Add(entity);
 
@@ -130,6 +136,10 @@ internal sealed partial class EFCoreRepository<TKey, TEntity>(DbContext context,
         Context.Set<TEntity>().RemoveRange(entities);
     }
 
+    #endregion
+
+    #region Log Messages
+
     [LoggerMessage(Level = LogLevel.Debug, Message = "Add entity '{EntityType}'")]
     private static partial void LogAdd(ILogger logger, Type entityType);
 
@@ -153,4 +163,6 @@ internal sealed partial class EFCoreRepository<TKey, TEntity>(DbContext context,
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "DeleteRangeById entity '{EntityType}'")]
     private static partial void LogDeleteRangeById(ILogger logger, Type entityType);
+
+    #endregion
 }

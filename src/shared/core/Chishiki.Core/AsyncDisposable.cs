@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // File:        DisposableAsync.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Abstract base class implementing IAsyncDisposable with structured logging for async resource cleanup.
@@ -8,6 +8,7 @@
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
+
 using Chishiki.Logging;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -17,10 +18,10 @@ namespace Chishiki;
 /// <summary>Abstract base class implementing IAsyncDisposable with structured logging for async resource cleanup.</summary>
 /// <param name="logger">Optional logger used to emit disposal diagnostics. Defaults to <see cref="NullLogger.Instance"/> when not provided.</param>
 /// <param name="loggerFactory">Optional logger factory used to create loggers for derived types. Defaults to <c>null</c> when not provided.</param>
-public abstract partial class DisposableAsync(ILogger? logger = null, ILoggerFactory? loggerFactory = null) : Loggable(logger, loggerFactory), IAsyncDisposable
+public abstract partial class AsyncDisposable(ILogger? logger = null, ILoggerFactory? loggerFactory = null) : Loggable(logger, loggerFactory), IAsyncDisposable
 {
     /// <summary>Gets a value indicating whether the object has already been disposed. This flag prevents multiple disposal attempts and ensures that disposal logic is executed only once. .</summary>
-    private bool _disposedValue;
+    protected bool IsDisposed { get; private set; }
 
     /// <summary>Releases managed resources asynchronously. Override to dispose owned <see cref="IAsyncDisposable"/> or <see cref="IDisposable"/> members.</summary>
     /// <param name="cancellationToken">Token to observe for cancellation.</param>
@@ -40,7 +41,7 @@ public abstract partial class DisposableAsync(ILogger? logger = null, ILoggerFac
     /// <returns>A task representing the asynchronous disposal.</returns>
     protected virtual async ValueTask DisposeAsync(bool disposing, CancellationToken cancellationToken = default)
     {
-        if (_disposedValue)
+        if (IsDisposed)
         {
             return;
         }
@@ -64,12 +65,12 @@ public abstract partial class DisposableAsync(ILogger? logger = null, ILoggerFac
         }
         finally
         {
-            _disposedValue = true;
+            IsDisposed = true;
         }
     }
 
     /// <summary>Finalizer that invokes unmanaged resource cleanup synchronously.</summary>
-    ~DisposableAsync() => DisposeUnmanaged();
+    ~AsyncDisposable() => DisposeUnmanaged();
 
     /// <inheritdoc/>
     public async ValueTask DisposeAsync()
@@ -77,6 +78,11 @@ public abstract partial class DisposableAsync(ILogger? logger = null, ILoggerFac
         await DisposeAsync(disposing: true).ConfigureAwait(false);
         GC.SuppressFinalize(this);
     }
+
+    /// <summary>
+    /// Checks if the object has already been disposed and throws an <see cref="ObjectDisposedException"/> if it has. This method should be called at the beginning of any public method that accesses resources to ensure that operations are not performed on a disposed object.
+    /// </summary>
+    protected void CheckDisposed() => ObjectDisposedException.ThrowIf(IsDisposed, this);
 
     /// <summary>Emits a debug log entry when managed resources are being disposed asynchronously.</summary>
     [LoggerMessage(Level = LogLevel.Debug, Message = "Disposing managed resources asynchronously for {TypeName}")]

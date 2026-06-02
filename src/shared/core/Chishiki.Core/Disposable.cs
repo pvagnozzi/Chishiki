@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // File:        Disposable.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Abstract base class implementing IDisposable with structured logging and error handling.
@@ -20,7 +20,7 @@ namespace Chishiki;
 public abstract partial class Disposable(ILogger? logger = null, ILoggerFactory? loggerFactory = null) : Loggable(logger, loggerFactory), IDisposable
 {
     /// <summary>Gets a value indicating whether the object has already been disposed. This flag prevents multiple disposal attempts and ensures that disposal logic is executed only once. .</summary>
-    private bool _disposedValue;
+    protected bool DisposedValue { get; private set; }
 
     /// <summary>Releases managed resources. Override to dispose owned <see cref="IDisposable"/> members.</summary>
     protected virtual void DisposeManaged() { }
@@ -32,7 +32,7 @@ public abstract partial class Disposable(ILogger? logger = null, ILoggerFactory?
     /// <param name="disposing"><c>true</c> when called from <see cref="IDisposable.Dispose"/>; <c>false</c> when called from the finalizer.</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (_disposedValue)
+        if (DisposedValue)
         {
             return;
         }
@@ -56,9 +56,14 @@ public abstract partial class Disposable(ILogger? logger = null, ILoggerFactory?
         }
         finally
         {
-            _disposedValue = true;
+            DisposedValue = true;
         }
     }
+
+    /// <summary>
+    /// Throws an exception if this object has been disposed.
+    /// </summary>
+    protected void CheckDisposed() => ObjectDisposedException.ThrowIf(DisposedValue, this);
 
     /// <summary>Finalizer that invokes unmanaged resource cleanup.</summary>
     ~Disposable() => Dispose(disposing: false);

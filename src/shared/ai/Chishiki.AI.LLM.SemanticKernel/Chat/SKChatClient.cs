@@ -9,6 +9,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
+using System.Globalization;
 using Chishiki.AI.LLM.Abstractions;
 using Chishiki.Services;
 using Microsoft.Extensions.Logging;
@@ -107,38 +108,34 @@ public sealed partial class SKChatClient(
         return history;
     }
 
-    internal static PromptExecutionSettings? BuildSettings(LLMChatOptions? options)
-    {
-        if (options is null)
-            return null;
-
-        return new PromptExecutionSettings
-        {
-            ModelId = options.ModelId,
-            ExtensionData = new Dictionary<string, object?>
+    internal static PromptExecutionSettings? BuildSettings(LLMChatOptions? options) =>
+        options is null
+            ? null
+            : new PromptExecutionSettings
             {
-                ["temperature"] = options.Temperature,
-                ["top_p"] = options.TopP,
-                ["max_tokens"] = options.MaxTokens,
-                ["stop"] = options.StopSequences,
-            },
-        };
-    }
+                ModelId = options.ModelId,
+                ExtensionData = new Dictionary<string, object>
+                {
+                    ["temperature"] = options.Temperature ?? 0,
+                    ["top_p"] = options.TopP ?? 0,
+                    ["max_tokens"] = options.MaxTokens ?? 0,
+                    ["stop"] = options.StopSequences ?? []
+                }
+            };
 
     private static LLMTokenUsage? ExtractUsage(IReadOnlyDictionary<string, object?>? metadata)
     {
         if (metadata is null)
+        {
             return null;
+        }
 
-        var prompt = metadata.TryGetValue("PromptTokenCount", out var p) ? Convert.ToInt32(p) : 0;
-        var completion = metadata.TryGetValue("CompletionTokenCount", out var c) ? Convert.ToInt32(c) : 0;
+        var prompt = metadata.TryGetValue("PromptTokenCount", out var p) ? Convert.ToInt32(p, CultureInfo.InvariantCulture) : 0;
+        var completion = metadata.TryGetValue("CompletionTokenCount", out var c) ? Convert.ToInt32(c, CultureInfo.InvariantCulture) : 0;
         return prompt == 0 && completion == 0 ? null : new LLMTokenUsage(prompt, completion, prompt + completion);
     }
 
-    // -------------------------------------------------------------------------
-    // Log messages
-    // -------------------------------------------------------------------------
-
+    #region Log messages
     [LoggerMessage(Level = LogLevel.Debug, Message = "Starting chat completion with {MessageCount} messages")]
     private partial void LogChatStarted(int messageCount);
 
@@ -156,4 +153,5 @@ public sealed partial class SKChatClient(
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Streaming chat completed after {TotalChunks} chunks")]
     private partial void LogStreamingCompleted(int totalChunks);
+    #endregion
 }

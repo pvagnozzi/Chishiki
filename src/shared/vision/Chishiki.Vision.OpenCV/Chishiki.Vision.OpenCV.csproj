@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\core\Chishiki.Core\Chishiki.Core.csproj" />
     <ProjectReference Include="..\Chishiki.Vision.Abstraction\Chishiki.Vision.Abstraction.csproj" />
+    <ProjectReference Include="..\Chishiki.Vision.Common\Chishiki.Vision.Common.csproj" />
   </ItemGroup>
 
 </Project>
