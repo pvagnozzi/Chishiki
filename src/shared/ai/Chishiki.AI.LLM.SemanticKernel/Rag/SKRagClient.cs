@@ -15,7 +15,6 @@ using Chishiki.AI.LLM.Abstractions;
 using Chishiki.Services;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
-using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace Chishiki.AI.LLM.SemanticKernel.Rag;
 
@@ -26,7 +25,6 @@ namespace Chishiki.AI.LLM.SemanticKernel.Rag;
 public sealed partial class SKRagClient(
     // IVectorStore vectorStore,  // TODO: SK 1.76 - IVectorStore not found in Microsoft.Extensions.VectorData.Abstractions 10.6.0
     IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator,
-    IChatCompletionService _,  // Temporarily unused pending RAG implementation
     ILogger<SKRagClient> logger) : Service(logger), ILLMRagClient
 {
     #region Constants

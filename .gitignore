@@ -197,3 +197,14 @@ containers/ollama/models/
 !.crew/graphs/
 !.crew/artifacts/.gitkeep
 !.crew/graphs/.gitkeep
+
+# ────────────────────────────────────────────────────────────
+#  Pi project-local state
+# ────────────────────────────────────────────────────────────
+/.pi/npm/
+/.pi/git/
+/.pi/sessions/
+/.pi/cache/
+!.pi/settings.json
+!.pi/skills/
+!.pi/extensions/

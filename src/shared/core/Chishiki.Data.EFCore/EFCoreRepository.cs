@@ -3,7 +3,7 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: EF Core implementation of a full CRUD repository using DbContext.
 // Created:     2026-05-04
-// Modified:    2026-05-04
+// Modified:    2026-06-05
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -101,17 +101,30 @@ internal sealed partial class EFCoreRepository<TKey, TEntity>(DbContext context,
     #region Sync Methods
 
     /// <inheritdoc/>
-    public void Add(TEntity entity) => Context.Set<TEntity>().Add(entity);
+    public void Add(TEntity entity)
+    {
+        LogAdd(Logger, typeof(TEntity));
+        _ = Context.Set<TEntity>().Add(entity);
+    }
 
     /// <inheritdoc/>
-    public void Update(TEntity entity) => Context.Set<TEntity>().Update(entity);
+    public void Update(TEntity entity)
+    {
+        LogUpdate(Logger, typeof(TEntity));
+        _ = Context.Set<TEntity>().Update(entity);
+    }
 
     /// <inheritdoc/>
-    public void Delete(TEntity entity) => Context.Set<TEntity>().Remove(entity);
+    public void Delete(TEntity entity)
+    {
+        LogDelete(Logger, typeof(TEntity));
+        _ = Context.Set<TEntity>().Remove(entity);
+    }
 
     /// <inheritdoc/>
     public void DeleteById(TKey id)
     {
+        LogDeleteById(Logger, typeof(TEntity));
         var entity = Context.Set<TEntity>().Find(id);
         if (entity is not null)
         {
@@ -120,17 +133,30 @@ internal sealed partial class EFCoreRepository<TKey, TEntity>(DbContext context,
     }
 
     /// <inheritdoc/>
-    public void AddRange(IEnumerable<TEntity> entities) => Context.Set<TEntity>().AddRange(entities);
+    public void AddRange(IEnumerable<TEntity> entities)
+    {
+        LogAddRange(Logger, typeof(TEntity));
+        Context.Set<TEntity>().AddRange(entities);
+    }
 
     /// <inheritdoc/>
-    public void UpdateRange(IEnumerable<TEntity> entities) => Context.Set<TEntity>().UpdateRange(entities);
+    public void UpdateRange(IEnumerable<TEntity> entities)
+    {
+        LogUpdateRange(Logger, typeof(TEntity));
+        Context.Set<TEntity>().UpdateRange(entities);
+    }
 
     /// <inheritdoc/>
-    public void DeleteRange(IEnumerable<TEntity> entities) => Context.Set<TEntity>().RemoveRange(entities);
+    public void DeleteRange(IEnumerable<TEntity> entities)
+    {
+        LogDeleteRange(Logger, typeof(TEntity));
+        Context.Set<TEntity>().RemoveRange(entities);
+    }
 
     /// <inheritdoc/>
     public void DeleteRangeById(IEnumerable<TKey> ids)
     {
+        LogDeleteRangeById(Logger, typeof(TEntity));
         var idList = ids.ToList();
         var entities = Context.Set<TEntity>().Where(e => idList.Contains(e.Id)).ToList();
         Context.Set<TEntity>().RemoveRange(entities);

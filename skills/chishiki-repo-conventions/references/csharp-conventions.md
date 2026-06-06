@@ -63,7 +63,11 @@ Guidelines:
 ## Logging
 
 - Use structured logging.
-- Prefer meaningful property names over interpolated free-form strings when logging values.
+- Prefer `[LoggerMessage]` source-generated logging for recurring log messages, especially in infrastructure, hot paths, and top-level startup/shutdown flows.
+- Use PascalCase placeholder names such as `{DbContextName}` and `{PendingMigrations}`.
+- Keep `Exception` parameters last in logging method signatures.
+- Do not use string interpolation inside log templates; pass values as structured properties instead.
+- Prefer concrete `ILogger<T>` categories when straightforward, but do not widen scope into logger-category refactors unless the task requires it.
 - Keep log messages concise and actionable.
 
 ## Dependency Injection

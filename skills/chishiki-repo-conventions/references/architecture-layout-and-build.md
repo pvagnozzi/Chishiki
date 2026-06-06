@@ -2,6 +2,17 @@
 
 This reference captures the repository-specific architecture and layout guidance that remains useful after converting the GitHub Copilot instructions to Pi resources. It is intentionally curated rather than copied verbatim so it matches the current repository structure.
 
+## Start Here for Pi
+
+When working with Pi in this repository, read these files in order:
+
+1. `README.md` for the high-level project overview and entry points
+2. `skills/chishiki-repo-conventions/SKILL.md` for the repo-local Pi rules
+3. this file for current layout and build commands
+4. `skills/chishiki-repo-conventions/references/csharp-conventions.md` for C#-specific expectations
+
+Use `.github/copilot-instructions.md` as historical/reference material, but prefer the Pi skill resources plus the live repository tree when there is any mismatch.
+
 ## Architecture Summary
 
 Chishiki is a cloud-native distributed RAG platform exposed through an MCP host and built around .NET, Orleans, Aspire, and shared libraries under `src/shared`.

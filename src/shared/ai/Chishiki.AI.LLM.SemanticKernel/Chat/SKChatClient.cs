@@ -3,7 +3,7 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: ILLMChatClient implementation backed by a Semantic Kernel IChatCompletionService.
 // Created:     2026-05-10
-// Modified:    2026-05-10
+// Modified:    2026-06-05
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -69,8 +69,34 @@ public sealed partial class SKChatClient(
         var settings = BuildSettings(options);
         var chunkCount = 0;
 
-        await foreach (var chunk in chatService.GetStreamingChatMessageContentsAsync(history, settings, cancellationToken: cancellationToken))
+        await using var enumerator = chatService
+            .GetStreamingChatMessageContentsAsync(history, settings, cancellationToken: cancellationToken)
+            .GetAsyncEnumerator(cancellationToken);
+
+        while (true)
         {
+            StreamingChatMessageContent chunk;
+
+            try
+            {
+                if (!await enumerator.MoveNextAsync())
+                {
+                    break;
+                }
+
+                chunk = enumerator.Current;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                LogStreamingCanceled(chunkCount);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                LogStreamingFailed(chunkCount, ex);
+                throw;
+            }
+
             chunkCount++;
             LogChunkReceived(chunkCount);
             yield return new LLMStreamingChatChunk(chunk.Content ?? string.Empty, chunk.ModelId);
@@ -153,5 +179,11 @@ public sealed partial class SKChatClient(
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Streaming chat completed after {TotalChunks} chunks")]
     private partial void LogStreamingCompleted(int totalChunks);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Streaming chat canceled after {ChunkCount} chunks")]
+    private partial void LogStreamingCanceled(int chunkCount);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Streaming chat failed after {ChunkCount} chunks")]
+    private partial void LogStreamingFailed(int chunkCount, Exception ex);
     #endregion
 }

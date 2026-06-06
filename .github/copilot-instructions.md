@@ -2,7 +2,7 @@
 
 > **Chishiki** (知識 — *knowledge* in Japanese) is a cloud-native, distributed **RAG platform** exposed as a
 > **Model Context Protocol (MCP) server**, built on **.NET 10**, **Microsoft Orleans**, **.NET Aspire**,
-> and **Microsoft Kernel Memory**. Designed for on-premises or Azure deployment, including **Kubernetes**.
+> and shared AI/core/vision libraries for local and self-hosted workflows.
 
 > Pi users should start from the repo-local guidance in `skills/chishiki-repo-conventions/SKILL.md` and its
 > reference files. Those Pi resources are the maintained conversion of these repository conventions for Pi-based
@@ -28,7 +28,6 @@
 - [⚡ Async](#-async)
 - [🎨 Code Style](#-code-style)
 - [🧪 Testing](#-testing)
-- [☸️ Kubernetes](#-kubernetes)
 
 ---
 
@@ -50,23 +49,21 @@ commands, file header format, and XML documentation expectations.
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        .NET Aspire AppHost                          │
-│                    (Local & Kubernetes Orchestration)               │
+│                       (Local Orchestration)                         │
 └──────────────────────────────┬──────────────────────────────────────┘
                                │
           ┌────────────────────┼────────────────────┐
           ▼                    ▼                    ▼
 ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────────┐
-│  MCP Server     │  │  Orleans Silo   │  │    Infrastructure    │
-│  (ASP.NET Core) │  │  (Engine Host)  │  │                      │
+│  MCP Host       │  │ Shared          │  │    Infrastructure    │
+│  (ASP.NET Core) │  │ Libraries       │  │                      │
 │                 │  │                 │  │  • PostgreSQL+pgvec  │
-│  /mcp  :5010   │  │  Grains         │  │  • Qdrant            │
-│  StreamableHTTP │  │  Streams        │  │  • Redis             │
-│  Tools/Prompts  │  │  Reminders      │  │  • Keycloak (OIDC)   │
-└────────┬────────┘  └────────┬────────┘  │  • Ollama (LLM)      │
-         │                    │           │  • Prometheus+Grafana │
-         └────────────────────┘           └──────────────────────┘
-                    │ Orleans Redis Clustering
-                    │ Kernel Memory RAG Pipeline
+│  /mcp  :5010    │  │  • ai           │  │  • Qdrant            │
+│  Tools/Prompts  │  │  • core         │  │  • Redis             │
+│  StreamableHTTP │  │  • orleans      │  │  • Keycloak (OIDC)   │
+└────────┬────────┘  │  • vision       │  │  • Ollama (LLM)      │
+         │           └────────┬────────┘  │  • Prometheus+Grafana │
+         └────────────────────┴───────────┴──────────────────────┘
 ```
 
 ### Key Technology Choices
@@ -75,12 +72,12 @@ commands, file header format, and XML documentation expectations.
 |---|---|
 | RAG pipeline | Microsoft Kernel Memory |
 | Actor model | .NET Orleans 10 (virtual actors / grains) |
-| Orchestration | .NET Aspire 9.x (local + K8s) |
+| Orchestration | .NET Aspire 9.x (local) |
 | MCP transport | `ModelContextProtocol.AspNetCore` — StreamableHTTP at `/mcp` |
 | Vector store | Qdrant (primary) + PostgreSQL pgvector (secondary) |
 | Embedding / LLM | Ollama (`nomic-embed-text` default) |
 | Caching / clustering | Redis 7 |
-| Identity | Keycloak 26 — realm `chishiki`, client `chishiki-api` |
+| Identity | Keycloak 26 |
 | Observability | OpenTelemetry → Prometheus → Grafana |
 
 ---
@@ -89,57 +86,44 @@ commands, file header format, and XML documentation expectations.
 
 ```
 /
-├── src/                                    # All runnable services
+├── src/
+│   ├── infrastructure/
+│   │   └── aspire/
+│   │       ├── Chishiki.Infrastructure.Aspire.AppHost/
+│   │       └── Chishiki.Infrastructure.Aspire.ServiceDefaults/
 │   ├── mcp/
-│   │   └── Chishiki.MCP.Host/             # MCP server — tools auto-discovered via assembly scan
-│   ├── engine/
-│   │   ├── Chishiki.Host/                 # Orleans Silo host
-│   │   └── clustering/
-│   │       ├── Chishiki.Clustering/           # Grain interface contracts (no impl)
-│   │       ├── Chishiki.Clustering.Client/    # Orleans client extensions
-│   │       └── Chishiki.Clustering.Server/    # Silo-side grain registration
-│   ├── api/
-│   │   └── Chishiki.API.Web/              # ASP.NET Core Minimal API (planned)
-│   ├── ingestion/                          # Ingestion pipeline services (planned)
-│   ├── rag/                               # RAG query services (planned)
-│   └── security/                          # Security scanning services (planned)
-│
-├── shared/                                # Cross-cutting libraries — NO back-refs into src/
-│   └── core/
-│       ├── Chishiki.Core/                 # DDD primitives: Entity, AggregateRoot, Disposable
-│       ├── Chishiki.Data/                 # Repository + UoW abstractions
-│       └── Chishiki.Data.EFCore/          # EF Core implementation
-│
-├── infrastructure/
-│   └── aspire/
-│       ├── Chishiki.Infrastructure.Aspire.AppHost/         # Aspire orchestration root
-│       └── Chishiki.Infrastructure.Aspire.ServiceDefaults/ # Shared OTel / health / resilience
-│
-├── tests/                                 # Mirrors src/ + shared/ layout
-├── containers/                            # Per-service Dockerfiles + configs
-├── k8s/                                   # Kubernetes manifests / Helm charts
-├── docs/                                  # Architecture Decision Records (ADRs)
-└── scripts/                               # Build, deploy, seed scripts
+│   │   └── Chishiki.MCP.Host/
+│   └── shared/
+│       ├── ai/
+│       ├── core/
+│       ├── orleans/
+│       └── vision/
+├── tests/
+├── containers/
+├── docs/
+├── scripts/
+├── skills/
+├── .mcp.json
+└── Chishiki.slnx
 ```
 
 ### Dependency Rules
 
 ```
-shared/core
+src/shared/core
   Chishiki.Core          — no project refs (BCL only)
   Chishiki.Data          — may ref Chishiki.Core
   Chishiki.Data.EFCore   — may ref Core + Data
 
-infrastructure/aspire/ServiceDefaults
+src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.ServiceDefaults
   — may ref BCL + Aspire SDK only
 
-src/ services
-  — may reference shared/core + ServiceDefaults
-  — must NOT reference other service projects directly
-    (communicate via Orleans grains or HTTP service discovery)
+src/mcp and other runnable hosts
+  — may reference shared libraries + ServiceDefaults
+  — should not couple unrelated hosts directly when an abstraction or contract fits better
 ```
 
-> ⚠️ `shared/core` projects are reusable across solutions — keep them free of any Chishiki-specific service layer.
+> ⚠️ Shared libraries under `src/shared/` should remain reusable and should not take unnecessary dependencies on runnable hosts.
 
 ---
 
@@ -162,26 +146,26 @@ dotnet test .\Chishiki.slnx --filter "FullyQualifiedName~MethodName_Scenario"
 dotnet test .\Chishiki.slnx --collect:"XPlat Code Coverage"
 
 # Run — full stack via Aspire (requires Docker)
-dotnet run --project .\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppHost\Chishiki.Infrastructure.Aspire.AppHost.csproj
+dotnet run --project .\src\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppHost\Chishiki.Infrastructure.Aspire.AppHost.csproj
 
 # Run — MCP server standalone
 dotnet run --project .\src\mcp\Chishiki.MCP.Host\Chishiki.MCP.Host.csproj
 
 # Run — with security scanner profile
 $env:CHISHIKI_SECURITY_PROFILE = "true"
-dotnet run --project .\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppHost\Chishiki.Infrastructure.Aspire.AppHost.csproj
+dotnet run --project .\src\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppHost\Chishiki.Infrastructure.Aspire.AppHost.csproj
 ```
 
 | Endpoint | URL |
 |---|---|
 | Aspire Dashboard | http://localhost:15888 |
 | MCP endpoint | http://localhost:5010/mcp |
-| API | http://localhost:8080 |
 | Grafana | http://localhost:3000 |
 | Keycloak | http://localhost:8180 |
+| Qdrant | http://localhost:6333 |
 
-> 💡 Infrastructure containers use `builder.AddDockerfile("name", '../../../../containers/<name>')` in `AppHost.cs` —
-> not Aspire built-in helpers. The root `.mcp.json` registers the MCP server for VS 2026 / GitHub Copilot.
+> 💡 Infrastructure containers use `builder.AddDockerfile("name", '../../../../containers/<name>')` in `AppHost.cs`.
+> The root `.mcp.json` registers the MCP server for local MCP-aware tooling.
 
 ---
 
@@ -741,11 +725,7 @@ dotnet test .\Chishiki.slnx --filter "FullyQualifiedName~RagQueryTools"
 
 ## ☸️ Kubernetes
 
-- Kubernetes manifests and Helm charts: `k8s/`.
-- Use Aspire's `PublishingContext` to generate initial K8s manifests — avoid hand-authoring what Aspire can generate.
-- All secrets are Kubernetes `Secret` objects — never in `ConfigMap` or image layers.
-- Orleans clustering on K8s uses the Redis provider.
-- Health probes: `/health` (readiness) and `/alive` (liveness) — wired by `ServiceDefaults`, referenced in every deployment manifest.
-- Resource naming: `chishiki-<service>` (e.g., `chishiki-mcp`, `chishiki-engine`, `chishiki-api`).
+There is no first-class top-level `k8s/` directory in the current repository layout.
+If Kubernetes deployment assets are introduced later, prefer generated Aspire artifacts where possible and keep secrets out of source control.
 
 ---

@@ -3,7 +3,7 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: Abstract factory for creating typed repository instances.
 // Created:     2024-04-15
-// Modified:    2026-05-04
+// Modified:    2026-06-05
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -56,7 +56,7 @@ public abstract class RepositoryFactory(IRepositoryMapper repositoryMapper, ILog
         where TEntity : class, IEntity<TKey>
     {
         var type = RepositoryMapper.GetRepositoryType(typeof(TEntity));
-        ILogger logger = LoggerFactory.CreateLogger<IReadOnlyRepository<TKey, TEntity>>();
+        ILogger logger = LoggerFactory.CreateLogger<IRepository<TKey, TEntity>>();
 
         var result = type is not null
             ? (IRepository<TKey, TEntity>?)CreateInstance(type, logger)

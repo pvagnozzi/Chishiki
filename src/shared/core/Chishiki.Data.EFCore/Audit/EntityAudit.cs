@@ -92,7 +92,7 @@ public static class EntityAuditExtensions
     /// <param name="PropertyName">The name of the property that was changed.</param>
     /// <param name="OldValue">The value before the change.</param>
     /// <param name="NewValue">The value after the change.</param>
-    private record PropertyAuditJsonSerialization(
+    private sealed record PropertyAuditJsonSerialization(
         [property: JsonPropertyName("PropertyName")]
         string PropertyName,
         [property: JsonPropertyName("oldValue")]
