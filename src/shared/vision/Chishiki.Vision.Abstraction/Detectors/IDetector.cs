@@ -1,7 +1,7 @@
-﻿// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // File:        IDetector.cs
 // Author:      Piergiorgio Vagnozzi
-// Description: Abstraction for a stateful motion detector operating on sequential video frames.
+// Description: Detector base class.
 // Created:     2025-01-01
 // Modified:    2026-05-31
 // -----------------------------------------------------------------------------

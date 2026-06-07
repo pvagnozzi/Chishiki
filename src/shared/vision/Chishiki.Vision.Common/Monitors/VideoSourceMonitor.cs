@@ -45,7 +45,7 @@ public abstract partial class VideoSourceMonitor : AsyncDisposable, IVideoSource
     public IVideoSource VideoSource { get; }
 
     /// <inheritdoc/>
-    public IMotionDetector Detector { get; }
+    public IMotionDetector MotionDetector { get; }
 
     /// <inheritdoc/>
     public VideoSourceMonitorOptions Options { get; }
@@ -62,6 +62,7 @@ public abstract partial class VideoSourceMonitor : AsyncDisposable, IVideoSource
     /// <summary>Initializes a new <see cref="VideoSourceMonitor"/> for the given camera. .</summary>
     /// <param name="source">The video source to capture from.</param>
     /// <param name="detector">The motion detector to run on each frame.</param>
+   
     /// <param name="options">Configuration options for this monitor.</param>
     /// <param name="logger">Logger used for diagnostics.</param>
     protected VideoSourceMonitor(
@@ -72,7 +73,7 @@ public abstract partial class VideoSourceMonitor : AsyncDisposable, IVideoSource
         : base(logger)
     {
         VideoSource = source;
-        Detector = detector;
+        MotionDetector = detector;
         Options = options;
 
         _frameChannel = Channel.CreateBounded<IImage>(new BoundedChannelOptions(options.ChannelCapacity)
@@ -137,7 +138,7 @@ public abstract partial class VideoSourceMonitor : AsyncDisposable, IVideoSource
         await StopAsync();
         _cts?.Dispose();
         VideoSource.Dispose();
-        Detector.Dispose();
+        MotionDetector.Dispose();
         await base.DisposeManagedAsync(cancellationToken);
     }
 
@@ -188,7 +189,7 @@ public abstract partial class VideoSourceMonitor : AsyncDisposable, IVideoSource
                 {
                     try
                     {
-                        var result = await Detector.DetectAsync(frame, cancellationToken);
+                        var result = await MotionDetector.DetectAsync(frame, cancellationToken);
 
                         if (!Options.RaiseOnlyOnMotion || result.HasMotion)
                         {

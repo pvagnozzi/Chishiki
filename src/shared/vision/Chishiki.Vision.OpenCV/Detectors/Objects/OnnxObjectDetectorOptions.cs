@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// File:        OnnxDetectorOptions.cs
+// File:        OnnxObjectDetectorOptions.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Configuration options for ONNX-based object detectors including YOLO models.
 // Created:     2025-01-01
@@ -11,10 +11,10 @@
 
 using Chishiki.Vision.Abstraction.Detectors;
 
-namespace Chishiki.Vision.Onnx.Detector;
+namespace Chishiki.Vision.OpenCV.Detectors.Objects;
 
 /// <summary>Configuration options for ONNX Runtime-based object detection models.</summary>
-public record OnnxDetectorOptions : DetectorOptions
+public record OnnxObjectDetectorOptions : DetectorOptions
 {
     /// <summary>Gets or sets the ONNX model file path. This is a required field.</summary>
     public required string ModelPath { get; set; }

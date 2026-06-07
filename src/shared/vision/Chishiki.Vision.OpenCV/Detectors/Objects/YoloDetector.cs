@@ -10,16 +10,15 @@
 // -----------------------------------------------------------------------------
 
 using Chishiki.Vision.Abstraction;
-using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Objects;
-using Chishiki.Vision.Abstraction.Models;
+using Chishiki.Vision.OpenCV.Detectors.Objects;
 using Microsoft.Extensions.Logging;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using OpenCvSharp;
 using Rect = Chishiki.Vision.Abstraction.Models.Rect;
 
-namespace Chishiki.Vision.Onnx.Detector;
+namespace Chishiki.Vision.Onnx.Detector.Objects;
 
 /// <summary>
 /// YOLO-specific detector that implements preprocessing (letterbox resize + normalization),
@@ -31,7 +30,7 @@ namespace Chishiki.Vision.Onnx.Detector;
 /// </remarks>
 /// <param name="options">Configuration options for the YOLO model.</param>
 /// <param name="logger">Logger for diagnostic output.</param>
-public sealed partial class YoloDetector(OnnxDetectorOptions options, ILogger<YoloDetector> logger) : OnnxDetector(options, logger)
+public sealed partial class YoloDetector(OnnxObjectDetectorOptions options, ILogger<YoloDetector> logger) : OnnxObjectDetector(options, logger)
 {
     /// <inheritdoc/>
     protected override async Task<DenseTensor<float>> PreprocessAsync(Mat frame, CancellationToken cancellationToken)
@@ -40,41 +39,39 @@ public sealed partial class YoloDetector(OnnxDetectorOptions options, ILogger<Yo
 
         LogPreprocessingStarted();
 
-        // 1. Decode IImage.ImageData → ImageSharp Image
-        //using var image = Image.Load<Rgb24>(frame.ImageData);
+        // 1. Resize frame to model input size
+        var targetSize = new Size(Options.InputWidth, Options.InputHeight);
+        using var resized = new Mat();
+        Cv2.Resize(frame, resized, targetSize, interpolation: InterpolationFlags.Linear);
 
-        // 2. Letterbox resize to model input size
-        /*
-        image.Mutate(ctx => ctx.Resize(new ResizeOptions
-        {
-            Size = targetSize,
-            Mode = ResizeMode.Pad,
-            PadColor = ImageSharpColor.Gray
-        }));
-        */
+        // 2. Convert BGR to RGB if needed
+        using var rgb = new Mat();
+        Cv2.CvtColor(resized, rgb, ColorConversionCodes.BGR2RGB);
 
-        // 3. Convert to NCHW tensor and normalize
+        // 3. Convert to NCHW tensor with normalization
         var tensor = new DenseTensor<float>([1, 3, Options.InputHeight, Options.InputWidth]);
 
-        /*
-        image.ProcessPixelRows(accessor =>
+        var rows = rgb.Rows;
+        var cols = rgb.Cols;
+        // OpenCV Mat<Vec3b> access for RGB pixel data
+        for (var y = 0; y < rows; y++)
         {
-            for (var y = 0; y < image.Height; y++)
+            for (var x = 0; x < cols; x++)
             {
-                var row = accessor.GetRowSpan(y);
-                for (var x = 0; x < image.Width; x++)
-                {
-                    var pixel = row[x];
+                var pixel = rgb.At<Vec3b>(y, x);
 
-                    // NCHW layout: [batch, channel, height, width]
-                    // Apply normalization: (pixel / 255.0) * scale + mean
-                    tensor[0, 0, y, x] = pixel.R * OnnxOptions.NormalizationScale[0] + OnnxOptions.NormalizationMean[0];
-                    tensor[0, 1, y, x] = pixel.G * OnnxOptions.NormalizationScale[1] + OnnxOptions.NormalizationMean[1];
-                    tensor[0, 2, y, x] = pixel.B * OnnxOptions.NormalizationScale[2] + OnnxOptions.NormalizationMean[2];
-                }
+                // Vec3b stores as [R, G, B]
+                var r = pixel.Item0;
+                var g = pixel.Item1;
+                var b = pixel.Item2;
+
+                // NCHW layout: [batch, channel, height, width]
+                // Apply normalization: (value / 255.0) * scale + mean
+                tensor[0, 0, y, x] = (r * Options.NormalizationScale[0]) + Options.NormalizationMean[0];
+                tensor[0, 1, y, x] = (g * Options.NormalizationScale[1]) + Options.NormalizationMean[1];
+                tensor[0, 2, y, x] = (b * Options.NormalizationScale[2]) + Options.NormalizationMean[2];
             }
-        });
-        */
+        }
 
         LogPreprocessingCompleted();
         return await Task.FromResult(tensor);
@@ -148,7 +145,7 @@ public sealed partial class YoloDetector(OnnxDetectorOptions options, ILogger<Yo
         }
 
         // 3. Apply Non-Maximum Suppression
-        var nmsDetections = ApplyNms(detections, Options.IouThreshold);
+        var nmsDetections = detections.ApplyNms(Options.IouThreshold);
 
         LogPostprocessingCompleted(nmsDetections.Count);
         return await Task.FromResult(nmsDetections.Take(Options.MaxDetections).ToList().AsReadOnly());
@@ -159,57 +156,7 @@ public sealed partial class YoloDetector(OnnxDetectorOptions options, ILogger<Yo
     /// </summary>
     /// <param name="image">The image for which to create an empty detection result.</param>
     /// <returns>An empty detection result.</returns>
-    protected override DetectionResult<ObjectDetection> CreateEmptyResult(IImage image) => new(image);
-
-    /// <summary>
-    /// Applies Non-Maximum Suppression to filter overlapping detections.
-    /// </summary>
-    /// <param name="detections">The list of candidate detections.</param>
-    /// <param name="iouThreshold">The IoU threshold for suppression.</param>
-    /// <returns>A filtered list of detections after NMS.</returns>
-    private static List<ObjectDetection> ApplyNms(List<ObjectDetection> detections, float iouThreshold)
-    {
-        if (detections.Count == 0)
-        {
-            return [];
-        }
-
-        // Sort by score descending
-        var sorted = detections.OrderByDescending(d => d.Score).ToList();
-        var keep = new List<ObjectDetection>();
-
-        while (sorted.Count > 0)
-        {
-            var current = sorted[0];
-            keep.Add(current);
-            sorted.RemoveAt(0);
-
-            sorted = sorted.Where(d => ComputeIou(current.Rect, d.Rect) < iouThreshold).ToList();
-        }
-
-        return keep;
-    }
-
-    /// <summary>
-    /// Computes the Intersection over Union (IoU) between two bounding boxes.
-    /// </summary>
-    /// <param name="a">First bounding box.</param>
-    /// <param name="b">Second bounding box.</param>
-    /// <returns>The IoU value between 0.0 and 1.0.</returns>
-    private static float ComputeIou(Rect a, Rect b)
-    {
-        var x1 = Math.Max(a.X, b.X);
-        var y1 = Math.Max(a.Y, b.Y);
-        var x2 = Math.Min(a.X + a.Width, b.X + b.Width);
-        var y2 = Math.Min(a.Y + a.Height, b.Y + b.Height);
-
-        var intersectionArea = Math.Max(0, x2 - x1) * Math.Max(0, y2 - y1);
-        var areaA = a.Width * a.Height;
-        var areaB = b.Width * b.Height;
-        var unionArea = areaA + areaB - intersectionArea;
-
-        return unionArea > 0 ? (float)intersectionArea / unionArea : 0f;
-    }
+    protected override ObjectDetectionResult CreateEmptyResult(IImage image) => new(image);
 
     // -------------------------------------------------------------------------
     // Compile-time logging
@@ -230,4 +177,57 @@ public sealed partial class YoloDetector(OnnxDetectorOptions options, ILogger<Yo
     /// <summary>Emitted after postprocessing and NMS complete.</summary>
     [LoggerMessage(Level = Microsoft.Extensions.Logging.LogLevel.Debug, Message = "YOLO postprocessing completed: {DetectionCount} objects after NMS.")]
     private partial void LogPostprocessingCompleted(int detectionCount);
+}
+
+public static class YoloDetectorExtensions
+{
+    /// <summary>
+    /// Applies Non-Maximum Suppression to filter overlapping detections.
+    /// </summary>
+    /// <param name="detections">The list of candidate detections.</param>
+    /// <param name="iouThreshold">The IoU threshold for suppression.</param>
+    /// <returns>A filtered list of detections after NMS.</returns>
+    public static List<ObjectDetection> ApplyNms(this List<ObjectDetection> detections, float iouThreshold)
+    {
+        if (detections.Count == 0)
+        {
+            return [];
+        }
+
+        // Sort by score descending
+        var sorted = detections.OrderByDescending(d => d.Score).ToList();
+        var keep = new List<ObjectDetection>();
+
+        while (sorted.Count > 0)
+        {
+            var current = sorted[0];
+            keep.Add(current);
+            sorted.RemoveAt(0);
+
+            sorted = [.. sorted.Where(d => ComputeIoU(current.Rect, d.Rect) < iouThreshold)];
+        }
+
+        return keep;
+    }
+
+    /// <summary>
+    /// Computes the Intersection over Union (IoU) between two bounding boxes.
+    /// </summary>
+    /// <param name="a">First bounding box.</param>
+    /// <param name="b">Second bounding box.</param>
+    /// <returns>The IoU value between 0.0 and 1.0.</returns>
+    public static float ComputeIoU(this Rect a, Rect b)
+    {
+        var x1 = Math.Max(a.X, b.X);
+        var y1 = Math.Max(a.Y, b.Y);
+        var x2 = Math.Min(a.X + a.Width, b.X + b.Width);
+        var y2 = Math.Min(a.Y + a.Height, b.Y + b.Height);
+
+        var intersectionArea = Math.Max(0, x2 - x1) * Math.Max(0, y2 - y1);
+        var areaA = a.Width * a.Height;
+        var areaB = b.Width * b.Height;
+        var unionArea = areaA + areaB - intersectionArea;
+
+        return unionArea > 0 ? (float)intersectionArea / unionArea : 0f;
+    }
 }

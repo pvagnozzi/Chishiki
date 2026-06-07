@@ -1,9 +1,9 @@
 // -----------------------------------------------------------------------------
-// File:        CameraMonitorManager.cs
+// File:        VideoSourceMonitorManager.cs
 // Author:      Piergiorgio Vagnozzi
-// Description: Orchestrates multiple CameraMonitor instances in parallel, aggregating their motion events.
+// Description: Orchestrates multiple video source monitors in parallel, aggregating their motion events.
 // Created:     2025-01-01
-// Modified:    2025-01-01
+// Modified:    2026-06-07
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -12,6 +12,7 @@
 using System.Collections.Concurrent;
 using Chishiki.Vision.Abstraction.Detectors.Motion;
 using Chishiki.Vision.Abstraction.Monitors;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Chishiki.Vision.Common.Monitors;
@@ -24,6 +25,22 @@ namespace Chishiki.Vision.Common.Monitors;
 /// <param name="logger">Logger used for diagnostics.</param>
 public partial class VideoSourceMonitorManager(ILogger<VideoSourceMonitorManager> logger) : AsyncDisposable(logger), IVideoSourceMonitorManager
 {
+    /// <summary>Initializes a new <see cref="VideoSourceMonitorManager"/> and registers the video sources defined in configuration.</summary>
+    /// <param name="configuration">Application configuration containing the managed video sources section.</param>
+    /// <param name="videoSourceMonitorFactory">Factory used to create monitors from configuration.</param>
+    /// <param name="logger">Logger used for diagnostics.</param>
+    public VideoSourceMonitorManager(
+        IConfiguration configuration,
+        IVideoSourceMonitorFactory videoSourceMonitorFactory,
+        ILogger<VideoSourceMonitorManager> logger)
+        : this(logger)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+        ArgumentNullException.ThrowIfNull(videoSourceMonitorFactory);
+
+        RegisterConfiguredMonitors(configuration, videoSourceMonitorFactory);
+    }
+
     /// <summary>
     /// Monitors are stored in a thread-safe concurrent dictionary keyed by their unique camera ID. This allows for safe registration and unregistration of monitors from multiple threads without risking
     /// </summary>
@@ -130,6 +147,36 @@ public partial class VideoSourceMonitorManager(ILogger<VideoSourceMonitorManager
     // Private helpers
     // -------------------------------------------------------------------------
 
+    /// <summary>Registers the monitors described in configuration.</summary>
+    /// <param name="configuration">Application configuration containing the managed video sources section.</param>
+    /// <param name="videoSourceMonitorFactory">Factory used to create monitors from configuration.</param>
+    private void RegisterConfiguredMonitors(IConfiguration configuration, IVideoSourceMonitorFactory videoSourceMonitorFactory)
+    {
+        var section = configuration.GetSection(ManagedVideoSourceOptions.SectionName);
+
+        if (!section.Exists())
+        {
+            LogConfiguredVideoSourcesSectionNotFound(ManagedVideoSourceOptions.SectionName);
+            return;
+        }
+
+        var configuredVideoSources = section.Get<List<ManagedVideoSourceOptions>>();
+
+        if (configuredVideoSources is not { Count: > 0 })
+        {
+            LogNoConfiguredVideoSources(ManagedVideoSourceOptions.SectionName);
+            return;
+        }
+
+        foreach (var configuredVideoSource in configuredVideoSources)
+        {
+            var monitor = videoSourceMonitorFactory.Create(configuredVideoSource);
+            Register(monitor);
+        }
+
+        LogConfiguredVideoSourcesRegistered(configuredVideoSources.Count, ManagedVideoSourceOptions.SectionName);
+    }
+
     /// <summary>Forwards motion events from individual monitors to the aggregated surface event.</summary>
     private void OnCameraMotionDetected(object? sender, MotionDetectedEventArgs e) =>
         MotionDetected?.Invoke(this, e);
@@ -194,6 +241,18 @@ public partial class VideoSourceMonitorManager(ILogger<VideoSourceMonitorManager
     /// <summary>Emitted after all monitors have been stopped.</summary>
     [LoggerMessage(Level = LogLevel.Information, Message = "{Count} camera monitor(s) stopped.")]
     private partial void LogAllStopped(int count);
+
+    /// <summary>Emitted when a configured video source section is not present.</summary>
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Configured video sources section '{SectionName}' was not found.")]
+    private partial void LogConfiguredVideoSourcesSectionNotFound(string sectionName);
+
+    /// <summary>Emitted when no configured video sources are present in the section.</summary>
+    [LoggerMessage(Level = LogLevel.Debug, Message = "No configured video sources were found in section '{SectionName}'.")]
+    private partial void LogNoConfiguredVideoSources(string sectionName);
+
+    /// <summary>Emitted after configured video sources have been registered.</summary>
+    [LoggerMessage(Level = LogLevel.Information, Message = "Registered {Count} configured video source monitor(s) from section '{SectionName}'.")]
+    private partial void LogConfiguredVideoSourcesRegistered(int count, string sectionName);
 
     /// <summary>Emitted when a monitor fails to start.</summary>
     [LoggerMessage(Level = LogLevel.Error, Message = "Camera '{CameraId}' failed to start.")]

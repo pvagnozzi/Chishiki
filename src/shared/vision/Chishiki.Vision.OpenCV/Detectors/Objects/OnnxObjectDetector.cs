@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// File:        OnnxDetector.cs
+// File:        OnnxObjectDetector.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Abstract base class for ONNX Runtime-based object detectors with template method pattern.
 // Created:     2025-01-01
@@ -10,15 +10,13 @@
 // -----------------------------------------------------------------------------
 
 using Chishiki.Vision.Abstraction;
-using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Objects;
-using Chishiki.Vision.OpenCV.Detectors;
 using Microsoft.Extensions.Logging;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using OpenCvSharp;
 
-namespace Chishiki.Vision.Onnx.Detector;
+namespace Chishiki.Vision.OpenCV.Detectors.Objects;
 
 /// <summary>
 /// Abstract base class for ONNX Runtime-based object detectors.
@@ -27,7 +25,7 @@ namespace Chishiki.Vision.Onnx.Detector;
 /// </summary>
 /// <param name="options">Configuration options for the ONNX detector, including model path and input size.</param>
 /// <param name="logger">Logger for diagnostic output.</param>
-public abstract partial class OnnxDetector : OpenCVDetector<DetectionResult<ObjectDetection>, ObjectDetection>
+public abstract partial class OnnxObjectDetector : OpenCVDetector<ObjectDetectionResult, ObjectDetection>, IObjectDetector
 {
     /// <summary>
     /// Inference session for running the ONNX model. Initialized in the constructor and disposed in Dispose().
@@ -35,15 +33,15 @@ public abstract partial class OnnxDetector : OpenCVDetector<DetectionResult<Obje
     protected InferenceSession Session { get; init; }
 
     /// <inheritdoc/>
-    public new OnnxDetectorOptions Options => (OnnxDetectorOptions)base.Options;
+    public new OnnxObjectDetectorOptions Options => (OnnxObjectDetectorOptions)base.Options;
 
     /// <summary>
-    /// Initialises a new <see cref="OnnxDetector"/> with the supplied options and logger.
+    /// Initialises a new <see cref="OnnxObjectDetector"/> with the supplied options and logger.
     /// </summary>
     /// <param name="options">Configuration options for the ONNX detector.</param>
     /// <param name="logger">Logger for diagnostic output.</param>
     /// <exception cref="FileNotFoundException">Thrown when the model file does not exist.</exception>
-    protected OnnxDetector(OnnxDetectorOptions options, ILogger<OnnxDetector> logger) : base(options, logger)
+    protected OnnxObjectDetector(OnnxObjectDetectorOptions options, ILogger<OnnxObjectDetector> logger) : base(options, logger)
     {
         if (!File.Exists(options.ModelPath))
         {
@@ -67,7 +65,7 @@ public abstract partial class OnnxDetector : OpenCVDetector<DetectionResult<Obje
     }
 
     /// <inheritdoc/>
-    protected override async Task<DetectionResult<ObjectDetection>> ProcessFrameAsync(IImage originalImage, Mat image, CancellationToken cancellationToken = default)
+    protected override async Task<ObjectDetectionResult> ProcessFrameAsync(IImage originalImage, Mat image, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -80,7 +78,7 @@ public abstract partial class OnnxDetector : OpenCVDetector<DetectionResult<Obje
             // 3. Postprocessing: decode outputs → ObjectDetection list
             var detections = await PostprocessAsync(outputs, image, cancellationToken);
             LogDetectionCompleted(Logger, detections.Count);
-            return new DetectionResult<ObjectDetection>(originalImage, detections: detections);
+            return new ObjectDetectionResult(originalImage, detections: detections);
         }
         catch (Exception ex)
         {
@@ -171,4 +169,3 @@ public abstract partial class OnnxDetector : OpenCVDetector<DetectionResult<Obje
     [LoggerMessage(Level = Microsoft.Extensions.Logging.LogLevel.Error, Message = "ONNX model file not found at {ModelPath}")]
     private static partial void LogModelFileMissing(ILogger logger, string modelPath);
 }
-

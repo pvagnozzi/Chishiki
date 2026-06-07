@@ -25,7 +25,7 @@ public interface IVideoSourceMonitor : IAsyncDisposable
     /// <summary>
     /// Gets the motion detector.
     /// </summary>
-    IMotionDetector Detector { get; }
+    IMotionDetector MotionDetector { get; }
 
     /// <summary>
     /// Gets the configuration options for this camera monitor, including parameters such as capture FPS, channel capacity, and motion detection settings. These options control the behaviour of the capture-and-detect loop and can be used to fine-tune performance and sensitivity.
