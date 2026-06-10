@@ -19,6 +19,7 @@
     <File Path="skills/chishiki-repo-conventions/references/architecture-layout-and-build.md" />
     <File Path="skills/chishiki-repo-conventions/references/csharp-conventions.md" />
   </Folder>
+  <Folder Name="/src/infrastructure/aspire/" />
 
   <!-- ── src/mcp ── MCP Servers ────────────────────────────────────────── -->
   <Folder Name="/src/mcp/">
@@ -31,8 +32,8 @@
   <!-- ── src/infrastructure ── Aspire AppHost + ServiceDefaults ──────── -->
   <Folder Name="/src/infrastructure/">
     <File Path="src/infrastructure/README.md" />
-    <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.AppHost/Chishiki.Infrastructure.Aspire.AppHost.csproj" />
-    <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.ServiceDefaults/Chishiki.Infrastructure.Aspire.ServiceDefaults.csproj" />
+    <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.AppHost/Chishiki.Infrastructure.Aspire.AppHost.csproj" Id="8d7af370-13e2-489c-a9f9-5ea2a62bcf2c" />
+    <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.ServiceDefaults/Chishiki.Infrastructure.Aspire.ServiceDefaults.csproj" Id="4ad9e74a-4e4e-464a-9b6e-f66aa6fbb8a5" />
   </Folder>
 
   <!-- ── src/shared ── Cross-cutting Primitives ───────────────────────── -->
@@ -41,7 +42,7 @@
   </Folder>
   <Folder Name="/src/shared/ai/">
     <Project Path="src/shared/ai/Chishiki.AI.LLM.Abstractions/Chishiki.AI.LLM.Abstractions.csproj" Id="fdcb9f9c-a699-4b8c-b849-01905178992b" />
-    <Project Path="src/shared/ai/Chishiki.AI.LLM.SemanticKernel/Chishiki.AI.LLM.SemanticKernel.csproj" />
+    <Project Path="src/shared/ai/Chishiki.AI.LLM.SemanticKernel/Chishiki.AI.LLM.SemanticKernel.csproj" Id="625f0fbd-5c67-4b63-a34a-c10cd56f1d89" />
   </Folder>
   <Folder Name="/src/shared/core/">
     <Project Path="src/shared/core/Chishiki.Core/Chishiki.Core.csproj" Id="c90e4349-3920-452e-bdfc-9e7913596ff6" />
@@ -49,7 +50,12 @@
     <Project Path="src/shared/core/Chishiki.Data/Chishiki.Data.csproj" Id="50d94f6a-16fb-4cab-a1ca-e78305be1052" />
     <Project Path="src/shared/core/Chishiki.Mapping/Chishiki.Mapping.csproj" Id="19db25c1-89e9-4354-b4cd-236688e100a1" />
     <Project Path="src/shared/core/Chishiki.Messaging/Chishiki.Messaging.csproj" Id="a3155434-8cf7-4f5f-87c6-6d384c4cb58b" />
-    <Project Path="src/shared/core/Chishiki.Serial/Chishiki.Serial.csproj" Id="471ee4df-1ba7-48be-9f45-a0c7a68dbd50" />
+    <Project Path="src/shared/core/Chishiki.Serial.Abstractions/Chishiki.Serial.Abstractions.csproj" Id="b3c9417e-e53b-4450-b83e-05ab8d2c55f2" />
+    <Project Path="src/shared/core/Chishiki.Serial.Common/Chishiki.Serial.Common.csproj" Id="fe6ba3cd-d203-4111-a526-2d4030919df6" />
+    <Project Path="src/shared/core/Chishiki.Web.Client/Chishiki.Web.Client.csproj" Id="56342f06-435e-41c4-881f-5eb9641fb78b" />
+  </Folder>
+  <Folder Name="/src/shared/iot/">
+    <Project Path="src/shared/iot/Chishiki.ESPTool/Chishiki.ESPTool.csproj" Id="051fc662-98b2-40aa-afd0-91b8a55e8072" />
   </Folder>
   <Folder Name="/src/shared/orleans/">
     <Project Path="src/shared/orleans/Chishiki.Orleans.Silo/Chishiki.Orleans.Silo.csproj" Id="eaf53b03-befa-4374-bc27-f360dacf14c8" />
@@ -58,6 +64,24 @@
     <Project Path="src/shared/vision/Chishiki.Vision.Abstraction/Chishiki.Vision.Abstraction.csproj" Id="829c151a-5761-486c-8c04-f9fde6ec8ea2" />
     <Project Path="src/shared/vision/Chishiki.Vision.Common/Chishiki.Vision.Common.csproj" Id="845e4b43-cf57-4764-92b8-8d5d0e46d193" />
     <Project Path="src/shared/vision/Chishiki.Vision.OpenCV/Chishiki.Vision.OpenCV.csproj" Id="9b57dc50-7d0c-4d63-9fd0-39f372d37164" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Chishiki.AI.LLM.Abstractions.Tests/Chishiki.AI.LLM.Abstractions.Tests.csproj" />
+    <Project Path="tests/Chishiki.AI.LLM.SemanticKernel.Tests/Chishiki.AI.LLM.SemanticKernel.Tests.csproj" />
+    <Project Path="tests/Chishiki.Core.Tests/Chishiki.Core.Tests.csproj" />
+    <Project Path="tests/Chishiki.Data.EFCore.Tests/Chishiki.Data.EFCore.Tests.csproj" />
+    <Project Path="tests/Chishiki.Data.Tests/Chishiki.Data.Tests.csproj" />
+    <Project Path="tests/Chishiki.ESPTool.Tests/Chishiki.ESPTool.Tests.csproj" Id="7bd7a715-e7c0-4da5-a1aa-74e384d1feba" />
+    <Project Path="tests/Chishiki.Infrastructure.Aspire.AppHost.Tests/Chishiki.Infrastructure.Aspire.AppHost.Tests.csproj" />
+    <Project Path="tests/Chishiki.Infrastructure.Aspire.ServiceDefaults.Tests/Chishiki.Infrastructure.Aspire.ServiceDefaults.Tests.csproj" />
+    <Project Path="tests/Chishiki.Mapping.Tests/Chishiki.Mapping.Tests.csproj" />
+    <Project Path="tests/Chishiki.MCP.Host.Tests/Chishiki.MCP.Host.Tests.csproj" />
+    <Project Path="tests/Chishiki.Messaging.Tests/Chishiki.Messaging.Tests.csproj" />
+    <Project Path="tests/Chishiki.Serial.Abstractions.Tests/Chishiki.Serial.Abstractions.Tests.csproj" />
+    <Project Path="tests/Chishiki.Serial.Common.Tests/Chishiki.Serial.Common.Tests.csproj" />
+    <Project Path="tests/Chishiki.Vision.Abstraction.Tests/Chishiki.Vision.Abstraction.Tests.csproj" />
+    <Project Path="tests/Chishiki.Vision.Common.Tests/Chishiki.Vision.Common.Tests.csproj" />
+    <Project Path="tests/Chishiki.Vision.OpenCV.Tests/Chishiki.Vision.OpenCV.Tests.csproj" />
   </Folder>
 
 </Solution>

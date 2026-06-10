@@ -58,4 +58,67 @@ public static class OpenCVImageExtensions
     /// <param name="openCvImage">The OpenCV <see cref="Mat"/> to convert.</param>
     /// <returns>An <see cref="IImage"/> instance containing the same image data.</returns>
     public static IImage ToIImage(this Mat openCvImage) => new OpenCVImage(openCvImage);
+
+    /// <summary>
+    /// Extension method to convert a <see cref="VisionRect"/> to an OpenCV <see cref="Rect"/>. This is used to convert bounding boxes from the vision pipeline into a format compatible with OpenCV functions.
+    /// </summary>
+    /// <param name="rect"></param>
+    /// <param name="imageSize"></param>
+    /// <param name="paddingFactor"></param>
+    /// <returns></returns>
+    public static Rect ExpandRect(this Rect rect, Size imageSize, double paddingFactor)
+    {
+        var paddingX = (int)Math.Round(rect.Width * Math.Max(0.0, paddingFactor));
+        var paddingY = (int)Math.Round(rect.Height * Math.Max(0.0, paddingFactor));
+
+        var x = Math.Max(0, rect.X - paddingX);
+        var y = Math.Max(0, rect.Y - paddingY);
+        var right = Math.Min(imageSize.Width, rect.Right + paddingX);
+        var bottom = Math.Min(imageSize.Height, rect.Bottom + paddingY);
+
+        return new Rect(x, y, Math.Max(1, right - x), Math.Max(1, bottom - y));
+    }
+
+    /// <summary>
+    /// Calculates a detection score based on the aspect ratio and rectangularity of a candidate region. This is used to rank potential cardplate detections.
+    /// </summary>
+    /// <param name="aspectRatio">The aspect ratio of the candidate region.</param>
+    /// <param name="rectangularity">The rectangularity of the candidate region.</param>
+    /// <returns>A score between 0.0 and 1.0 indicating the likelihood of the region being a cardplate.</returns>
+    public static float CalculateDetectionScore(this double aspectRatio, double rectangularity)
+    {
+        const double idealAspectRatio = 4.0;
+        var aspectScore = 1.0 - Math.Min(1.0, Math.Abs(aspectRatio - idealAspectRatio) / idealAspectRatio);
+        return (float)Math.Clamp((aspectScore + rectangularity) / 2.0, 0.0, 1.0);
+    }
+
+    /// <summary>
+    /// Converts an OpenCV <see cref="Mat"/> to a grayscale image. If the image is already grayscale, a clone is returned.
+    /// </summary>
+    /// <param name="image">The source image.</param>
+    /// <returns>A grayscale <see cref="Mat"/>.</returns>
+    public static Mat ToGrayscale(this Mat image)
+    {
+        if (image.Channels() == 1)
+        {
+            return image.Clone();
+        }
+
+        var grayscale = new Mat();
+        var conversionCode = image.Channels() switch
+        {
+            4 => ColorConversionCodes.BGRA2GRAY,
+            _ => ColorConversionCodes.BGR2GRAY
+        };
+
+        Cv2.CvtColor(image, grayscale, conversionCode);
+        return grayscale;
+    }
+
+    /// <summary>
+    /// Ensures that the kernel size is odd, which is required for certain OpenCV operations like Gaussian blur.
+    /// </summary>
+    /// <param name="size">The desired kernel size.</param>
+    /// <returns>An odd kernel size, adjusted if necessary.</returns>
+    public static int EnsureOddKernel(this int size) => size <= 1 ? 1 : size % 2 == 0 ? size + 1 : size;
 }

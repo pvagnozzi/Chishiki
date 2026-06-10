@@ -16,11 +16,11 @@ namespace Chishiki.Vision.Abstraction.Monitors;
 public class VideoSourceMonitorOptions
 {
     /// <summary>Gets or sets the target capture rate in frames per second. Default is 10.</summary>
-    public double FramesPerSecond { get; set; } = 10.0;
+    public double FramesPerSecond { get; set; } = 1;
 
     /// <summary>Gets or sets the maximum number of unprocessed results buffered in the internal channel. Default is 32.</summary>
     public int ChannelCapacity { get; set; } = 32;
 
     /// <summary>Gets or sets a value indicating whether only frames with detected motion are raised via the event. Default is true.</summary>
-    public bool RaiseOnlyOnMotion { get; set; } = true;
+    public bool RaiseOnlyOnMotion { get; set; } = true; 
 }

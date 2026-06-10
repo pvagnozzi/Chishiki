@@ -62,7 +62,6 @@ public abstract partial class VideoSourceMonitor : AsyncDisposable, IVideoSource
     /// <summary>Initializes a new <see cref="VideoSourceMonitor"/> for the given camera. .</summary>
     /// <param name="source">The video source to capture from.</param>
     /// <param name="detector">The motion detector to run on each frame.</param>
-   
     /// <param name="options">Configuration options for this monitor.</param>
     /// <param name="logger">Logger used for diagnostics.</param>
     protected VideoSourceMonitor(

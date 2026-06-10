@@ -3,7 +3,7 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: Aspire AppHost entry point — declares and wires all Chishiki infrastructure containers and services.
 // Created:     2026-04-26
-// Modified:    2026-05-04
+// Modified:    2026-06-10
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -148,7 +148,6 @@ if (builder.Configuration["CHISHIKI_SECURITY_PROFILE"] == "true")
 }
 
 // ── Chishiki MCP Host ────────────────────────────────────────────────────────
-builder.AddProject<Projects.Chishiki_MCP_Host>("chishiki-mcp")
-    .WithHttpEndpoint(port: 5010, name: "http");
+_ = builder.AddProject<Projects.Chishiki_MCP_Host>("chishiki-mcp");
 
 builder.Build().Run();

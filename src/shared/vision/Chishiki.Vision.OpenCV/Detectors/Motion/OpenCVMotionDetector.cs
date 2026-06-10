@@ -31,6 +31,7 @@ public partial class OpenCVMotionDetector(OpenCVMotionDetectorOptions options, I
             history: options.BackgroundHistory,
             varThreshold: options.Mog2Threshold,
             detectShadows: options.DetectShadows);
+
     /// <summary>
     /// Erosion kernel used for morphological erosion to remove noise from motion masks. It is initialized in the constructor based on the provided options and remains constant for the lifetime of the detector.
     /// </summary>
