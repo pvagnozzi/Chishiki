@@ -3,7 +3,7 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: Covers deterministic aggregation behavior for the composed object detector.
 // Created:     2026-06-10
-// Modified:    2026-06-10
+// Modified:    2026-06-11
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -20,15 +20,17 @@ namespace Chishiki.Vision.Common.Tests;
 /// <summary>Provides focused tests for <see cref="ComposedObjectDetector"/>.</summary>
 public sealed class ComposedObjectDetectorTests
 {
+    private static readonly int[] ExpectedClassIds = [1, 2];
+
     [Test]
     public async Task DetectAsyncAggregatesDetectionsFromAllInnerDetectors()
     {
         var frame = new TestImage();
         var detector1 = Substitute.For<IObjectDetector>();
         var detector2 = Substitute.For<IObjectDetector>();
-        detector1.DetectAsync(Arg.Any<IImage>(), Arg.Any<CancellationToken>())
+        _ = detector1.DetectAsync(Arg.Any<IImage>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(new ObjectDetectionResult(frame, detections: [new ObjectDetection(1, 0.9f, 1, 2, 3, 4)])));
-        detector2.DetectAsync(Arg.Any<IImage>(), Arg.Any<CancellationToken>())
+        _ = detector2.DetectAsync(Arg.Any<IImage>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(new ObjectDetectionResult(frame, detections: [new ObjectDetection(2, 0.8f, 5, 6, 7, 8)])));
 
         var composedDetector = new ComposedObjectDetector(new TestDetectorOptions(), [detector1, detector2], NullLogger<ComposedObjectDetector>.Instance);
@@ -36,7 +38,7 @@ public sealed class ComposedObjectDetectorTests
         var result = await composedDetector.DetectAsync(frame);
 
         Assert.That(result.OriginalFrame, Is.SameAs(frame));
-        Assert.That(result.Detections.Select(detection => detection.ClassId), Is.EqualTo(new[] { 1, 2 }));
+        Assert.That(result.Detections.Select(detection => detection.ClassId), Is.EqualTo(ExpectedClassIds));
     }
 
     [Test]

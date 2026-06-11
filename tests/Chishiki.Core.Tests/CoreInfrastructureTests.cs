@@ -9,7 +9,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
-using System.Reflection;
 using Chishiki.Configuration;
 using Chishiki.Exceptions;
 using Chishiki.Logging;
@@ -113,8 +112,8 @@ public sealed class CoreInfrastructureTests
         {
             Assert.That(copy, Is.Not.SameAs(original));
             Assert.That(copy.Name, Is.EqualTo(original.Name));
-            Assert.That(original.Tags, Is.EqualTo(new[] { "math", "logic" }));
-            Assert.That(copy.Tags, Is.EqualTo(new[] { "math", "logic", "poetry" }));
+            Assert.That(original.Tags, Is.EqualTo(["math", "logic"]));
+            Assert.That(copy.Tags, Is.EqualTo(["math", "logic", "poetry"]));
         });
     }
 
@@ -124,7 +123,9 @@ public sealed class CoreInfrastructureTests
         var suppliedLogger = Substitute.For<ILogger>();
         var loggerFactory = Substitute.For<ILoggerFactory>();
         var factoryLogger = Substitute.For<ILogger>();
-        loggerFactory.CreateLogger(typeof(TestLoggable)).Returns(factoryLogger);
+#pragma warning disable CA2263 // Prefer generic overload - Testing non-generic overload behavior is the purpose of this test
+        _ = loggerFactory.CreateLogger(typeof(TestLoggable)).Returns(factoryLogger);
+#pragma warning restore CA2263
 
         var withLogger = new TestLoggable(suppliedLogger, loggerFactory);
         var withFactory = new TestLoggable(null, loggerFactory);
@@ -137,7 +138,9 @@ public sealed class CoreInfrastructureTests
             Assert.That(withoutAnything.Logger, Is.SameAs(NullLogger.Instance));
         });
 
+#pragma warning disable CA2263 // Prefer generic overload - Testing non-generic overload behavior is the purpose of this test
         _ = loggerFactory.Received(1).CreateLogger(typeof(TestLoggable));
+#pragma warning restore CA2263
     }
 
     [Test]
@@ -157,7 +160,7 @@ public sealed class CoreInfrastructureTests
     }
 
     [Test]
-    public async Task AsyncDisposableDisposeAsyncSwallowsManagedCleanupExceptionsAndMarksDisposed()
+    public Task AsyncDisposableDisposeAsyncSwallowsManagedCleanupExceptionsAndMarksDisposed()
     {
         var sut = new TestAsyncDisposable(throwOnManagedDispose: true);
 
@@ -168,6 +171,7 @@ public sealed class CoreInfrastructureTests
             Assert.That(sut.ManagedDisposeCallCount, Is.EqualTo(1));
             Assert.That(sut.IsDisposedForTest, Is.True);
         });
+        return Task.CompletedTask;
     }
 
     [Test]
@@ -318,7 +322,9 @@ public sealed class CoreInfrastructureTests
         var assembly = typeof(CoreInfrastructureTests).Assembly;
 
         var genericMatches = assembly.GetTypesImplementing<ITestContract>();
+#pragma warning disable CA2263 // Prefer generic overload - Testing non-generic overload behavior is the purpose of this test
         var runtimeMatches = assembly.GetTypesImplementing(typeof(ITestContract));
+#pragma warning restore CA2263
 
         Assert.Multiple(() =>
         {
@@ -357,7 +363,9 @@ public sealed class CoreInfrastructureTests
     [Test]
     public void PrettyPrintJsonFormatsCompactJson()
     {
+#pragma warning disable JSON002 // Rilevata probabile stringa JSON
         var result = "{\"name\":\"Ada\",\"age\":42}".PrettyPrintJson();
+#pragma warning restore JSON002 // Rilevata probabile stringa JSON
 
         Assert.That(result, Does.Contain(Environment.NewLine));
         Assert.That(result, Does.Contain("  \"name\": \"Ada\""));
@@ -388,6 +396,32 @@ public sealed class CoreInfrastructureTests
                     break;
                 case ConsoleColor.Yellow:
                     text.YellowWriteLine();
+                    break;
+                case ConsoleColor.Black:
+                    break;
+                case ConsoleColor.DarkBlue:
+                    break;
+                case ConsoleColor.DarkGreen:
+                    break;
+                case ConsoleColor.DarkCyan:
+                    break;
+                case ConsoleColor.DarkRed:
+                    break;
+                case ConsoleColor.DarkMagenta:
+                    break;
+                case ConsoleColor.DarkYellow:
+                    break;
+                case ConsoleColor.Gray:
+                    break;
+                case ConsoleColor.DarkGray:
+                    break;
+                case ConsoleColor.Blue:
+                    break;
+                case ConsoleColor.Cyan:
+                    break;
+                case ConsoleColor.Magenta:
+                    break;
+                case ConsoleColor.White:
                     break;
                 default:
                     text.ColoredWriteLine(color);
@@ -430,12 +464,7 @@ public sealed class CoreInfrastructureTests
         {
             ManagedDisposeCallCount++;
             cancellationToken.ThrowIfCancellationRequested();
-            if (throwOnManagedDispose)
-            {
-                throw new InvalidOperationException("managed failure");
-            }
-
-            return ValueTask.CompletedTask;
+            return throwOnManagedDispose ? throw new InvalidOperationException("managed failure") : ValueTask.CompletedTask;
         }
 
         protected override void DisposeUnmanaged() => UnmanagedDisposeCallCount++;

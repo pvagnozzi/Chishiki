@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // File:        Loggable.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: Abstract base class implementing ILoggable with lazy logger creation via ILoggerFactory.
@@ -27,5 +27,7 @@ public abstract class Loggable(ILogger? logger, ILoggerFactory? loggerFactory = 
     /// <summary>Creates an <see cref="ILogger"/> instance for the specified type.</summary>
     /// <param name="type">The type for which to create a logger. This is typically the class or component that will use the logger.</param>
     /// <returns>An <see cref="ILogger"/> instance associated with the specified type. If a logger cannot be created, a no-op logger is returned.</returns>
+#pragma warning disable CA2263 // Prefer generic overload - Type parameter is determined at runtime via GetType()
     protected ILogger CreateLogger(Type type) => _loggerFactory?.CreateLogger(type) ?? NullLogger.Instance;
+#pragma warning restore CA2263
 }

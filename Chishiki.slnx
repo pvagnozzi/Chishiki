@@ -5,7 +5,9 @@
     <File Path="docs/implementation-plan.md" />
   </Folder>
 
-  <Folder Name="/solution/" />
+  <Folder Name="/solution/">
+    <File Path=".editorconfig" />
+  </Folder>
 
   <Folder Name="/solution/instructions/">
     <File Path=".github/copilot-instructions.md" />

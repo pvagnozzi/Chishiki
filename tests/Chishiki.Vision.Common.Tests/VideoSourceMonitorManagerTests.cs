@@ -3,7 +3,7 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: Covers deterministic registration and orchestration behavior for the video source monitor manager.
 // Created:     2026-06-10
-// Modified:    2026-06-10
+// Modified:    2026-06-11
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -22,6 +22,8 @@ namespace Chishiki.Vision.Common.Tests;
 /// <summary>Provides focused tests for <see cref="VideoSourceMonitorManager"/>.</summary>
 public sealed class VideoSourceMonitorManagerTests
 {
+    private static readonly string[] ExpectedCamera6Ids = ["camera-6"];
+
     [Test]
     public void RegisterThrowsWhenVideoSourceIdIsDuplicated()
     {
@@ -102,7 +104,7 @@ public sealed class VideoSourceMonitorManagerTests
 
         var manager = new VideoSourceMonitorManager(configuration, factory, NullLogger<VideoSourceMonitorManager>.Instance);
 
-        Assert.That(manager.CameraIds, Is.EqualTo(new[] { "camera-6" }));
+        Assert.That(manager.CameraIds, Is.EqualTo(ExpectedCamera6Ids));
         factory.Received(1).Create(Arg.Is<ManagedVideoSourceOptions>(options =>
             options.VideoSourceId == "camera-6"
             && options.SourceType == "Camera"
@@ -120,7 +122,9 @@ public sealed class VideoSourceMonitorManagerTests
         monitor.IsRunning.Returns(isRunning);
         monitor.StopAsync().Returns(Task.CompletedTask);
         monitor.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+#pragma warning disable CA2012 // NSubstitute setup — ValueTask is consumed by the Returns extension method
         monitor.DisposeAsync().Returns(ValueTask.CompletedTask);
+#pragma warning restore CA2012
 
         return monitor;
     }

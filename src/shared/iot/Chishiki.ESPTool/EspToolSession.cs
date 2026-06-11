@@ -403,7 +403,11 @@ public sealed class EspToolSession : Disposable
             throw new EspToolException("The flash image cannot be empty.");
         }
 
+        // MD5 is required by the ESP32/ESP8266 hardware flashing protocol for checksum verification.
+        // This is not used for cryptographic security, but for data integrity checks during hardware communication.
+#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms
         var expectedMd5 = Convert.ToHexStringLower(MD5.HashData(request.ImageData));
+#pragma warning restore CA5351
         var actualMd5 = await ReadFlashMd5Async(request.FlashOffset, (uint)request.ImageData.Length, cancellationToken).ConfigureAwait(false);
 
         return new EspFlashVerificationResult
@@ -631,7 +635,11 @@ public sealed class EspToolSession : Disposable
         var data = outputStream.ToArray();
         var digestPacket = await _transport.ReadSlipPacketAsync(Options.CommandTimeout, cancellationToken).ConfigureAwait(false);
         var expectedDigest = NormalizeMd5Digest(digestPacket);
+        // MD5 is required by the ESP32/ESP8266 hardware flashing protocol for checksum verification.
+        // This is not used for cryptographic security, but for data integrity checks during hardware communication.
+#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms
         var actualDigest = Convert.ToHexStringLower(MD5.HashData(data));
+#pragma warning restore CA5351
         if (!string.Equals(expectedDigest, actualDigest, StringComparison.OrdinalIgnoreCase))
         {
             throw new EspToolException($"Digest mismatch: expected {expectedDigest}, got {actualDigest}.");

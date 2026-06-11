@@ -230,3 +230,12 @@ indent_size  = 4
 [*.sql]
 indent_style = space
 indent_size  = 4
+
+# ──────────────────────────────────────────────────
+#  Tests
+# ──────────────────────────────────────────────────
+[tests/**/*.cs]
+dotnet_naming_rule.local_functions_should_be_camel_case.severity = none
+dotnet_diagnostic.CA1707.severity = none
+dotnet_naming_style.underscored_method.required_prefix = 
+dotnet_naming_style.underscored_method.word_separator = _

@@ -3,7 +3,7 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: Entry point for the Chishiki MCP Host — configures and starts the StreamableHTTP MCP server.
 // Created:     2026-04-26
-// Modified:    2026-06-10
+// Modified:    2026-06-11
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -69,6 +69,3 @@ internal static partial class Log
     [LoggerMessage(Level = LogLevel.Critical, Message = "Chishiki MCP Host terminated unexpectedly")]
     public static partial void AppTerminatedUnexpectedly(this ILogger logger, Exception ex);
 }
-
-/// <summary>Test hook enabling <c>WebApplicationFactory&lt;Program&gt;</c> for the MCP host.</summary>
-public partial class Program;

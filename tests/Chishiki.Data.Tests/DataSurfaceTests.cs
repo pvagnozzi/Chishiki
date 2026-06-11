@@ -32,8 +32,8 @@ public sealed class DataSurfaceTests
 
         var result = csv.ImportFromCsv<CsvRow>();
 
-        Assert.That(result.Select(x => x.Id), Is.EqualTo(new[] { 1, 2 }));
-        Assert.That(result.Select(x => x.Name), Is.EqualTo(new[] { "Ada", "Grace" }));
+        Assert.That(result.Select(x => x.Id), Is.EqualTo([1, 2]));
+        Assert.That(result.Select(x => x.Name), Is.EqualTo(["Ada", "Grace"]));
     }
 
     [Test]
@@ -65,7 +65,7 @@ public sealed class DataSurfaceTests
         var result = filter.GetAndCastType();
 
         Assert.That(result, Is.TypeOf<object[]>());
-        Assert.That(((object[])result!).Cast<int>(), Is.EqualTo(new[] { 1, 2, 3 }));
+        Assert.That(((object[])result!).Cast<int>(), Is.EqualTo([1, 2, 3]));
     }
 
     [Test]
@@ -101,7 +101,7 @@ public sealed class DataSurfaceTests
     {
         var mapper = new RepositoryMapper();
 
-        mapper.Register(typeof(TestRepository));
+        _ = mapper.Register(typeof(TestRepository));
 
         Assert.That(mapper.GetRepositoryType(typeof(TestEntity)), Is.EqualTo(typeof(TestRepository)));
     }
@@ -111,7 +111,7 @@ public sealed class DataSurfaceTests
     {
         var mapper = new RepositoryMapper();
 
-        mapper.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+        _ = mapper.RegisterFromAssembly(Assembly.GetExecutingAssembly());
 
         Assert.That(mapper.GetRepositoryType(typeof(TestEntity)), Is.EqualTo(typeof(TestRepository)));
         Assert.That(mapper.GetRepositoryType(typeof(UnmappedEntity)), Is.Null);
@@ -126,7 +126,7 @@ public sealed class DataSurfaceTests
         Expression<Func<TestEntity, bool>> filter = entity => entity.Name == "Ada";
         var cancellationToken = new CancellationTokenSource().Token;
 
-        repository.FirstOrDefaultAsync(Arg.Do<ISpecification<int, TestEntity>>(spec => capturedSpecification = spec), cancellationToken)
+        _ = repository.FirstOrDefaultAsync(Arg.Do<ISpecification<int, TestEntity>>(spec => capturedSpecification = spec), cancellationToken)
             .Returns(expected);
 
         var result = await repository.FirstOrDefaultAsync(filter, cancellationToken);
@@ -144,8 +144,8 @@ public sealed class DataSurfaceTests
         var expected = new TestEntity { Id = 9, Name = "Ada" };
         Expression<Func<TestEntity, bool>> filter = entity => entity.Id == 9;
 
-        unitOfWork.GetReadOnlyRepository<int, TestEntity>().Returns(repository);
-        repository.FirstOrDefaultAsync(Arg.Any<ISpecification<int, TestEntity>>(), Arg.Any<CancellationToken>())
+        _ = unitOfWork.GetReadOnlyRepository<int, TestEntity>().Returns(repository);
+        _ = repository.FirstOrDefaultAsync(Arg.Any<ISpecification<int, TestEntity>>(), Arg.Any<CancellationToken>())
             .Returns(expected);
 
         var result = await unitOfWork.FirstOrDefaultAsync<int, TestEntity>(filter);
@@ -162,8 +162,8 @@ public sealed class DataSurfaceTests
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var deleteDetailCalled = false;
 
-        unitOfWork.GetRepository<int, TestEntity>().Returns(repository);
-        repository.GetByIdAsync(42, Arg.Any<CancellationToken>()).Returns((TestEntity?)null);
+        _ = unitOfWork.GetRepository<int, TestEntity>().Returns(repository);
+        _ = repository.GetByIdAsync(42, Arg.Any<CancellationToken>()).Returns((TestEntity?)null);
 
         Assert.That(
             async () => await unitOfWork.DeleteMasterDetailAsync<int, TestEntity>(42, (_, _) =>
@@ -174,8 +174,12 @@ public sealed class DataSurfaceTests
             Throws.TypeOf<NotFoundDomainException>());
 
         Assert.That(deleteDetailCalled, Is.False);
-        repository.DidNotReceive().DeleteByIdAsync(Arg.Any<int>(), Arg.Any<CancellationToken>());
+        _ = repository.DidNotReceive().DeleteByIdAsync(Arg.Any<int>(), Arg.Any<CancellationToken>());
     }
+
+    private static readonly int[] second = [3];
+    private static readonly int[] secondArray = [1];
+    private static readonly int[] secondArray0 = [2];
 
     [Test]
     public async Task UpdateAsyncPartitionsInsertedUpdatedAndDeletedEntities()
@@ -193,18 +197,18 @@ public sealed class DataSurfaceTests
             new TestEntity { Id = 2, Name = "Deleted" }
         };
 
-        unitOfWork.GetRepository<int, TestEntity>().Returns(repository);
+        _ = unitOfWork.GetRepository<int, TestEntity>().Returns(repository);
 
         await unitOfWork.UpdateAsync<int, TestEntity>(incoming, existing);
 
         await repository.Received(1).AddRangeAsync(
-            Arg.Is<IEnumerable<TestEntity>>(entities => entities.Select(x => x.Id).SequenceEqual(new[] { 3 })),
+            Arg.Is<IEnumerable<TestEntity>>(entities => entities.Select(x => x.Id).SequenceEqual(second)),
             Arg.Any<CancellationToken>());
         await repository.Received(1).UpdateRangeAsync(
-            Arg.Is<IEnumerable<TestEntity>>(entities => entities.Select(x => x.Id).SequenceEqual(new[] { 1 })),
+            Arg.Is<IEnumerable<TestEntity>>(entities => entities.Select(x => x.Id).SequenceEqual(secondArray)),
             Arg.Any<CancellationToken>());
         await repository.Received(1).DeleteRangeAsync(
-            Arg.Is<IEnumerable<TestEntity>>(entities => entities.Select(x => x.Id).SequenceEqual(new[] { 2 })),
+            Arg.Is<IEnumerable<TestEntity>>(entities => entities.Select(x => x.Id).SequenceEqual(secondArray0)),
             Arg.Any<CancellationToken>());
     }
 
@@ -219,7 +223,7 @@ public sealed class DataSurfaceTests
 
         var result = source.Sort([new SortExpression(nameof(TestEntity.Name))]).ToList();
 
-        Assert.That(result.Select(x => x.Name), Is.EqualTo(new[] { "Ada", "Charlie" }));
+        Assert.That(result.Select(x => x.Name), Is.EqualTo(["Ada", "Charlie"]));
     }
 
     [Test]
@@ -235,7 +239,7 @@ public sealed class DataSurfaceTests
             [new FilterConditionExpression(nameof(TestEntity.Name), FilterConditionOperator.Contains, "AD", IgnoreCasing: true)])
             .ToList();
 
-        Assert.That(result.Select(x => x.Id), Is.EqualTo(new[] { 1 }));
+        Assert.That(result.Select(x => x.Id), Is.EqualTo([1]));
     }
 
     [Test]
@@ -266,7 +270,7 @@ public sealed class DataSurfaceTests
 
         var result = source.ToPagedList<int, TestEntity>(pageSize: 2, pageNumber: 1);
 
-        Assert.That(result.Items.Select(x => x.Id), Is.EqualTo(new[] { 3, 4 }));
+        Assert.That(result.Items.Select(x => x.Id), Is.EqualTo([3, 4]));
         Assert.That(result.TotalCount, Is.EqualTo(5));
         Assert.That(result.PageIndex, Is.EqualTo(1));
         Assert.That(result.TotalPages, Is.EqualTo(3));
@@ -301,7 +305,7 @@ public sealed class DataSurfaceTests
 
         var result = source.ApplySpecification(specification).ToList();
 
-        Assert.That(result.Select(x => x.Name), Is.EqualTo(new[] { "Ada", "Grace" }));
+        Assert.That(result.Select(x => x.Name), Is.EqualTo(["Ada", "Grace"]));
     }
 
     public sealed class CsvRow

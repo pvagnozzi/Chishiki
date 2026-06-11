@@ -9,9 +9,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
-using System.Reflection;
 using Chishiki.Data.Abstractions;
-using Chishiki.Data.EFCore;
 using Chishiki.Data.EFCore.Models;
 using Chishiki.Data.Models;
 using Chishiki.Data.Specifications;
@@ -50,7 +48,7 @@ public sealed class DataEfCoreInfrastructureTests
         Assert.Multiple(() =>
         {
             Assert.That(first!.Name, Is.EqualTo("Ada"));
-            Assert.That(remaining.Select(entity => entity.Id), Is.EqualTo(new[] { 1 }));
+            Assert.That(remaining.Select(entity => entity.Id), Is.EqualTo([1]));
             Assert.That(remaining[0].Name, Is.EqualTo("Updated Ada"));
         });
     }
@@ -81,7 +79,7 @@ public sealed class DataEfCoreInfrastructureTests
         {
             Assert.That(entity, Is.Not.Null);
             Assert.That(entity!.Name, Is.EqualTo("Updated"));
-            Assert.That(items.Select(item => item.Id), Is.EqualTo(new[] { 10 }));
+            Assert.That(items.Select(item => item.Id), Is.EqualTo([10]));
         });
     }
 
@@ -117,8 +115,8 @@ public sealed class DataEfCoreInfrastructureTests
             Assert.That(first!.Name, Is.EqualTo("Ada"));
             Assert.That(single, Is.Not.Null);
             Assert.That(single!.Id, Is.EqualTo(2));
-            Assert.That(list.Select(entity => entity.Name), Is.EqualTo(new[] { "Ada", "Grace" }));
-            Assert.That(paged.Items.Select(entity => entity.Name), Is.EqualTo(new[] { "Ada", "Charlie" }));
+            Assert.That(list.Select(entity => entity.Name), Is.EqualTo(["Ada", "Grace"]));
+            Assert.That(paged.Items.Select(entity => entity.Name), Is.EqualTo(["Ada", "Charlie"]));
         });
     }
 
@@ -129,12 +127,12 @@ public sealed class DataEfCoreInfrastructureTests
         var loggerFactory = CreateLoggerFactory();
 
         var successfulMapper = new RepositoryMapper();
-        successfulMapper.Register(typeof(FactoryMappedRepository));
+        _ = successfulMapper.Register(typeof(FactoryMappedRepository));
         var successfulFactory = CreateRepositoryFactory(successfulMapper, loggerFactory, context);
         var successfulRepository = successfulFactory.CreateRepository<int, FactoryMappedEntity>();
 
         var failingMapper = new RepositoryMapper();
-        failingMapper.Register(typeof(BadFactoryMappedRepository));
+        _ = failingMapper.Register(typeof(BadFactoryMappedRepository));
         var failingFactory = CreateRepositoryFactory(failingMapper, loggerFactory, context);
         var fallbackRepository = failingFactory.CreateRepository<int, BadFactoryMappedEntity>();
 
@@ -187,7 +185,7 @@ public sealed class DataEfCoreInfrastructureTests
         {
             Assert.That(entityType, Is.Not.Null);
             Assert.That(entityType!.GetTableName(), Is.EqualTo("audited_entities"));
-            Assert.That(entityType.FindProperty(nameof(AuditedEntity.Name))!.GetMaxLength(), Is.EqualTo(32));
+            Assert.That(entityType!.FindProperty(nameof(AuditedEntity.Name))!.GetMaxLength(), Is.EqualTo(32));
             Assert.That(entity.CreatedOn, Is.EqualTo(createdOn));
             Assert.That(entity.UpdatedOn, Is.EqualTo(updatedOn));
             Assert.That(entity.Equals(sameId), Is.True);
@@ -228,7 +226,7 @@ public sealed class DataEfCoreInfrastructureTests
     private static ILoggerFactory CreateLoggerFactory()
     {
         var loggerFactory = Substitute.For<ILoggerFactory>();
-        loggerFactory.CreateLogger(Arg.Any<string>()).Returns(NullLogger.Instance);
+        _ = loggerFactory.CreateLogger(Arg.Any<string>()).Returns(NullLogger.Instance);
         return loggerFactory;
     }
 
@@ -275,10 +273,10 @@ public sealed class DataEfCoreInfrastructureTests
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<RepositoryEntity>();
-            modelBuilder.Entity<FactoryMappedEntity>();
-            modelBuilder.Entity<BadFactoryMappedEntity>();
-            modelBuilder.Entity<AuditedEntity>(builder => builder.SetGuidBaseEntity());
+            _ = modelBuilder.Entity<RepositoryEntity>();
+            _ = modelBuilder.Entity<FactoryMappedEntity>();
+            _ = modelBuilder.Entity<BadFactoryMappedEntity>();
+            _ = modelBuilder.Entity<AuditedEntity>(builder => builder.SetGuidBaseEntity());
         }
     }
 

@@ -64,8 +64,5 @@ public sealed class OpenCVImageExtensionsTests
     [TestCase(1, 1)]
     [TestCase(2, 3)]
     [TestCase(7, 7)]
-    public void EnsureOddKernel_NormalizesKernelSize(int input, int expected)
-    {
-        Assert.That(input.EnsureOddKernel(), Is.EqualTo(expected));
-    }
+    public void EnsureOddKernel_NormalizesKernelSize(int input, int expected) => Assert.That(input.EnsureOddKernel(), Is.EqualTo(expected));
 }

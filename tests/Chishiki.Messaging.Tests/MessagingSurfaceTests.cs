@@ -8,6 +8,7 @@
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
+using System.Globalization;
 using Chishiki.Data.Abstractions;
 using Chishiki.Mapping;
 using Chishiki.Messaging.Abstractions;
@@ -52,7 +53,7 @@ public sealed class MessagingSurfaceTests
     public void SetMarkedUsesProvidedTimestampAndReturnsSameInstance()
     {
         var notification = new RequestNotification(new TestRequest(Guid.NewGuid()));
-        var markTime = DateTimeOffset.Parse("2026-06-10T10:15:00+00:00");
+        var markTime = DateTimeOffset.Parse("2026-06-10T10:15:00+00:00", CultureInfo.InvariantCulture);
 
         var result = notification.SetMarked(markTime);
 

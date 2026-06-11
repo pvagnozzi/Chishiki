@@ -9,6 +9,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
+using System.Globalization;
 using Chishiki.Data.Models;
 using Chishiki.Data.Specifications;
 using Chishiki.Messaging.Abstractions.Commands;
@@ -81,7 +82,7 @@ public sealed class MessagingRequestContractsTests
     [Test]
     public void RequestModelBase_PreservesInitializedState()
     {
-        var createdOn = DateTimeOffset.Parse("2026-06-10T08:00:00+00:00");
+        var createdOn = DateTimeOffset.Parse("2026-06-10T08:00:00+00:00", CultureInfo.InvariantCulture);
         var updatedOn = createdOn.AddMinutes(5);
 
         var model = new RequestModelBase<int>

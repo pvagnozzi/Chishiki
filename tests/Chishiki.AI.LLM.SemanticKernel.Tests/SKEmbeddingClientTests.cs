@@ -20,28 +20,33 @@ namespace Chishiki.AI.LLM.SemanticKernel.Tests;
 /// <summary>Provides focused tests for <see cref="SKEmbeddingClient"/>.</summary>
 public sealed class SKEmbeddingClientTests
 {
+    private static readonly float[] array = [9f, 9f, 9f];
+    private static readonly float[] array0 = [1f, 2f, 3f];
+    private static readonly float[] array1 = [1f, 2f];
+    private static readonly float[] array2 = [3f, 4f];
+
     [Test]
     public async Task GenerateEmbeddingAsync_ReturnsTheFirstGeneratedVector()
     {
         var generator = Substitute.For<IEmbeddingGenerator<string, Embedding<float>>>();
-        generator
+        _ = generator
             .GenerateAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<EmbeddingGenerationOptions?>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(CreateGeneratedEmbeddings(new float[] { 1f, 2f, 3f }.AsMemory(), new float[] { 9f, 9f, 9f }.AsMemory())));
+            .Returns(Task.FromResult(CreateGeneratedEmbeddings(array0.AsMemory(), array.AsMemory())));
 
         var client = new SKEmbeddingClient(generator, NullLogger<SKEmbeddingClient>.Instance);
 
         var embedding = await client.GenerateEmbeddingAsync("hello");
 
-        Assert.That(embedding.ToArray(), Is.EqualTo(new[] { 1f, 2f, 3f }));
+        Assert.That(embedding.ToArray(), Is.EqualTo([1f, 2f, 3f]));
     }
 
     [Test]
     public async Task GenerateEmbeddingsAsync_ReturnsVectorsInInputOrder()
     {
         var generator = Substitute.For<IEmbeddingGenerator<string, Embedding<float>>>();
-        generator
+        _ = generator
             .GenerateAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<EmbeddingGenerationOptions?>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(CreateGeneratedEmbeddings(new float[] { 1f, 2f }.AsMemory(), new float[] { 3f, 4f }.AsMemory())));
+            .Returns(Task.FromResult(CreateGeneratedEmbeddings(array1.AsMemory(), array2.AsMemory())));
 
         var client = new SKEmbeddingClient(generator, NullLogger<SKEmbeddingClient>.Instance);
 
@@ -50,8 +55,8 @@ public sealed class SKEmbeddingClientTests
         Assert.Multiple(() =>
         {
             Assert.That(embeddings, Has.Count.EqualTo(2));
-            Assert.That(embeddings[0].ToArray(), Is.EqualTo(new[] { 1f, 2f }));
-            Assert.That(embeddings[1].ToArray(), Is.EqualTo(new[] { 3f, 4f }));
+            Assert.That(embeddings[0].ToArray(), Is.EqualTo([1f, 2f]));
+            Assert.That(embeddings[1].ToArray(), Is.EqualTo([3f, 4f]));
         });
     }
 
@@ -59,7 +64,7 @@ public sealed class SKEmbeddingClientTests
     public void GenerateEmbeddingsAsync_WhenGeneratorThrows_PropagatesTheException()
     {
         var generator = Substitute.For<IEmbeddingGenerator<string, Embedding<float>>>();
-        generator
+        _ = generator
             .GenerateAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<EmbeddingGenerationOptions?>(), Arg.Any<CancellationToken>())
             .Returns<Task<GeneratedEmbeddings<Embedding<float>>>>(_ => throw new InvalidOperationException("embedding failed"));
 
@@ -86,5 +91,5 @@ public sealed class SKEmbeddingClientTests
     }
 
     private static GeneratedEmbeddings<Embedding<float>> CreateGeneratedEmbeddings(params ReadOnlyMemory<float>[] vectors)
-        => new(vectors.Select(vector => new Embedding<float>(vector)).ToArray());
+        => [.. vectors.Select(vector => new Embedding<float>(vector)).ToArray()];
 }

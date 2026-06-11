@@ -22,6 +22,9 @@ namespace Chishiki.AI.LLM.SemanticKernel.Tests;
 /// <summary>Provides focused tests for <see cref="SKChatClient"/>.</summary>
 public sealed class SKChatClientTests
 {
+    private static readonly LLMChatMessage[] SingleUserHelloMessage = [LLMChatMessage.User("hello")];
+    private static readonly string[] ExpectedStreamChunks = ["Hel", "lo", string.Empty];
+
     [Test]
     public async Task CompleteAsync_MapsContentModelFinishReasonAndUsage()
     {
@@ -72,7 +75,7 @@ public sealed class SKChatClientTests
 
         var client = new SKChatClient(chatService, NullLogger<SKChatClient>.Instance);
 
-        var response = await client.CompleteAsync([LLMChatMessage.User("hello")]);
+        var response = await client.CompleteAsync(SingleUserHelloMessage);
 
         Assert.Multiple(() =>
         {
@@ -91,7 +94,7 @@ public sealed class SKChatClientTests
         cts.Cancel();
 
         var exception = Assert.ThrowsAsync<OperationCanceledException>(async () =>
-            _ = await client.CompleteAsync([LLMChatMessage.User("hello")], cancellationToken: cts.Token));
+            _ = await client.CompleteAsync(SingleUserHelloMessage, cancellationToken: cts.Token));
 
         Assert.That(exception, Is.Not.Null);
     }
@@ -108,11 +111,11 @@ public sealed class SKChatClientTests
 
         var client = new SKChatClient(chatService, NullLogger<SKChatClient>.Instance);
 
-        var chunks = await client.CompleteStreamingAsync([LLMChatMessage.User("hello")]).ToListAsync();
+        var chunks = await client.CompleteStreamingAsync(SingleUserHelloMessage).ToListAsync();
 
         Assert.Multiple(() =>
         {
-            Assert.That(chunks.Select(c => c.Content), Is.EqualTo(new[] { "Hel", "lo", string.Empty }));
+            Assert.That(chunks.Select(c => c.Content), Is.EqualTo(ExpectedStreamChunks));
             Assert.That(chunks[^1].IsFinal, Is.True);
             Assert.That(chunks[0].ModelId, Is.EqualTo("stream-model"));
         });
@@ -129,7 +132,7 @@ public sealed class SKChatClientTests
         var client = new SKChatClient(chatService, NullLogger<SKChatClient>.Instance);
 
         var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            _ = await client.CompleteStreamingAsync([LLMChatMessage.User("hello")]).ToListAsync());
+            _ = await client.CompleteStreamingAsync(SingleUserHelloMessage).ToListAsync());
 
         Assert.That(exception?.Message, Is.EqualTo("stream failed"));
     }
@@ -174,7 +177,7 @@ public sealed class SKChatClientTests
 
     private sealed class FakeChatCompletionService : IChatCompletionService
     {
-        public IReadOnlyDictionary<string, object> Attributes { get; } = new Dictionary<string, object>();
+        public IReadOnlyDictionary<string, object?> Attributes { get; } = new Dictionary<string, object?>();
 
         public Func<ChatHistory, PromptExecutionSettings?, Kernel?, CancellationToken, Task<IReadOnlyList<ChatMessageContent>>>? GetContentsAsync { get; init; }
 

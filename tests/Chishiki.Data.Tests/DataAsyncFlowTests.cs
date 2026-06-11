@@ -12,7 +12,6 @@
 using System.Linq.Expressions;
 using Chishiki.Data;
 using Chishiki.Data.Abstractions;
-using Chishiki.Data.Audit;
 using Chishiki.Data.Models;
 using Chishiki.Data.Specifications;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +33,7 @@ public sealed class DataAsyncFlowTests
         ISpecification<int, TestEntity>? captured = null;
         Expression<Func<TestEntity, bool>> filter = entity => entity.Name == "Ada";
 
-        repository.ListAsync(Arg.Do<ISpecification<int, TestEntity>>(spec => captured = spec), Arg.Any<CancellationToken>())
+        _ = repository.ListAsync(Arg.Do<ISpecification<int, TestEntity>>(spec => captured = spec), Arg.Any<CancellationToken>())
             .Returns(expected);
 
         var result = await repository.ListAsync(filter);
@@ -55,8 +54,8 @@ public sealed class DataAsyncFlowTests
         IList<TestEntity> expected = [new() { Id = 2, Name = "Grace" }];
         Expression<Func<TestEntity, bool>> filter = entity => entity.Id == 2;
 
-        unitOfWork.GetReadOnlyRepository<int, TestEntity>().Returns(repository);
-        repository.ListAsync(Arg.Any<ISpecification<int, TestEntity>>(), Arg.Any<CancellationToken>()).Returns(expected);
+        _ = unitOfWork.GetReadOnlyRepository<int, TestEntity>().Returns(repository);
+        _ = repository.ListAsync(Arg.Any<ISpecification<int, TestEntity>>(), Arg.Any<CancellationToken>()).Returns(expected);
 
         var result = await unitOfWork.ListAsync<int, TestEntity>(filter);
 
@@ -69,10 +68,10 @@ public sealed class DataAsyncFlowTests
     {
         var repository = Substitute.For<IReadOnlyRepository<int, TestEntity>>();
         IPagedSpecification<int, TestEntity>? captured = null;
-        IPagedList<TestEntity> expected = new Chishiki.PagedList<TestEntity>([], 0, 2, 5);
+        IPagedList<TestEntity> expected = new PagedList<TestEntity>([], 0, 2, 5);
         Expression<Func<TestEntity, bool>> filter = entity => entity.Score > 10;
 
-        repository.ListPagedAsync(Arg.Do<IPagedSpecification<int, TestEntity>>(spec => captured = spec), Arg.Any<CancellationToken>())
+        _ = repository.ListPagedAsync(Arg.Do<IPagedSpecification<int, TestEntity>>(spec => captured = spec), Arg.Any<CancellationToken>())
             .Returns(expected);
 
         var result = await repository.ListAsync(filter, pageIndex: 2, pageSize: 5);
@@ -97,7 +96,7 @@ public sealed class DataAsyncFlowTests
             new TestEntity { Id = 1, Name = "Ada" },
             new TestEntity { Id = 2, Name = "Grace" },
         };
-        unitOfWork.GetRepository<int, TestEntity>().Returns(repository);
+        _ = unitOfWork.GetRepository<int, TestEntity>().Returns(repository);
 
         var callbackEntity = default(TestEntity);
         await unitOfWork.InsertMasterDetailAsync<int, TestEntity>(entities[0], (entity, _) =>
@@ -122,11 +121,11 @@ public sealed class DataAsyncFlowTests
             new TestEntity { Id = 3, Name = "Three" },
             new TestEntity { Id = 1, Name = "One" },
             new TestEntity { Id = 2, Name = "Two" });
-        await dbContext.SaveChangesAsync();
+        _ = await dbContext.SaveChangesAsync();
 
         var result = await dbContext.Entities.ToPagedListAsync<int, TestEntity>(pageSize: 2, pageNumber: 0);
 
-        Assert.That(result.Items.Select(entity => entity.Id), Is.EqualTo(new[] { 1, 2 }));
+        Assert.That(result.Items.Select(entity => entity.Id), Is.EqualTo([1, 2]));
     }
 
     [Test]
@@ -137,7 +136,7 @@ public sealed class DataAsyncFlowTests
             new TestEntity { Id = 10, Name = "Ten" },
             new TestEntity { Id = 20, Name = "Twenty" },
             new TestEntity { Id = 30, Name = "Thirty" });
-        await dbContext.SaveChangesAsync();
+        _ = await dbContext.SaveChangesAsync();
 
         var result = await dbContext.Entities
             .OrderBy(entity => entity.Id)
@@ -145,20 +144,21 @@ public sealed class DataAsyncFlowTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.Items, Is.EqualTo(new[] { "0:Ten", "1:Twenty" }));
+            Assert.That(result.Items, Is.EqualTo(["0:Ten", "1:Twenty"]));
             Assert.That(result.TotalCount, Is.EqualTo(3));
             Assert.That(result.TotalPages, Is.EqualTo(2));
         });
     }
 
     [Test]
-    public async Task DataSeederSeedDataAsyncSwallowsSeedEntitiesException()
+    public Task DataSeederSeedDataAsyncSwallowsSeedEntitiesException()
     {
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var logger = Substitute.For<ILogger<DataSeeder>>();
         var sut = new ThrowingDataSeeder(unitOfWork, logger);
 
         Assert.DoesNotThrowAsync(async () => await sut.SeedDataAsync());
+        return Task.CompletedTask;
     }
 
     [Test]
@@ -167,7 +167,7 @@ public sealed class DataAsyncFlowTests
         var repository = Substitute.For<IRepository<int, SeedEntity>>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var logger = Substitute.For<ILogger<DataSeeder>>();
-        unitOfWork.GetRepository<int, SeedEntity>().Returns(repository);
+        _ = unitOfWork.GetRepository<int, SeedEntity>().Returns(repository);
         var sut = new TestDataSeeder(unitOfWork, logger);
         var entities = new[]
         {
@@ -188,9 +188,9 @@ public sealed class DataAsyncFlowTests
         var repository = Substitute.For<IRepository<int, SeedEntity>>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var logger = Substitute.For<ILogger<DataSeeder>>();
-        unitOfWork.GetRepository<int, SeedEntity>().Returns(repository);
-        repository.ListAsync(null, Arg.Any<CancellationToken>()).Returns(
-            new List<SeedEntity> { new() { Id = 1, Name = "Ada" } });
+        _ = unitOfWork.GetRepository<int, SeedEntity>().Returns(repository);
+        _ = repository.ListAsync(null, Arg.Any<CancellationToken>()).Returns(
+            [new() { Id = 1, Name = "Ada" }]);
         var sut = new TestDataSeeder(unitOfWork, logger);
         var entities = new[]
         {
@@ -202,7 +202,7 @@ public sealed class DataAsyncFlowTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.Select(entity => entity.Id), Is.EqualTo(new[] { 1, 2 }));
+            Assert.That(result.Select(entity => entity.Id), Is.EqualTo([1, 2]));
             Assert.That(result[0].Name, Is.EqualTo("Ada"));
             Assert.That(result[1].Name, Is.EqualTo("Grace"));
         });

@@ -31,10 +31,7 @@ public sealed class CoreExtensionsTests
     }
 
     [Test]
-    public void CapitalizeWhenValueIsEmptyThrowsArgumentException()
-    {
-        Assert.That(() => string.Empty.Capitalize(), Throws.ArgumentException);
-    }
+    public void CapitalizeWhenValueIsEmptyThrowsArgumentException() => Assert.That(() => string.Empty.Capitalize(), Throws.ArgumentException);
 
     [Test]
     public void CapitalizeWhenValueStartsLowercaseReturnsCapitalizedText()
@@ -98,7 +95,7 @@ public sealed class CoreExtensionsTests
         ]);
 
         Assert.That(result, Is.SameAs(claims));
-        Assert.That(result.Select(c => c.Type), Is.EqualTo(new[] { ClaimTypes.Name, ClaimTypes.Role }));
+        Assert.That(result.Select(c => c.Type), Is.EqualTo([ClaimTypes.Name, ClaimTypes.Role]));
     }
 
     [Test]
@@ -152,7 +149,7 @@ public sealed class CoreExtensionsTests
 
         var result = source.Map(value => $"#{value}");
 
-        Assert.That(result.Items, Is.EqualTo(new[] { "#1", "#2" }));
+        Assert.That(result.Items, Is.EqualTo(["#1", "#2"]));
         Assert.That(result.TotalCount, Is.EqualTo(5));
         Assert.That(result.PageIndex, Is.EqualTo(1));
         Assert.That(result.PageSize, Is.EqualTo(2));
@@ -215,10 +212,7 @@ public sealed class CoreExtensionsTests
     }
 
     [Test]
-    public void EncryptWhenKeyIsInvalidLengthThrowsCryptographicException()
-    {
-        Assert.That(() => "secret".Encrypt("short"), Throws.TypeOf<CryptographicException>());
-    }
+    public void EncryptWhenKeyIsInvalidLengthThrowsCryptographicException() => Assert.That(() => "secret".Encrypt("short"), Throws.TypeOf<CryptographicException>());
 
     private sealed class SampleOptions
     {

@@ -10,7 +10,6 @@
 // -----------------------------------------------------------------------------
 using Chishiki.Data.Abstractions;
 using Chishiki.Data.Audit;
-using Chishiki.Data.EFCore;
 using Chishiki.Data.EFCore.Audit;
 using Chishiki.Data.EFCore.Models;
 using Chishiki.Data.Models;
@@ -66,14 +65,14 @@ public sealed class DataEfCoreTests
 
         var result = await context.RepositoryEntities.OrderBy(x => x.Id).ToListAsync();
 
-        Assert.That(result.Select(x => x.Id), Is.EqualTo(new[] { 1, 2 }));
+        Assert.That(result.Select(x => x.Id), Is.EqualTo([1, 2]));
     }
 
     [Test]
     public async Task GetChangesReturnsInsertedEntityDetails()
     {
         await using var context = CreateDbContext();
-        context.RepositoryEntities.Add(new RepositoryEntity { Id = 1, Name = "Ada" });
+        _ = context.RepositoryEntities.Add(new RepositoryEntity { Id = 1, Name = "Ada" });
 
         var result = context.GetChanges().Single();
 
@@ -86,7 +85,7 @@ public sealed class DataEfCoreTests
     public async Task GetChangesReturnsUpdatedAndDeletedEntityDetails()
     {
         await using var context = CreateDbContext();
-        context.RepositoryEntities.Add(new RepositoryEntity { Id = 1, Name = "Ada" });
+        _ = context.RepositoryEntities.Add(new RepositoryEntity { Id = 1, Name = "Ada" });
         _ = await context.SaveChangesAsync();
 
         var existing = await context.RepositoryEntities.SingleAsync();
@@ -96,7 +95,7 @@ public sealed class DataEfCoreTests
         Assert.That(updated.Operation, Is.EqualTo(ChangeAction.Updated));
         Assert.That(updated.Properties.Any(property => property.PropertyName == nameof(RepositoryEntity.Name)), Is.True);
 
-        context.Remove(existing);
+        _ = context.Remove(existing);
 
         var deleted = context.GetChanges().Single(change => change.Operation == ChangeAction.Deleted);
         Assert.That(deleted.EntityId, Is.EqualTo("1"));
@@ -109,10 +108,10 @@ public sealed class DataEfCoreTests
         var entityType = context.Model.FindEntityType(typeof(AuditedEntity));
 
         Assert.That(entityType, Is.Not.Null);
-        Assert.That(entityType!.FindPrimaryKey()!.Properties.Select(x => x.Name), Is.EqualTo(new[] { nameof(EFBaseEntity<Guid>.Id) }));
-        Assert.That(entityType.FindProperty(nameof(EFBaseEntity<Guid>.Id))!.GetMaxLength(), Is.EqualTo(64));
-        Assert.That(entityType.FindProperty(nameof(EFBaseEntity<Guid>.CreatedOn))!.IsNullable, Is.False);
-        Assert.That(entityType.FindProperty(nameof(EFBaseEntity<Guid>.UpdatedOn))!.IsNullable, Is.False);
+        Assert.That(entityType!.FindPrimaryKey()!.Properties.Select(x => x.Name), Is.EqualTo([nameof(EFBaseEntity<>.Id)]));
+        Assert.That(entityType.FindProperty(name: nameof(EFBaseEntity<>.Id))!.GetMaxLength(), Is.EqualTo(64));
+        Assert.That(entityType.FindProperty(nameof(EFBaseEntity<>.CreatedOn))!.IsNullable, Is.False);
+        Assert.That(entityType.FindProperty(nameof(EFBaseEntity<>.UpdatedOn))!.IsNullable, Is.False);
     }
 
     [Test]
@@ -124,24 +123,22 @@ public sealed class DataEfCoreTests
         _ = services.AddDbContextFactory<TestDbContext>(options => options.UseInMemoryDatabase(databaseName));
         _ = services.AddEFUnitOfWorkFactory<TestDbContext>();
 
-        await using (var provider = services.BuildServiceProvider())
+        await using var provider = services.BuildServiceProvider();
+        await using (var scope = provider.CreateAsyncScope())
         {
-            await using (var scope = provider.CreateAsyncScope())
-            {
-                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var repository = unitOfWork.GetRepository<int, RepositoryEntity>();
-                await repository.AddAsync(new RepositoryEntity { Id = 10, Name = "Persisted" });
-                await unitOfWork.SaveChangesAsync();
-            }
-
-            await using var verificationScope = provider.CreateAsyncScope();
-            var verificationUnitOfWork = verificationScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-            var verificationRepository = verificationUnitOfWork.GetReadOnlyRepository<int, RepositoryEntity>();
-            var result = await verificationRepository.GetByIdAsync(10);
-
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result!.Name, Is.EqualTo("Persisted"));
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var repository = unitOfWork.GetRepository<int, RepositoryEntity>();
+            await repository.AddAsync(new RepositoryEntity { Id = 10, Name = "Persisted" });
+            await unitOfWork.SaveChangesAsync();
         }
+
+        await using var verificationScope = provider.CreateAsyncScope();
+        var verificationUnitOfWork = verificationScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        var verificationRepository = verificationUnitOfWork.GetReadOnlyRepository<int, RepositoryEntity>();
+        var result = await verificationRepository.GetByIdAsync(10);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Name, Is.EqualTo("Persisted"));
     }
 
     [Test]
@@ -203,9 +200,9 @@ public sealed class DataEfCoreTests
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<RepositoryEntity>();
-            modelBuilder.Entity<MappedEntity>();
-            modelBuilder.Entity<AuditedEntity>(builder => builder.SetGuidBaseEntity());
+            _ = modelBuilder.Entity<RepositoryEntity>();
+            _ = modelBuilder.Entity<MappedEntity>();
+            _ = modelBuilder.Entity<AuditedEntity>(builder => builder.SetGuidBaseEntity());
         }
     }
 
@@ -291,9 +288,6 @@ public sealed class DataEfCoreTests
 
         public void DeleteRangeById(IEnumerable<int> ids) => throw new NotImplementedException();
 
-        public void Dispose()
-        {
-            GC.KeepAlive(logger);
-        }
+        public void Dispose() => GC.KeepAlive(logger);
     }
 }

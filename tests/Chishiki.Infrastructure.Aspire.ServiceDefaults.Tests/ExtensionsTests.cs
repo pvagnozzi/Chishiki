@@ -10,7 +10,6 @@
 // -----------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,22 +28,22 @@ public sealed class ExtensionsTests
     {
         var builder = CreateBuilder(Environments.Development);
 
-        builder.AddServiceDefaults();
+        _ = builder.AddServiceDefaults();
 
         using var app = builder.Build();
         var options = app.Services.GetRequiredService<IOptions<ServiceDiscoveryOptions>>().Value;
 
-        Assert.That(options.AllowedSchemes, Is.EquivalentTo(new[] { "https" }));
+        Assert.That(options.AllowedSchemes, Is.EquivalentTo(["https"]));
     }
 
     [Test]
     public async Task MapDefaultEndpoints_InDevelopment_MapsHealthAliveAndMetrics()
     {
         var builder = CreateBuilder(Environments.Development);
-        builder.AddServiceDefaults();
+        _ = builder.AddServiceDefaults();
 
         await using var app = builder.Build();
-        app.MapDefaultEndpoints();
+        _ = app.MapDefaultEndpoints();
         await app.StartAsync();
 
         var client = app.GetTestClient();
@@ -65,10 +64,10 @@ public sealed class ExtensionsTests
     public async Task MapDefaultEndpoints_InProduction_DoesNotMapHealthEndpointsButKeepsMetrics()
     {
         var builder = CreateBuilder(Environments.Production);
-        builder.AddServiceDefaults();
+        _ = builder.AddServiceDefaults();
 
         await using var app = builder.Build();
-        app.MapDefaultEndpoints();
+        _ = app.MapDefaultEndpoints();
         await app.StartAsync();
 
         var client = app.GetTestClient();
@@ -98,7 +97,7 @@ public sealed class ExtensionsTests
 
         Assert.DoesNotThrow(() =>
         {
-            builder.AddServiceDefaults();
+            _ = builder.AddServiceDefaults();
             using var app = builder.Build();
         });
     }
@@ -111,11 +110,11 @@ public sealed class ExtensionsTests
             ApplicationName = typeof(ExtensionsTests).Assembly.GetName().Name,
         });
 
-        builder.WebHost.UseTestServer();
+        _ = builder.WebHost.UseTestServer();
 
         if (configuration is not null)
         {
-            builder.Configuration.AddInMemoryCollection(configuration);
+            _ = builder.Configuration.AddInMemoryCollection(configuration);
         }
 
         return builder;
