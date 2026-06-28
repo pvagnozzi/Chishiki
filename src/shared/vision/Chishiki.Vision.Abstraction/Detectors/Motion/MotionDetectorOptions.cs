@@ -16,7 +16,7 @@ namespace Chishiki.Vision.Abstraction.Detectors.Motion;
 public record MotionDetectorOptions : DetectorOptions
 {
     /// <summary>Gets or sets the minimum contour area in pixels to be considered a valid motion region. Default is 500.</summary>
-    public double MinContourArea { get; set; } = 500.0;
+    public new double MinContourArea { get; set; } = 500.0;
 
     /// <summary>Gets or sets the threshold on the squared Mahalanobis distance to classify a pixel as foreground. Default is 16.</summary>
     public double Threshold { get; set; } = 16.0;

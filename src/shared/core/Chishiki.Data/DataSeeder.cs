@@ -50,7 +50,7 @@ public abstract partial class DataSeeder(IUnitOfWork unitOfWork, ILogger<DataSee
     /// <param name="cancellationToken">Token to observe for cancellation.</param>
     protected async Task SeedEntityAsync<TKey, TEntity>(IEnumerable<TEntity> entities,
         CancellationToken cancellationToken = default)
-        where TEntity : class, IEntityWithDates<TKey>
+        where TEntity : class, IEntity<TKey>
     {
         try
         {
@@ -90,7 +90,7 @@ public abstract partial class DataSeeder(IUnitOfWork unitOfWork, ILogger<DataSee
     /// <returns>List of all seeded and existing entities.</returns>
     protected async Task<IList<TEntity>> SeedEntityAsync<TKey, TEntity>(IEnumerable<TEntity> entities,
         Func<TEntity, TEntity, bool> finder, CancellationToken cancellationToken = default)
-        where TEntity : class, IEntityWithDates<TKey>
+        where TEntity : class, IEntity<TKey>
     {
         var result = new List<TEntity>();
         var entityTypeName = typeof(TEntity).Name;

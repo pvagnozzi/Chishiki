@@ -10,6 +10,7 @@
 // -----------------------------------------------------------------------------
 
 using Chishiki.Vision.Abstraction;
+using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Objects;
 using Microsoft.Extensions.Logging;
 using Microsoft.ML.OnnxRuntime;
@@ -25,7 +26,7 @@ namespace Chishiki.Vision.OpenCV.Detectors.Objects;
 /// </summary>
 /// <param name="options">Configuration options for the ONNX detector, including model path and input size.</param>
 /// <param name="logger">Logger for diagnostic output.</param>
-public abstract partial class OnnxObjectDetector : OpenCVDetector<ObjectDetectionResult, ObjectDetection>, IObjectDetector
+public abstract partial class OnnxObjectDetector : OpenCVDetector<ObjectDetectionResult, ObjectDetection, OnnxObjectDetectorOptions>, IObjectDetector
 {
     /// <summary>
     /// Inference session for running the ONNX model. Initialized in the constructor and disposed in Dispose().
@@ -34,6 +35,7 @@ public abstract partial class OnnxObjectDetector : OpenCVDetector<ObjectDetectio
 
     /// <inheritdoc/>
     public new OnnxObjectDetectorOptions Options => (OnnxObjectDetectorOptions)base.Options;
+    DetectorOptions IDetector<ObjectDetection, DetectorOptions>.Options => Options;
 
     /// <summary>
     /// Initialises a new <see cref="OnnxObjectDetector"/> with the supplied options and logger.

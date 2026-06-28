@@ -27,15 +27,21 @@ public record Detection
     public double Area { get; init; }
 
     /// <summary>
+    /// Gets the confidence score associated with this detection, typically in the range [0.0, 1.0], where higher values indicate greater confidence in the detection's validity.
+    /// </summary>
+    public float Score { get; init; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Detection"/> record with the specified point and size.
     /// </summary>
     /// <param name="rect">The detection rectangle.</param>
     /// <param name="area">The area of the region. If not provided, it will be calculated as width multiplied by height.</param>
     // ReSharper disable once MemberCanBePrivate.Global
     // ReSharper disable once MemberCanBeProtected.Global
-    public Detection(Rect rect, double area = -1)
+    public Detection(Rect rect, float score = 0.0f, double area = -1)
     {
         Rect = rect;
+        Score = score;
         Area = area >= 0 ? area : rect.Width * rect.Height;
     }
 
@@ -44,10 +50,11 @@ public record Detection
     /// </summary>
     /// <param name="point">The top-left corner of the region.</param>
     /// <param name="size">The size of the region.</param>
+    /// <param name="score">The confidence score associated with this detection.</param>
     /// <param name="area">The area of the region. If not provided, it will be calculated as width multiplied by height.</param>
     // ReSharper disable once MemberCanBePrivate.Global
     // ReSharper disable once MemberCanBeProtected.Global
-    public Detection(Point point, Size size, double area = -1) : this(new Rect(point, size), area)
+    public Detection(Point point, Size size, float score, double area = -1) : this(new Rect(point, size), score, area)
     {
     }
 
@@ -58,9 +65,10 @@ public record Detection
     /// <param name="y">Y-coordinate of the top-left corner of the region.</param>
     /// <param name="width">Width of the region.</param>
     /// <param name="height">Height of the region.</param>
+    /// <param name="score">The confidence score associated with this detection.</param>
     /// <param name="area">The area of the region. If not provided, it will be calculated as width multiplied by height.</param>
     // ReSharper disable once MemberCanBeProtected.Global
-    public Detection(int x, int y, int width, int height, double area = -1) : this(new Point(x, y), new Size(width, height), area)
+    public Detection(int x, int y, int width, int height, float score, double area = -1) : this(new Point(x, y), new Size(width, height), score, area)
     {
     }
 }

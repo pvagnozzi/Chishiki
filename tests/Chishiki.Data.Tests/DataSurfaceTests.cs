@@ -3,7 +3,7 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: Covers focused unit tests for the Chishiki.Data shared library surface.
 // Created:     2026-06-10
-// Modified:    2026-06-10
+// Modified:    2026-06-12
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -12,6 +12,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Chishiki.Data;
 using Chishiki.Data.Abstractions;
+using Chishiki.Data.EFCore;
 using Chishiki.Data.Models;
 using Chishiki.Data.Query;
 using Chishiki.Data.Specifications;
@@ -330,22 +331,25 @@ public sealed class DataSurfaceTests
     public sealed class TestEntity : IEntity<int>
     {
         public int Id { get; init; }
-
         public string Name { get; init; } = string.Empty;
-
         public int Score { get; init; }
+        public DateTimeOffset CreatedAt { get; init; }
+        public DateTimeOffset UpdatedAt { get; init; }
     }
 
     public sealed class UnmappedEntity : IEntity<int>
     {
         public int Id { get; init; }
+        public DateTimeOffset CreatedAt { get; init; }
+        public DateTimeOffset UpdatedAt { get; init; }
     }
 
     public sealed class ParentEntity : IEntity<int>
     {
         public int Id { get; init; }
-
         public List<ChildEntity> Children { get; init; } = [];
+        public DateTimeOffset CreatedAt { get; init; }
+        public DateTimeOffset UpdatedAt { get; init; }
     }
 
     public sealed class ChildEntity

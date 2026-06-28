@@ -11,6 +11,7 @@
 
 using Chishiki.Vision.Abstraction;
 using Chishiki.Vision.Abstraction.Detectors.Faces;
+using Chishiki.Vision.Abstraction.Recognizers;
 using Microsoft.Extensions.Logging;
 using OpenCvSharp;
 using OpenCvSharp.Face;
@@ -31,7 +32,7 @@ public partial class OpenCVLBPHFaceRecognizer(OpenCVLBPHFaceRecognizerOptions op
     public new OpenCVLBPHFaceRecognizerOptions Options => (OpenCVLBPHFaceRecognizerOptions)base.Options;
 
     /// <inheritdoc/>
-    public override Task<FaceRecognitionResult> RecognizeAsync(IImage image, CancellationToken cancellationToken = default)
+    public override Task<RecognitionResult> RecognizeAsync(IImage image, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         CheckDisposed();
@@ -43,7 +44,7 @@ public partial class OpenCVLBPHFaceRecognizer(OpenCVLBPHFaceRecognizerOptions op
             if (grayscale.Empty())
             {
                 LogEmptyFaceCrop(Logger);
-                return Task.FromResult(new FaceRecognitionResult());
+                return Task.FromResult<RecognitionResult>(new FaceRecognitionResult());
             }
 
             using var normalized = NormalizeFace(grayscale);
@@ -51,19 +52,19 @@ public partial class OpenCVLBPHFaceRecognizer(OpenCVLBPHFaceRecognizerOptions op
             if (labelId < 0)
             {
                 LogNoPrediction(Logger);
-                return Task.FromResult(new FaceRecognitionResult(distance: distance));
+                return Task.FromResult<RecognitionResult>(new FaceRecognitionResult(distance: distance));
             }
 
             if (Options.MaximumDistance > 0.0 && distance > Options.MaximumDistance)
             {
                 LogPredictionRejected(Logger, labelId, distance, Options.MaximumDistance);
-                return Task.FromResult(new FaceRecognitionResult(distance: distance));
+                return Task.FromResult<RecognitionResult>(new FaceRecognitionResult(distance: distance));
             }
 
             var identity = _recognizer.GetLabelInfo(labelId);
             var normalizedScore = NormalizeScore(distance, Options.MaximumDistance);
             LogRecognitionCompleted(Logger, labelId, normalizedScore, distance);
-            return Task.FromResult(new FaceRecognitionResult(labelId, identity, normalizedScore, distance));
+            return Task.FromResult<RecognitionResult>(new FaceRecognitionResult(identity: identity, labelId: labelId, score: normalizedScore, distance: distance));
         }
         catch (OperationCanceledException)
         {

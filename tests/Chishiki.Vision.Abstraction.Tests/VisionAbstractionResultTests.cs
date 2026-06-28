@@ -13,6 +13,7 @@ using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Cardplates;
 using Chishiki.Vision.Abstraction.Detectors.Faces;
 using Chishiki.Vision.Abstraction.Detectors.Motion;
+using Chishiki.Vision.Abstraction.Recognizers.Cardplages;
 using NUnit.Framework;
 
 namespace Chishiki.Vision.Abstraction.Tests;

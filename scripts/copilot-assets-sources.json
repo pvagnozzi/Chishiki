@@ -1,0 +1,15 @@
+{
+  "sources": [
+    {
+      "name": "microsoft-copilot-instructions",
+      "repo": "microsoft/copilot-instructions",
+      "branch": "main",
+      "description": "Repository Microsoft ufficiale per skill, instructions e agent Copilot.",
+      "mappings": [
+        { "remote": "skills",       "local": ".github/skills"       },
+        { "remote": "instructions", "local": ".github/instructions" },
+        { "remote": "agents",       "local": ".github/agents"       }
+      ]
+    }
+  ]
+}

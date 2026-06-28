@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 
 using Chishiki.Vision.Abstraction;
-using Chishiki.Vision.Abstraction.Detectors.Faces;
+using Chishiki.Vision.Abstraction.Recognizers;
 using Microsoft.Extensions.Logging;
 
 namespace Chishiki.Vision.Common.Detectors.Faces;
@@ -18,11 +18,11 @@ namespace Chishiki.Vision.Common.Detectors.Faces;
 /// <summary>Base class for face recognizers.</summary>
 /// <param name="options">Recognizer configuration options.</param>
 /// <param name="logger">Logger used for diagnostics.</param>
-public abstract class FaceRecognizer(FaceRecognizerOptions options, ILogger logger) : Disposable(logger), IFaceRecognizer
+public abstract class FaceRecognizer(RecognizerOptions options, ILogger logger) : Disposable(logger), IRecognizer
 {
     /// <inheritdoc/>
-    public FaceRecognizerOptions Options { get; } = options;
+    public RecognizerOptions Options { get; } = options;
 
     /// <inheritdoc/>
-    public abstract Task<FaceRecognitionResult> RecognizeAsync(IImage image, CancellationToken cancellationToken = default);
+    public abstract Task<RecognitionResult> RecognizeAsync(IImage image, CancellationToken cancellationToken = default);
 }

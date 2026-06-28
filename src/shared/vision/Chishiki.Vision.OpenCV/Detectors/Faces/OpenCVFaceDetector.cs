@@ -10,7 +10,9 @@
 // -----------------------------------------------------------------------------
 
 using Chishiki.Vision.Abstraction;
+using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Faces;
+using Chishiki.Vision.Abstraction.Recognizers;
 using Microsoft.Extensions.Logging;
 using OpenCvSharp;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -23,10 +25,10 @@ namespace Chishiki.Vision.OpenCV.Detectors.Faces;
 /// <remarks>Initializes a new <see cref="OpenCVFaceDetector"/> with the supplied options, recognizer, and logger.</remarks>
 /// <param name="options">Detector configuration options.</param>
 /// <param name="logger">Logger used for diagnostics.</param>
-public partial class OpenCVFaceDetector : OpenCVDetector<FaceDetectionResult, FaceDetection>, IFaceDetector
+public partial class OpenCVFaceDetector : OpenCVDetector<FaceDetectionResult, FaceDetection, OpenCVFaceDetectorOptions>, IFaceDetector
 {
     private readonly CascadeClassifier _cascadeClassifier;
-    private readonly IFaceRecognizer? _recognizer;
+    private readonly IRecognizer? _recognizer;
     private readonly bool _ownsRecognizer;
 
     /// <summary>Initializes a new <see cref="OpenCVFaceDetector"/> with a default LBPH recognizer when configured.</summary>
@@ -41,12 +43,12 @@ public partial class OpenCVFaceDetector : OpenCVDetector<FaceDetectionResult, Fa
     /// <param name="options">Detector configuration options.</param>
     /// <param name="recognizer">Recognizer used to enrich candidate detections with identities.</param>
     /// <param name="logger">Logger used for diagnostics.</param>
-    public OpenCVFaceDetector(OpenCVFaceDetectorOptions options, IFaceRecognizer recognizer, ILogger<OpenCVFaceDetector> logger)
+    public OpenCVFaceDetector(OpenCVFaceDetectorOptions options, IRecognizer recognizer, ILogger<OpenCVFaceDetector> logger)
         : this(options, recognizer, logger, ownsRecognizer: false)
     {
     }
 
-    private OpenCVFaceDetector(OpenCVFaceDetectorOptions options, IFaceRecognizer? recognizer, ILogger<OpenCVFaceDetector> logger, bool ownsRecognizer)
+    private OpenCVFaceDetector(OpenCVFaceDetectorOptions options, IRecognizer? recognizer, ILogger<OpenCVFaceDetector> logger, bool ownsRecognizer)
         : base(options, logger)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -72,10 +74,7 @@ public partial class OpenCVFaceDetector : OpenCVDetector<FaceDetectionResult, Fa
     }
 
     /// <summary>Gets the strongly typed detector options.</summary>
-    public new OpenCVFaceDetectorOptions Options => (OpenCVFaceDetectorOptions)base.Options;
-
-    /// <inheritdoc/>
-    FaceDetectorOptions IFaceDetector.Options => Options;
+    FaceDetectorOptions IDetector<FaceDetection, FaceDetectorOptions>.Options => Options;
 
     /// <inheritdoc/>
     public override void Reset() => CheckDisposed();
@@ -151,7 +150,7 @@ public partial class OpenCVFaceDetector : OpenCVDetector<FaceDetectionResult, Fa
         }
 
         var label = !string.IsNullOrWhiteSpace(detection.Identity)
-            ? detection.Identity!
+            ? detection.Identity
             : $"Label {detection.LabelId}";
         var textOriginY = detection.Rect.Y > 16 ? detection.Rect.Y - 6 : detection.Rect.Y + detection.Rect.Height + 16;
         Cv2.PutText(
@@ -191,7 +190,9 @@ public partial class OpenCVFaceDetector : OpenCVDetector<FaceDetectionResult, Fa
         {
             using var face = new Mat(image, region);
             using var faceImage = new OpenCVImage(face.Clone());
-            return await _recognizer.RecognizeAsync(faceImage, cancellationToken);
+            var raw = await _recognizer.RecognizeAsync(faceImage, cancellationToken);
+            return raw as FaceRecognitionResult
+                ?? new FaceRecognitionResult(labelId: int.TryParse(raw.LabelId, out var id) ? id : null, score: raw.Score, distance: raw.Distance);
         }
         catch (OperationCanceledException)
         {

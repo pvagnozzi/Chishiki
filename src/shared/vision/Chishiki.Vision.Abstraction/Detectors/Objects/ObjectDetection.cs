@@ -25,7 +25,7 @@ public record ObjectDetection : Detection
     /// <param name="score">The confidence score of the detected object.</param>
     /// <param name="rect">The bounding rectangle of the detected object.</param>
     /// <param name="area">The area of the detected object. If not specified, defaults to -1.</param>
-    public ObjectDetection(int classId, float score, Rect rect, double area = -1) : base(rect, area)
+    public ObjectDetection(int classId, float score, Rect rect, double area = -1) : base(rect, score, area)
     {
         ClassId = classId;
         Score = score;
@@ -39,7 +39,7 @@ public record ObjectDetection : Detection
     /// <param name="point">The top-left corner of the bounding rectangle.</param>
     /// <param name="size">The size of the bounding rectangle.</param>
     /// <param name="area">The area of the detected object. If not specified, defaults to -1.</param>
-    public ObjectDetection(int classId, float score, Point point, Size size, double area = -1) : base(point, size, area)
+    public ObjectDetection(int classId, float score, Point point, Size size, double area = -1) : base(point, size, score, area)
     {
         ClassId = classId;
         Score = score;
@@ -55,7 +55,7 @@ public record ObjectDetection : Detection
     /// <param name="width">The width of the bounding rectangle.</param>
     /// <param name="height">The height of the bounding rectangle.</param>
     /// <param name="area"></param>
-    public ObjectDetection(int classId, float score, int x, int y, int width, int height, double area = -1) : base(x, y, width, height, area)
+    public ObjectDetection(int classId, float score, int x, int y, int width, int height, double area = -1) : base(x, y, width, height, score, area)
     {
         ClassId = classId;
         Score = score;
@@ -69,5 +69,5 @@ public record ObjectDetection : Detection
     /// <summary>
     /// Gets the confidence score of the detected object, representing the model's certainty that the detection is correct. The score is typically a value between 0.0 and 1.0, where higher values indicate greater confidence in the detection.
     /// </summary>
-    public float Score { get; init; }
+    public new float Score { get; init; }
 }

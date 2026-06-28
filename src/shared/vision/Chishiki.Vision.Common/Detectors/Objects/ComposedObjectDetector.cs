@@ -36,7 +36,7 @@ public class ComposedObjectDetector(DetectorOptions options, IEnumerable<IObject
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the aggregated object detection result.</returns>
     /// <exception cref="NotImplementedException"></exception>
-    public override async Task<ObjectDetectionResult> DetectAsync(IImage frame, CancellationToken cancellationToken = default)
+    public override async Task<DetectionResult<ObjectDetection>> DetectAsync(IImage frame, CancellationToken cancellationToken = default)
     {
         var results = new List<ObjectDetection>();
 

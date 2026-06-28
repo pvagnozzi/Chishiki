@@ -9,10 +9,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
-namespace Chishiki.Vision.Abstraction.Detectors.Cardplates;
+namespace Chishiki.Vision.Abstraction.Recognizers.Cardplages;
 
 /// <summary>Defines the common configuration used by cardplate recognition algorithms.</summary>
-public record CardplateRecognizerOptions
+public record CardplateRecognizerOptions : RecognizerOptions
 {
     /// <summary>Gets or sets the ordered set of characters that can be emitted by the recognizer. Default is the Latin uppercase alphabet plus digits.</summary>
     public string AllowedCharacters { get; set; } = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

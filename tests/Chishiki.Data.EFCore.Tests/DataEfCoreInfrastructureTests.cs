@@ -174,8 +174,8 @@ public sealed class DataEfCoreInfrastructureTests
         var updatedOn = createdOn.AddMinutes(5);
         var entity = new AuditedEntity()
             .WithId(Guid.Parse("11111111-1111-1111-1111-111111111111"))
-            .WithCreatedOn(createdOn)
-            .WithUpdatedOn(updatedOn);
+            .WithCreatedAt(createdOn)
+            .WithUpdatedAt(updatedOn);
 
         var sameId = new AuditedEntity().WithId(entity.Id);
         var guidEntity = new EFGuidEntity();
@@ -186,8 +186,8 @@ public sealed class DataEfCoreInfrastructureTests
             Assert.That(entityType, Is.Not.Null);
             Assert.That(entityType!.GetTableName(), Is.EqualTo("audited_entities"));
             Assert.That(entityType!.FindProperty(nameof(AuditedEntity.Name))!.GetMaxLength(), Is.EqualTo(32));
-            Assert.That(entity.CreatedOn, Is.EqualTo(createdOn));
-            Assert.That(entity.UpdatedOn, Is.EqualTo(updatedOn));
+            Assert.That(entity.CreatedAt, Is.EqualTo(createdOn));
+            Assert.That(entity.UpdatedAt, Is.EqualTo(updatedOn));
             Assert.That(entity.Equals(sameId), Is.True);
             Assert.That(entity.GetHashCode(), Is.EqualTo(entity.Id.GetHashCode()));
             Assert.That(guidEntity.Id, Is.Not.EqualTo(Guid.Empty));
@@ -284,16 +284,22 @@ public sealed class DataEfCoreInfrastructureTests
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
     }
 
     public sealed class FactoryMappedEntity : IEntity<int>
     {
         public int Id { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
     }
 
     public sealed class BadFactoryMappedEntity : IEntity<int>
     {
         public int Id { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
     }
 
     private sealed class FactoryMappedRepository(DbContext context, ILogger logger) : IRepository<int, FactoryMappedEntity>

@@ -22,7 +22,7 @@ namespace Chishiki.Vision.OpenCV.Detectors.Motion;
 /// <param name="options">Algorithm configuration options.</param>
 /// <param name="logger">Logger used for diagnostics.</param>
 public partial class OpenCVMotionDetector(OpenCVMotionDetectorOptions options, ILogger<OpenCVMotionDetector> logger) :
-    OpenCVDetector<MotionDetectionResult, MotionDetection>(options, logger), IMotionDetector
+    OpenCVDetector<MotionDetectionResult, MotionDetection, OpenCVMotionDetectorOptions>(options, logger), IMotionDetector
 {
     /// <summary>
     /// Background subtractor instance using the MOG2 algorithm. It is initialized in the constructor with parameters from the provided options and is responsible for maintaining the background model and generating foreground masks for motion detection. The subtractor is a stateful component that updates its model over time as new frames are processed, allowing it to adapt to changes in the scene while effectively distinguishing between background and moving objects.
@@ -50,11 +50,11 @@ public partial class OpenCVMotionDetector(OpenCVMotionDetectorOptions options, I
     /// Gets the strongly-typed options for this motion detector, allowing access to specific configuration parameters defined in <see cref="OpenCVMotionDetectorOptions"/> without needing to cast from the base <see cref="DetectorOptions"/> type. This property provides convenient access to the motion detector's settings, such as Gaussian kernel size, background history, MOG2 threshold, and morphological operation parameters, enabling derived classes and internal methods to easily reference these options when processing frames and performing motion detection logic.
     /// </summary>
     public new OpenCVMotionDetectorOptions Options => (OpenCVMotionDetectorOptions)base.Options;
+    MotionDetectorOptions IDetector<MotionDetection, MotionDetectorOptions>.Options => Options;
 
     /// <summary>
     /// Gets the name of the motion detector, which is used for logging and identification purposes. This property returns a string that uniquely identifies this specific implementation of a motion detector, allowing it to be distinguished from other detectors in logs, diagnostics, and when managing multiple detectors within the application.
     /// </summary>
-    MotionDetectorOptions IMotionDetector.Options => Options;
 
     /// <inheritdoc/>
     public override void Reset()

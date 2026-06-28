@@ -124,7 +124,11 @@ public sealed class MessagingRequestContractsTests
 
     private sealed class TestEntity : IEntity<int>
     {
-        public int Id { get; init; }
+        public int Id => throw new NotImplementedException();
+
+        public DateTimeOffset CreatedAt => throw new NotImplementedException();
+
+        public DateTimeOffset UpdatedAt => throw new NotImplementedException();
     }
 
     private sealed class TestSpecification : ISpecification<int, TestEntity>

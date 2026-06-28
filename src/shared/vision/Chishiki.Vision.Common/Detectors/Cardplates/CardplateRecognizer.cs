@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 
 using Chishiki.Vision.Abstraction;
-using Chishiki.Vision.Abstraction.Detectors.Cardplates;
+using Chishiki.Vision.Abstraction.Recognizers.Cardplages;
 using Microsoft.Extensions.Logging;
 
 namespace Chishiki.Vision.Common.Detectors.Cardplates;

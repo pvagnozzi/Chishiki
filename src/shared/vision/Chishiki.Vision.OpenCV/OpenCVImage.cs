@@ -45,6 +45,11 @@ public class OpenCVImage(Mat imageData) : Image
 /// </summary>
 public static class OpenCVImageExtensions
 {
+    /// <summary>
+    /// Converts an <see cref="IImage"/> to an OpenCV <see cref="Mat"/>. If the image is already an <see cref="OpenCVImage"/>, its underlying <see cref="Mat"/> is returned directly. Otherwise, a new <see cref="Mat"/> is created from the image's byte data. This allows for seamless integration of any <see cref="IImage"/> into OpenCV processing functions.
+    /// </summary>
+    /// <param name="image">The source image to convert.</param>
+    /// <returns>An OpenCV <see cref="Mat"/> containing the same image data.</returns>
     public static Mat ToMat(this IImage image) => image is OpenCVImage openCvImage ? openCvImage.Mat : Mat.FromImageData(image.ImageData, ImreadModes.AnyColor);
 
     /// <summary>Converts an <see cref="IImage"/> to an <see cref="OpenCVImage"/> by wrapping its byte data in a new OpenCV <see cref="Mat"/>. This is used to convert frames from the video source into a format compatible with OpenCV processing.</summary>

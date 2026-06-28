@@ -110,8 +110,8 @@ public sealed class DataEfCoreTests
         Assert.That(entityType, Is.Not.Null);
         Assert.That(entityType!.FindPrimaryKey()!.Properties.Select(x => x.Name), Is.EqualTo([nameof(EFBaseEntity<>.Id)]));
         Assert.That(entityType.FindProperty(name: nameof(EFBaseEntity<>.Id))!.GetMaxLength(), Is.EqualTo(64));
-        Assert.That(entityType.FindProperty(nameof(EFBaseEntity<>.CreatedOn))!.IsNullable, Is.False);
-        Assert.That(entityType.FindProperty(nameof(EFBaseEntity<>.UpdatedOn))!.IsNullable, Is.False);
+        Assert.That(entityType.FindProperty(nameof(EFBaseEntity<Guid>.CreatedAt))!.IsNullable, Is.False);
+        Assert.That(entityType.FindProperty(nameof(EFBaseEntity<Guid>.UpdatedAt))!.IsNullable, Is.False);
     }
 
     [Test]
@@ -209,15 +209,17 @@ public sealed class DataEfCoreTests
     private sealed class RepositoryEntity : IEntity<int>
     {
         public int Id { get; set; }
-
         public string Name { get; set; } = string.Empty;
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
     }
 
     private sealed class MappedEntity : IEntity<int>
     {
         public int Id { get; set; }
-
         public string Name { get; set; } = string.Empty;
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
     }
 
     private sealed class AuditedEntity : EFBaseEntity<Guid>

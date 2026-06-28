@@ -9,10 +9,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
-namespace Chishiki.Vision.Abstraction.Detectors.Faces;
+namespace Chishiki.Vision.Abstraction.Recognizers;
 
 /// <summary>Defines the common configuration used by face recognition algorithms.</summary>
-public record FaceRecognizerOptions
+public record RecognizerOptions
 {
     /// <summary>Gets or sets the path to the face-recognition model used by the recognizer.</summary>
     public string ModelPath { get; set; } = string.Empty;

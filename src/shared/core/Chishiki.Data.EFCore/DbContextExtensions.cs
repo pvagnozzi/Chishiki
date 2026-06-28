@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // File:        DbContextExtensions.cs
 // Author:      Piergiorgio Vagnozzi
 // Description: EF Core extensions for DbContext.
@@ -9,12 +9,14 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
-using Chishiki.Data.Audit;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Data;
 using System.Diagnostics;
 using System.Transactions;
+using Chishiki.Data.Audit;
+using Chishiki.Data.Models;
+using Chishiki.Data.Specifications;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Chishiki.Data.EFCore;
 
@@ -99,4 +101,116 @@ public static class DbContextExtensions
     private static PropertyChange ToPropertyChange(this PropertyEntry propertyEntry) =>
         new(propertyEntry.Metadata.Name, propertyEntry.CurrentValue?.ToString(),
             propertyEntry.OriginalValue?.ToString());
+
+    /// <summary>Converts to PagedList async. .</summary>
+    /// <typeparam name="TKey">The type of the key.</typeparam>
+    /// <typeparam name="TEntity">The type of the entity.</typeparam>
+    /// <param name="source">The source.</param>
+    /// <param name="pageSize">Size of the page.</param>
+    /// <param name="pageNumber">The page number.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns></returns>
+    public static async Task<PagedList<TEntity>> ToPagedListAsync<TKey, TEntity>(
+        this IQueryable<TEntity> source,
+        int pageSize = 10,
+        int pageNumber = 0,
+        CancellationToken cancellationToken = default)
+        where TEntity : class, IEntity<TKey>
+    {
+        var count = await source.CountAsync(cancellationToken);
+        var orderedQueryable = source.OrderMethodExists() ? source : source.OrderBy(s => s.Id);
+        var items = await orderedQueryable
+            .Skip(pageNumber * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+        return new PagedList<TEntity>(items, count, pageNumber, pageSize);
+    }
+
+    /// <summary>Converts to paged list with select expression. .</summary>
+    /// <param name="source">Source data.</param>
+    /// <param name="selectExpression">Select expression.</param>
+    /// <param name="pageSize">Page size.</param>
+    /// <param name="pageNumber">Page number.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <typeparam name="TKey">Key type.</typeparam>
+    /// <typeparam name="TEntity">Entity type.</typeparam>
+    /// <typeparam name="TResult">Result type.</typeparam>
+    /// <returns>Paged list.</returns>
+    public static async Task<PagedList<TResult>> ToPagedListWithSelectAsync<TKey, TEntity, TResult>(
+        this IQueryable<TEntity> source,
+        Func<TEntity, int, TResult> selectExpression,
+        int pageSize = 10,
+        int pageNumber = 0,
+        CancellationToken cancellationToken = default) where TEntity : class, IEntity<TKey>
+    {
+        var res = await source.ToPagedListAsync<TKey, TEntity>(
+            pageSize,
+            pageNumber,
+            cancellationToken);
+
+        List<TResult> mappedItems = [.. res.Items.Select(selectExpression)];
+        return new PagedList<TResult>(mappedItems, res.TotalCount, pageNumber, pageSize);
+    }
+
+    /// <summary>Includes the specified include expression. .</summary>
+    /// <typeparam name="T">Entity type</typeparam>
+    /// <param name="source">The source.</param>
+    /// <param name="includeExpression">The include expression.</param>
+    /// <returns>Expresion with include.</returns>
+    // ReSharper disable once MemberCanBePrivate.Global
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static IQueryable<T> Include<T>(this IQueryable<T> source, IIncludeExpression includeExpression)
+        where T : class
+    {
+        _ = source.Include(includeExpression.PropertyName);
+
+        foreach (var childExpression in includeExpression.NestedExpressions)
+        {
+            _ = source.Include(childExpression);
+        }
+
+        return source;
+    }
+
+    /// <summary>Includes the specified include expressions. .</summary>
+    /// <typeparam name="T">Entity type</typeparam>
+    /// <param name="source">The source.</param>
+    /// <param name="includeExpressions">The include expressions.</param>
+    /// <returns>Filtered result.</returns>
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static IQueryable<T> Include<T>(this IQueryable<T> source,
+        IEnumerable<IIncludeExpression> includeExpressions)
+        where T : class
+    {
+        foreach (var includeExpression in includeExpressions)
+        {
+            _ = source.Include(includeExpression);
+        }
+
+        return source;
+    }
+
+    /// <summary>Applies the specification to the query source. .</summary>
+    /// <typeparam name="TKey">The type of the entity key.</typeparam>
+    /// <typeparam name="TEntity">The type of the entity.</typeparam>
+    /// <param name="source">The source queryable.</param>
+    /// <param name="specification">The specification to apply.</param>
+    /// <returns>The filtered and sorted queryable.</returns>
+    public static IQueryable<TEntity> ApplySpecification<TKey, TEntity>(
+        this IQueryable<TEntity> source,
+        ISpecification<TKey, TEntity> specification)
+        where TEntity : class, IEntity<TKey>
+    {
+        _ = source.Include(specification.Includes);
+
+        if (specification.Where is not null)
+        {
+            source = source.Where(specification.Where);
+        }
+
+        source = source.Where(specification.Filters);
+        source = source.Sort(specification.Sort);
+
+        return source;
+    }
 }

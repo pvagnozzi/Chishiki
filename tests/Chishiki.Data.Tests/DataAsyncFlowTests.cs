@@ -3,7 +3,7 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: Covers data seeding flows, repository extension helpers, and async query paging behavior.
 // Created:     2026-06-10
-// Modified:    2026-06-10
+// Modified:    2026-06-12
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -12,6 +12,7 @@
 using System.Linq.Expressions;
 using Chishiki.Data;
 using Chishiki.Data.Abstractions;
+using Chishiki.Data.EFCore;
 using Chishiki.Data.Models;
 using Chishiki.Data.Specifications;
 using Microsoft.EntityFrameworkCore;
@@ -228,14 +229,16 @@ public sealed class DataAsyncFlowTests
         public int Id { get; init; }
         public string Name { get; init; } = string.Empty;
         public int Score { get; init; }
+        public DateTimeOffset CreatedAt { get; init; }
+        public DateTimeOffset UpdatedAt { get; init; }
     }
 
-    public sealed class SeedEntity : IEntityWithDates<int>
+    public sealed class SeedEntity : IEntity<int>
     {
         public int Id { get; init; }
         public string Name { get; init; } = string.Empty;
-        public DateTimeOffset CreatedOn { get; init; }
-        public DateTimeOffset UpdatedOn { get; init; }
+        public DateTimeOffset CreatedAt { get; init; }
+        public DateTimeOffset UpdatedAt { get; init; }
     }
 
     private sealed class ThrowingDataSeeder(IUnitOfWork unitOfWork, ILogger<DataSeeder> logger) : DataSeeder(unitOfWork, logger)

@@ -188,7 +188,9 @@ public abstract partial class VideoSourceMonitor : AsyncDisposable, IVideoSource
                 {
                     try
                     {
-                        var result = await MotionDetector.DetectAsync(frame, cancellationToken);
+                        var rawResult = await MotionDetector.DetectAsync(frame, cancellationToken);
+                        var result = rawResult as MotionDetectionResult
+                            ?? new MotionDetectionResult(rawResult.OriginalFrame, rawResult.AnnotatedFrame, rawResult.Detections, rawResult.Timestamp);
 
                         if (!Options.RaiseOnlyOnMotion || result.HasMotion)
                         {

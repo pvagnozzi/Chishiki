@@ -21,7 +21,16 @@
     <File Path="skills/chishiki-repo-conventions/references/architecture-layout-and-build.md" />
     <File Path="skills/chishiki-repo-conventions/references/csharp-conventions.md" />
   </Folder>
-  <Folder Name="/src/infrastructure/aspire/" />
+  <Folder Name="/src/infrastructure/aspire/">
+    <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.AppHost/Chishiki.Infrastructure.Aspire.AppHost.csproj" Id="8d7af370-13e2-489c-a9f9-5ea2a62bcf2c" />
+    <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.ServiceDefaults/Chishiki.Infrastructure.Aspire.ServiceDefaults.csproj" Id="4ad9e74a-4e4e-464a-9b6e-f66aa6fbb8a5" />
+  </Folder>
+  <Folder Name="/src/iot/" />
+  <Folder Name="/src/iot/backend/" />
+  <Folder Name="/src/iot/frontend/" />
+  <Folder Name="/src/iot/shared/">
+    <Project Path="src/iot/shared/Chishiki.IoT.Models/Chishiki.IoT.Models.csproj" Id="fa987955-d569-4657-b022-386ffa9134a3" />
+  </Folder>
 
   <!-- ── src/mcp ── MCP Servers ────────────────────────────────────────── -->
   <Folder Name="/src/mcp/">
@@ -34,8 +43,6 @@
   <!-- ── src/infrastructure ── Aspire AppHost + ServiceDefaults ──────── -->
   <Folder Name="/src/infrastructure/">
     <File Path="src/infrastructure/README.md" />
-    <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.AppHost/Chishiki.Infrastructure.Aspire.AppHost.csproj" Id="8d7af370-13e2-489c-a9f9-5ea2a62bcf2c" />
-    <Project Path="src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.ServiceDefaults/Chishiki.Infrastructure.Aspire.ServiceDefaults.csproj" Id="4ad9e74a-4e4e-464a-9b6e-f66aa6fbb8a5" />
   </Folder>
 
   <!-- ── src/shared ── Cross-cutting Primitives ───────────────────────── -->

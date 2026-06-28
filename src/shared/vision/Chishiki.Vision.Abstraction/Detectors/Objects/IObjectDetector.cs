@@ -14,4 +14,4 @@ namespace Chishiki.Vision.Abstraction.Detectors.Objects;
 /// <summary>
 /// Represents an object detector interface.
 /// </summary>
-public interface IObjectDetector : IDetector<ObjectDetectionResult, ObjectDetection>;
+public interface IObjectDetector : IDetector<ObjectDetection, DetectorOptions>;

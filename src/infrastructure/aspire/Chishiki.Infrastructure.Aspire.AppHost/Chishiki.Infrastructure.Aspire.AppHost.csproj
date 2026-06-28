@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MessagePack" Version="3.1.7" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\mcp\Chishiki.MCP.Host\Chishiki.MCP.Host.csproj" />
   </ItemGroup>
 

@@ -9,6 +9,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
+using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Faces;
 using Microsoft.Extensions.Logging;
 
@@ -18,11 +19,9 @@ namespace Chishiki.Vision.Common.Detectors.Faces;
 /// <param name="options">The detector options.</param>
 /// <param name="logger">The logger for the detector.</param>
 public abstract class FaceDetector(FaceDetectorOptions options, ILogger logger)
-    : Detector<FaceDetectionResult, FaceDetection>(options, logger), IFaceDetector
+    : Detector<FaceDetection, FaceDetectorOptions>(options, logger), IFaceDetector
 {
     /// <summary>Gets the strongly typed options for this detector.</summary>
     public new FaceDetectorOptions Options => (FaceDetectorOptions)base.Options;
-
-    /// <inheritdoc/>
-    FaceDetectorOptions IFaceDetector.Options => Options;
+    FaceDetectorOptions IDetector<FaceDetection, FaceDetectorOptions>.Options => Options;
 }

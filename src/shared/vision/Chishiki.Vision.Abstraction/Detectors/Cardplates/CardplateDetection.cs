@@ -3,7 +3,7 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: Represents a detected vehicle cardplate region within an image frame.
 // Created:     2026-06-07
-// Modified:    2026-06-07
+// Modified:    2026-06-28
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -23,7 +23,7 @@ public record CardplateDetection : Detection
     /// <param name="recognitionScore">The recognition confidence score, when text recognition succeeds.</param>
     /// <param name="area">The area of the detected cardplate region. If not provided, it is derived from the rectangle dimensions.</param>
     public CardplateDetection(Rect rect, float detectionScore = 0.0f, string? recognizedText = null, float? recognitionScore = null, double area = -1)
-        : base(rect, area)
+        : base(rect, detectionScore, area)
     {
         DetectionScore = detectionScore;
         RecognizedText = NormalizeText(recognizedText);
@@ -38,7 +38,7 @@ public record CardplateDetection : Detection
     /// <param name="recognitionScore">The recognition confidence score, when text recognition succeeds.</param>
     /// <param name="area">The area of the detected cardplate region. If not provided, it is derived from the size.</param>
     public CardplateDetection(Point point, Size size, float detectionScore = 0.0f, string? recognizedText = null, float? recognitionScore = null, double area = -1)
-        : base(point, size, area)
+        : base(point, size, detectionScore, area)
     {
         DetectionScore = detectionScore;
         RecognizedText = NormalizeText(recognizedText);
@@ -55,7 +55,7 @@ public record CardplateDetection : Detection
     /// <param name="recognitionScore">The recognition confidence score, when text recognition succeeds.</param>
     /// <param name="area">The area of the detected cardplate region. If not provided, it is derived from the dimensions.</param>
     public CardplateDetection(int x, int y, int width, int height, float detectionScore = 0.0f, string? recognizedText = null, float? recognitionScore = null, double area = -1)
-        : base(x, y, width, height, area)
+        : base(x, y, width, height, detectionScore, area)
     {
         DetectionScore = detectionScore;
         RecognizedText = NormalizeText(recognizedText);
@@ -65,14 +65,16 @@ public record CardplateDetection : Detection
     /// <summary>Gets the geometric confidence score assigned to this detection.</summary>
     public float DetectionScore { get; init; }
 
-    /// <summary>Gets the recognized cardplate text, when recognition succeeds.</summary>
+    /// <summary>Gets a value indicating whether this detection has recognized cardplate text.</summary>
+    public bool HasRecognition => RecognizedText is not null;
+
+    /// <summary>Gets the recognized cardplate text, or <see langword="null"/> when text recognition has not been performed.</summary>
     public string? RecognizedText { get; init; }
 
-    /// <summary>Gets the recognition confidence score associated with <see cref="RecognizedText"/>, when available.</summary>
+    /// <summary>Gets the recognition confidence score, or <see langword="null"/> when text recognition has not been performed.</summary>
     public float? RecognitionScore { get; init; }
 
-    /// <summary>Gets a value indicating whether this detection contains a recognized cardplate text.</summary>
-    public bool HasRecognition => !string.IsNullOrWhiteSpace(RecognizedText);
-
-    private static string? NormalizeText(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim().ToUpperInvariant();
+    /// <summary>Normalizes the raw recognized text by trimming whitespace and converting to uppercase.</summary>
+    private static string? NormalizeText(string? text) =>
+        string.IsNullOrWhiteSpace(text) ? null : text.Trim().ToUpperInvariant();
 }

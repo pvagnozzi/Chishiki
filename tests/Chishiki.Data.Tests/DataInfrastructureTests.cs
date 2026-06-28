@@ -35,7 +35,7 @@ public sealed class DataInfrastructureTests
         var idSettings = settings.Single(setting => setting.Name == nameof(AnnotatedBaseEntity.Id));
         var nameSettings = settings.Single(setting => setting.Name == nameof(AnnotatedDerivedEntity.Name));
         var activeSettings = settings.Single(setting => setting.Name == nameof(AnnotatedDerivedEntity.IsActive));
-        var createdOnSettings = settings.Single(setting => setting.Name == nameof(AnnotatedDerivedEntity.CreatedOn));
+        var createdOnSettings = settings.Single(setting => setting.Name == nameof(AnnotatedDerivedEntity.CreatedAt));
         var statusSettings = settings.Single(setting => setting.Name == nameof(AnnotatedDerivedEntity.Status));
         var statusForFilterSettings = settings.Single(setting => setting.Name == nameof(AnnotatedDerivedEntity.StatusForFilter));
         var notesSettings = settings.Single(setting => setting.Name == nameof(AnnotatedDerivedEntity.Notes));
@@ -45,8 +45,8 @@ public sealed class DataInfrastructureTests
             Id = 7,
             Name = "Ada",
             IsActive = true,
-            CreatedOn = DateTimeOffset.Parse("2026-06-10T12:00:00+00:00", System.Globalization.CultureInfo.InvariantCulture),
-            UpdatedOn = DateTimeOffset.Parse("2026-06-10T12:05:00+00:00", System.Globalization.CultureInfo.InvariantCulture),
+            CreatedAt = DateTimeOffset.Parse("2026-06-10T12:00:00+00:00", System.Globalization.CultureInfo.InvariantCulture),
+            UpdatedAt = DateTimeOffset.Parse("2026-06-10T12:05:00+00:00", System.Globalization.CultureInfo.InvariantCulture),
             Status = InfrastructureStatus.Active,
         };
 
@@ -237,7 +237,7 @@ public sealed class DataInfrastructureTests
     }
 
     [Entity(isSoftDeletable: true, isAuditable: true)]
-    private class AnnotatedBaseEntity : IEntityWithDates<int>
+    private class AnnotatedBaseEntity : IEntity<int>
     {
         [Key]
         [DisplayName("Identifier")]
@@ -246,9 +246,9 @@ public sealed class DataInfrastructureTests
         [Filterable(true, "IdFilter", QueryOperator.Equal, QueryValueType.Integer)]
         public int Id { get; set; }
 
-        public DateTimeOffset CreatedOn { get; init; }
+        public DateTimeOffset CreatedAt { get; init; }
 
-        public DateTimeOffset UpdatedOn { get; init; }
+        public DateTimeOffset UpdatedAt { get; init; }
     }
 
     private sealed class AnnotatedDerivedEntity : AnnotatedBaseEntity
@@ -289,13 +289,15 @@ public sealed class DataInfrastructureTests
     private sealed class RepoEntity : IEntity<int>
     {
         public int Id { get; init; }
+        public DateTimeOffset CreatedAt { get; init; }
+        public DateTimeOffset UpdatedAt { get; init; }
     }
 
     private sealed class TestAudit : IEntityAudit
     {
         public Guid Id { get; init; }
-        public DateTimeOffset CreatedOn { get; init; }
-        public DateTimeOffset UpdatedOn { get; init; }
+        public DateTimeOffset CreatedAt { get; init; }
+        public DateTimeOffset UpdatedAt { get; init; }
         public Guid UserId { get; init; }
         public string EntityId { get; init; } = string.Empty;
         public string EntityName { get; init; } = string.Empty;

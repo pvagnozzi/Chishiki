@@ -10,9 +10,8 @@
 // -----------------------------------------------------------------------------
 
 using Chishiki.Vision.Abstraction;
-using Chishiki.Vision.Abstraction.Detectors.Cardplates;
+using Chishiki.Vision.Abstraction.Recognizers.Cardplages;
 using Chishiki.Vision.Common.Detectors.Cardplates;
-using Chishiki.Vision.OpenCV;
 using Microsoft.Extensions.Logging;
 using OpenCvSharp;
 using OpenCvRect = OpenCvSharp.Rect;
@@ -40,7 +39,7 @@ public partial class OpenCVTemplateCardplateRecognizer(OpenCVTemplateCardplateRe
 
         try
         {
-            using var grayscale = ToGrayscale(image.ToMat());
+            using var grayscale = image.ToMat().ToGrayscale();
             if (grayscale.Empty())
             {
                 LogEmptyCardplate(Logger);
@@ -131,7 +130,7 @@ public partial class OpenCVTemplateCardplateRecognizer(OpenCVTemplateCardplateRe
             Cv2.GaussianBlur(working, working, new Size(blurKernel, blurKernel), 0);
         }
 
-        Cv2.Threshold(working, working, 0, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
+        _ = Cv2.Threshold(working, working, 0, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
 
         var whiteRatio = Cv2.CountNonZero(working) / (double)(working.Rows * working.Cols);
         if (whiteRatio > 0.5)
@@ -150,7 +149,7 @@ public partial class OpenCVTemplateCardplateRecognizer(OpenCVTemplateCardplateRe
         var minArea = binary.Width * binary.Height * Options.MinimumCharacterAreaRatio;
         var maxArea = binary.Width * binary.Height * Options.MaximumCharacterAreaRatio;
 
-        return contours
+        return [.. contours
             .Select(Cv2.BoundingRect)
             .Where(rect => rect.Width > 0 && rect.Height > 0)
             .Where(rect => rect.Height >= minHeight)
@@ -164,8 +163,7 @@ public partial class OpenCVTemplateCardplateRecognizer(OpenCVTemplateCardplateRe
                 var area = rect.Width * rect.Height;
                 return area >= minArea && area <= maxArea;
             })
-            .OrderBy(rect => rect.X)
-            .ToList();
+            .OrderBy(rect => rect.X)];
     }
 
     private CharacterMatch MatchCharacter(Mat binary, OpenCvRect region)
@@ -175,7 +173,7 @@ public partial class OpenCVTemplateCardplateRecognizer(OpenCVTemplateCardplateRe
         using var resized = new Mat();
         Cv2.Resize(character, resized, new Size(Options.TemplateWidth, Options.TemplateHeight));
 
-        char bestCharacter = '?';
+        var bestCharacter = '?';
         var bestScore = float.MinValue;
 
         foreach (var template in _templates)
@@ -206,7 +204,7 @@ public partial class OpenCVTemplateCardplateRecognizer(OpenCVTemplateCardplateRe
                 Math.Max(textSize.Height, (options.TemplateHeight + textSize.Height) / 2 - baseline));
 
             Cv2.PutText(template, candidate.ToString(), origin, HersheyFonts.HersheySimplex, options.FontScale, Scalar.White, options.FontThickness, LineTypes.AntiAlias);
-            Cv2.Threshold(template, template, 0, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
+            _ = Cv2.Threshold(template, template, 0, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
             templates[candidate] = template;
         }
 
@@ -222,33 +220,7 @@ public partial class OpenCVTemplateCardplateRecognizer(OpenCVTemplateCardplateRe
         return new OpenCvRect(x, y, Math.Max(1, right - x), Math.Max(1, bottom - y));
     }
 
-    private static Mat ToGrayscale(Mat image)
-    {
-        if (image.Channels() == 1)
-        {
-            return image.Clone();
-        }
-
-        var grayscale = new Mat();
-        var conversionCode = image.Channels() switch
-        {
-            4 => ColorConversionCodes.BGRA2GRAY,
-            _ => ColorConversionCodes.BGR2GRAY
-        };
-
-        Cv2.CvtColor(image, grayscale, conversionCode);
-        return grayscale;
-    }
-
-    private static int EnsureOddKernel(int size)
-    {
-        if (size <= 1)
-        {
-            return 1;
-        }
-
-        return size % 2 == 0 ? size + 1 : size;
-    }
+    private static int EnsureOddKernel(int size) => size <= 1 ? 1 : size % 2 == 0 ? size + 1 : size;
 
     private readonly record struct CharacterMatch(char Character, float Score);
     #endregion

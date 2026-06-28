@@ -9,6 +9,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
+using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Cardplates;
 using Microsoft.Extensions.Logging;
 
@@ -18,11 +19,9 @@ namespace Chishiki.Vision.Common.Detectors.Cardplates;
 /// <param name="options">The detector options.</param>
 /// <param name="logger">The logger for the detector.</param>
 public abstract class CardplateDetector(CardplateDetectorOptions options, ILogger logger)
-    : Detector<CardplateDetectionResult, CardplateDetection>(options, logger), ICardplateDetector
+    : Detector<CardplateDetection, CardplateDetectorOptions>(options, logger), ICardplateDetector
 {
     /// <summary>Gets the strongly typed options for this detector.</summary>
     public new CardplateDetectorOptions Options => (CardplateDetectorOptions)base.Options;
-
-    /// <inheritdoc/>
-    CardplateDetectorOptions ICardplateDetector.Options => Options;
+    CardplateDetectorOptions IDetector<CardplateDetection, CardplateDetectorOptions>.Options => Options;
 }

@@ -9,16 +9,13 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
-using Chishiki.Vision.Abstraction.Detectors.Cardplates;
+using Chishiki.Vision.Abstraction.Recognizers.Cardplages;
 
 namespace Chishiki.Vision.OpenCV.Detectors.Cardplates;
 
 /// <summary>Configuration options for the OpenCV template-based cardplate recognizer.</summary>
 public record OpenCVTemplateCardplateRecognizerOptions : CardplateRecognizerOptions
 {
-    /// <summary>Gets or sets the target height, in pixels, used to normalize the cardplate crop before segmentation. Default is 96.</summary>
-    public int TargetHeight { get; set; } = 96;
-
     /// <summary>Gets or sets the optional Gaussian blur kernel size applied before binarization. Default is 3.</summary>
     public int BinaryBlurKernelSize { get; set; } = 3;
 

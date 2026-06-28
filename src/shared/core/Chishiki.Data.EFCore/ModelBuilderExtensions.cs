@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Chishiki.Data.EFCore;
 
-/// <summary>Extensions for EntityTypeBuilder to configure base entities with common properties like Id, CreatedOn, and UpdatedOn.</summary>
+/// <summary>Extensions for EntityTypeBuilder to configure base entities with common properties like Id, CreatedAt, and UpdatedAt.</summary>
 public static class ModelBuilderExtensions
 {
     /// <summary>Configures an entity type as a base entity with a Guid primary key. Sets up primary key constraints and required properties. .</summary>
@@ -41,10 +41,10 @@ public static class ModelBuilderExtensions
             .HasMaxLength(64)
             .IsRequired();
         _ = builder
-            .Property(x => x.CreatedOn)
+            .Property(x => x.CreatedAt)
             .IsRequired();
         _ = builder
-            .Property(x => x.UpdatedOn)
+            .Property(x => x.UpdatedAt)
             .IsRequired();
         return builder;
     }

@@ -1,7 +1,7 @@
-﻿// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // File:        EFBaseEntity.cs
 // Author:      Piergiorgio Vagnozzi
-// Description: Abstract base entity class for all EF Core entities with Id, CreatedOn, and UpdatedOn properties.
+// Description: Abstract base entity class for all EF Core entities with Id, CreatedAt, and UpdatedAt properties.
 // Created:     2026-05-04
 // Modified:    2026-05-04
 // -----------------------------------------------------------------------------
@@ -17,10 +17,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Chishiki.Data.EFCore.Models;
 
-/// <summary>Abstract base entity for all EF Core entities with generic key type, providing Id, CreatedOn, and UpdatedOn audit properties.</summary>
+/// <summary>Abstract base entity for all EF Core entities with generic key type, providing Id, CreatedAt, and UpdatedAt audit properties.</summary>
 /// <typeparam name="TKey">The type of the entity's primary key.</typeparam>
 // ReSharper disable once InconsistentNaming
-public abstract class EFBaseEntity<TKey> : IEntityWithDates<TKey>, IEquatable<IEntity<TKey>>
+public abstract class EFBaseEntity<TKey> : IEntity<TKey>, IEquatable<IEntity<TKey>>
 {
     /// <summary>Gets the entity's primary key identifier. .</summary>
     [Key]
@@ -30,12 +30,12 @@ public abstract class EFBaseEntity<TKey> : IEntityWithDates<TKey>, IEquatable<IE
     /// <summary>Gets the date and time in UTC when this entity was created. .</summary>
     [Required]
     [DisplayName("Created On")]
-    public DateTimeOffset CreatedOn { get; protected internal set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset CreatedAt { get; protected internal set; } = DateTimeOffset.UtcNow;
 
     /// <summary>Gets the date and time in UTC when this entity was last updated. .</summary>
     [Required]
     [DisplayName("Updated On")]
-    public DateTimeOffset UpdatedOn { get; protected internal set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset UpdatedAt { get; protected internal set; } = DateTimeOffset.UtcNow;
 
     /// <summary>Determines whether the specified object is equal to the current entity by comparing primary keys. .</summary>
     /// <param name="obj">The object to compare with the current entity.</param>
@@ -59,7 +59,7 @@ public abstract class EFBaseEntity<TKey> : IEntityWithDates<TKey>, IEquatable<IE
 /// <summary>Extension methods for configuring EF Core entities that inherit from EFBaseEntity.</summary>
 public static class EFBaseEntityExtensions
 {
-    /// <summary>Configures an entity type with audit tracking properties (Id, CreatedOn, UpdatedOn) for the model builder. .</summary>
+    /// <summary>Configures an entity type with audit tracking properties (Id, CreatedAt, UpdatedAt) for the model builder. .</summary>
     /// <typeparam name="TKey">The type of the entity's primary key.</typeparam>
     /// <typeparam name="TEntity">The entity type to configure.</typeparam>
     /// <param name="modelBuilder">The model builder to configure.</param>
@@ -69,18 +69,21 @@ public static class EFBaseEntityExtensions
     public static ModelBuilder Configure<TKey, TEntity>(this ModelBuilder modelBuilder, string? tableName = null,
         Action<EntityTypeBuilder<TEntity>>? customAction = null)
         where TKey : IEquatable<TKey>
-        where TEntity : class, IEntityWithDates<TKey>
+        where TEntity : class, IEntity<TKey>
     {
         tableName ??= typeof(TEntity).Name;
-        modelBuilder.Entity<TEntity>(tb =>
+        _ = modelBuilder.Entity<TEntity>(tb =>
         {
-            tb.ToTable(tableName);
-            tb.HasKey(e => e.Id);
-            tb.Property(e => e.Id)
-                .HasMaxLength(64);
-            tb.Property(e => e.CreatedOn)
+            _ = tb
+                .ToTable(tableName)
+                .HasKey(e => e.Id);
+            _ = tb
+                .Property(e => e.Id);
+            _ = tb
+                .Property(e => e.CreatedAt)
                 .IsRequired();
-            tb.Property(e => e.UpdatedOn)
+            _ = tb
+                .Property(e => e.UpdatedAt)
                 .IsRequired();
             customAction?.Invoke(tb);
         });
@@ -105,24 +108,24 @@ public static class EFBaseEntityExtensions
     /// <summary>Fluent configuration method to set the entity's creation timestamp. .</summary>
     /// <typeparam name="TEntity">The entity type (must use Guid as key).</typeparam>
     /// <param name="entity">The entity to configure.</param>
-    /// <param name="createdOn">The value to assign to the entity's CreatedOn property.</param>
+    /// <param name="createdOn">The value to assign to the entity's CreatedAt property.</param>
     /// <returns>The entity for method chaining.</returns>
-    public static TEntity WithCreatedOn<TEntity>(this TEntity entity, DateTimeOffset createdOn)
+    public static TEntity WithCreatedAt<TEntity>(this TEntity entity, DateTimeOffset createdOn)
         where TEntity : EFBaseEntity<Guid>
     {
-        entity.CreatedOn = createdOn;
+        entity.CreatedAt = createdOn;
         return entity;
     }
 
     /// <summary>Fluent configuration method to set the entity's last update timestamp. .</summary>
     /// <typeparam name="TEntity">The entity type (must use Guid as key).</typeparam>
     /// <param name="entity">The entity to configure.</param>
-    /// <param name="updatedOn">The value to assign to the entity's UpdatedOn property.</param>
+    /// <param name="updatedOn">The value to assign to the entity's UpdatedAt property.</param>
     /// <returns>The entity for method chaining.</returns>
-    public static TEntity WithUpdatedOn<TEntity>(this TEntity entity, DateTimeOffset updatedOn)
+    public static TEntity WithUpdatedAt<TEntity>(this TEntity entity, DateTimeOffset updatedOn)
         where TEntity : EFBaseEntity<Guid>
     {
-        entity.UpdatedOn = updatedOn;
+        entity.UpdatedAt = updatedOn;
         return entity;
     }
 }

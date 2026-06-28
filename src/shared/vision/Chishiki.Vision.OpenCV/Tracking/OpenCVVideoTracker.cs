@@ -25,13 +25,17 @@ namespace Chishiki.Vision.OpenCV.Tracking;
 /// <param name="options">Tracker configuration options.</param>
 /// <param name="logger">Logger used for diagnostics.</param>
 public class OpenCVVideoTracker(OpenCVVideoTrackerOptions options, ILogger<OpenCVVideoTracker> logger) :
-    OpenCVDetector<TrackingResult, TrackingDetection>(options, logger)
+    OpenCVDetector<TrackingResult, TrackingDetection, OpenCVVideoTrackerOptions>(options, logger)
 {
+    /// <summary>
+    /// The template image of the tracked object. This field is initialized when the tracker is first set up with an initial region and is used for matching in subsequent frames to locate the object. It is updated only when the tracker is re-initialized or reset.
+    /// </summary>
     private Mat? _template;
-    private VisionRect? _lastKnownRegion;
 
-    /// <summary>Gets the strongly-typed tracker options.</summary>
-    public new OpenCVVideoTrackerOptions Options => (OpenCVVideoTrackerOptions)base.Options;
+    /// <summary>
+    /// Last known region of the tracked object. This field is used to determine the search area in subsequent frames and is updated after each successful tracking operation.
+    /// </summary>
+    private VisionRect? _lastKnownRegion;
 
     /// <summary>Gets a value indicating whether the tracker has already been initialized with an initial region.</summary>
     public bool IsInitialized => _template is not null && _lastKnownRegion is not null;

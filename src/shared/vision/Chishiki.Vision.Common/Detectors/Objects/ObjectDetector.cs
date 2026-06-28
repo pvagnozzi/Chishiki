@@ -20,4 +20,4 @@ namespace Chishiki.Vision.Common.Detectors.Objects;
 /// </summary>
 /// <param name="options">The options for the detector.</param>
 /// <param name="logger">The logger for the detector.</param>
-public abstract class ObjectDetector(DetectorOptions options, ILogger logger) : Detector<ObjectDetectionResult, ObjectDetection>(options, logger), IObjectDetector;
+public abstract class ObjectDetector(DetectorOptions options, ILogger logger) : Detector<ObjectDetection, DetectorOptions>(options, logger), IObjectDetector;

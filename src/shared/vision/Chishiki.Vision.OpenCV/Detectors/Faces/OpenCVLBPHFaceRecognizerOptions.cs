@@ -9,12 +9,12 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
-using Chishiki.Vision.Abstraction.Detectors.Faces;
+using Chishiki.Vision.Abstraction.Recognizers;
 
 namespace Chishiki.Vision.OpenCV.Detectors.Faces;
 
 /// <summary>Configuration options for the OpenCV LBPH face recognizer.</summary>
-public record OpenCVLBPHFaceRecognizerOptions : FaceRecognizerOptions
+public record OpenCVLBPHFaceRecognizerOptions : RecognizerOptions
 {
     /// <summary>Gets or sets the LBPH radius value. Default is 1.</summary>
     public int Radius { get; set; } = 1;

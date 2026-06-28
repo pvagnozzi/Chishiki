@@ -19,15 +19,15 @@ namespace Chishiki.Vision.Common.Detectors;
 /// Base class for stateful detectors that analyse sequential video frames. Concrete implementations should inherit from this class and implement the abstract members to provide specific detection functionality.
 /// </summary>
 /// <param name="logger">Logger instance.</param>
-/// <typeparam name="TResult">Result type.</typeparam>
 /// <typeparam name="TDetection">Detection type.</typeparam>
-public abstract class Detector<TResult, TDetection>(DetectorOptions options, ILogger logger) :
-    Disposable(logger), IDetector<TResult, TDetection>
-    where TResult : DetectionResult<TDetection>
+/// <typeparam name="TOptions">Options type.</typeparam>
+public abstract class Detector<TDetection, TOptions>(TOptions options, ILogger logger) :
+    Disposable(logger), IDetector<TDetection, TOptions>
     where TDetection : Detection
+    where TOptions : DetectorOptions
 {
     /// <summary> Gets the detector options. </summary>
-    public DetectorOptions Options { get; } = options;
+    public TOptions Options { get; } = options;
 
     /// <summary>
     /// Analyses the supplied <paramref name="frame"/> against the accumulated background model and returns a <see cref="TResult"/> with annotated image and detected regions.
@@ -35,7 +35,7 @@ public abstract class Detector<TResult, TDetection>(DetectorOptions options, ILo
     /// <param name="frame">Source frame.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Detection result.</returns>
-    public abstract Task<TResult> DetectAsync(IImage frame, CancellationToken cancellationToken = default);
+    public abstract Task<DetectionResult<TDetection>> DetectAsync(IImage frame, CancellationToken cancellationToken = default);
 
     /// <summary> Resets the history. </summary>
     public abstract void Reset();

@@ -14,7 +14,7 @@ using Chishiki.Data.Models;
 namespace Chishiki.Data.Audit;
 
 /// <summary>Interface for entity-level audit trail tracking with date tracking and user correlation.</summary>
-public interface IEntityAudit : IEntityWithDates<Guid>
+public interface IEntityAudit : IEntity<Guid>
 {
     /// <summary>Gets the ID of the user who made the change. .</summary>
     Guid UserId { get; init; }

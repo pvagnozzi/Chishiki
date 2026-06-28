@@ -20,17 +20,25 @@ namespace Chishiki.Vision.OpenCV.Detectors;
 /// <summary>
 /// Base class for OpenCV-based detectors. This abstract class provides a common foundation for all detectors that utilize OpenCV for image processing. It inherits from the generic <see cref="Detector{TResult, TDetection}"/> base class, allowing concrete implementations to specify their own result and detection types while sharing common functionality and configuration management.
 /// </summary>
-/// <typeparam name="TResult">The type of the detection result.</typeparam>
+/// <typeparam name="TResult">The concrete detection result type (must derive from <see cref="DetectionResult{TDetection}"/>).</typeparam>
 /// <typeparam name="TDetection">The type of the individual detection.</typeparam>
+/// <typeparam name="TOptions">The type of the detector options.</typeparam>
+/// <remarks>
+/// Initializes a new instance of the <see cref="OpenCVDetector{TResult, TDetection, TOptions}"/> class.
+/// </remarks>
 /// <param name="options">The configuration options for the detector.</param>
 /// <param name="logger">The logger used for diagnostics.</param>
-public abstract partial class OpenCVDetector<TResult, TDetection>(DetectorOptions options, ILogger Logger) :
-    Detector<TResult, TDetection>(options, Logger)
+public abstract partial class OpenCVDetector<TResult, TDetection, TOptions>(TOptions options, ILogger logger) :
+#pragma warning disable CS9107 // Il parametro viene catturato nello stato del tipo di inclusione e il relativo valore viene passato anche al costruttore di base. Il valore potrebbe essere catturato anche dalla classe di base.
+    Detector<TDetection, TOptions>(options, logger: logger)
+#pragma warning restore CS9107 // Il parametro viene catturato nello stato del tipo di inclusione e il relativo valore viene passato anche al costruttore di base. Il valore potrebbe essere catturato anche dalla classe di base.
     where TResult : DetectionResult<TDetection>
+    where TOptions : DetectorOptions
     where TDetection : Detection
 {
+
     /// <inheritdoc/>
-    public override async Task<TResult> DetectAsync(IImage frame, CancellationToken cancellationToken = default)
+    public override async Task<DetectionResult<TDetection>> DetectAsync(IImage frame, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         CheckDisposed();
@@ -46,7 +54,8 @@ public abstract partial class OpenCVDetector<TResult, TDetection>(DetectorOption
 
         var result = await ProcessFrameAsync(frame, mat, cancellationToken);
         var annotated = DrawDetections(mat, result.Detections);
-        return result with { AnnotatedFrame = new OpenCVImage(annotated) };
+        return result with { AnnotatedFrame = new OpenCVImage(annotated) }
+            ?? result;
     }
 
     /// <summary>
@@ -62,7 +71,7 @@ public abstract partial class OpenCVDetector<TResult, TDetection>(DetectorOption
     /// <param name="originalImage">The original input image before any preprocessing. This parameter allows derived classes to access the unmodified image data if needed for certain detection algorithms that may require the original pixel values or metadata.</param>
     /// <param name="image">The OpenCV Mat object representing the image frame.</param>
     /// <param name="cancellationToken">A cancellation token for cooperative cancellation.</param>
-    /// <returns>A task representing the asynchronous operation, with a result of type <typeparamref name="TResult"/>.</returns>
+    /// <returns>A task representing the asynchronous operation, with a result of type <typeparamref name="DetectionResult{TDetection}"/>.</returns>
     protected abstract Task<TResult> ProcessFrameAsync(IImage originalImage, Mat image, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -103,7 +112,7 @@ public abstract partial class OpenCVDetector<TResult, TDetection>(DetectorOption
     /// Creates an empty detection result. This abstract method must be implemented by derived classes to provide a way to create an empty result object of type <typeparamref name="TResult"/>. This is used when an empty frame is received, allowing the detector to return a valid but empty result without performing any detection logic.
     /// </summary>
     /// <param name="image">The input image for which to create the empty result. This parameter can be used by derived classes to initialize the result with relevant information from the image, such as dimensions or metadata, even when no detections are present.</param>
-    /// <returns>An empty detection result of type <typeparamref name="TResult"/>.</returns>
+    /// <returns>An empty detection result of type <typeparamref name="DetectionResult{TDetection}"/>.</returns>
     protected abstract TResult CreateEmptyResult(IImage image);
 
     /// <summary>Emitted when an empty frame is received and skipped.</summary>

@@ -28,6 +28,13 @@ Pi-compatible repository guidance distilled from the existing GitHub Copilot ins
 - [Architecture, layout, and build guidance](./references/architecture-layout-and-build.md)
 - [C# conventions for headers, XML docs, and common coding patterns](./references/csharp-conventions.md)
 
+## Related Skills
+
+- `.github/skills/chishiki-rag-development/` - RAG pipeline development
+- `.github/skills/chishiki-orleans-grains/` - Orleans grain development
+- `.github/skills/chishiki-mcp-tools/` - MCP tool development
+- `.github/skills/chishiki-aspire-host/` - Aspire host configuration
+
 ## Mapping Notes
 
 This skill is a curated conversion of repository GitHub Copilot instructions into Pi-friendly project resources:

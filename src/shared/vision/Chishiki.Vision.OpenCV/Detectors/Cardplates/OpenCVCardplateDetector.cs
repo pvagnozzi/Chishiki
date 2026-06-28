@@ -10,11 +10,13 @@
 // -----------------------------------------------------------------------------
 
 using Chishiki.Vision.Abstraction;
+using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Cardplates;
 using Microsoft.Extensions.Logging;
 using OpenCvSharp;
 using VisionRect = Chishiki.Vision.Abstraction.Models.Rect;
 using OpenCvRect = OpenCvSharp.Rect;
+using Chishiki.Vision.Abstraction.Recognizers.Cardplages;
 
 
 namespace Chishiki.Vision.OpenCV.Detectors.Cardplates;
@@ -23,10 +25,12 @@ namespace Chishiki.Vision.OpenCV.Detectors.Cardplates;
 /// <remarks>Initializes a new <see cref="OpenCVCardplateDetector"/> with the supplied options, recognizer, and logger.</remarks>
 /// <param name="options">Detector configuration options.</param>
 /// <param name="logger">Logger used for diagnostics.</param>
-public partial class OpenCVCardplateDetector : OpenCVDetector<CardplateDetectionResult, CardplateDetection>, ICardplateDetector
+public partial class OpenCVCardplateDetector : OpenCVDetector<CardplateDetectionResult, CardplateDetection, OpenCVCardplateDetectorOptions>, ICardplateDetector
 {
     private readonly Mat _closeKernel;
+
     private readonly ICardplateRecognizer _recognizer;
+
     private readonly bool _ownsRecognizer;
 
     /// <summary>Initializes a new <see cref="OpenCVCardplateDetector"/> with the default OpenCV template-based recognizer.</summary>
@@ -61,9 +65,9 @@ public partial class OpenCVCardplateDetector : OpenCVDetector<CardplateDetection
 
     /// <summary>Gets the strongly typed detector options.</summary>
     public new OpenCVCardplateDetectorOptions Options => (OpenCVCardplateDetectorOptions)base.Options;
+    CardplateDetectorOptions IDetector<CardplateDetection, CardplateDetectorOptions>.Options => Options;
 
     /// <inheritdoc/>
-    CardplateDetectorOptions ICardplateDetector.Options => Options;
 
     /// <inheritdoc/>
     public override void Reset() => CheckDisposed();

@@ -9,6 +9,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 using Chishiki.Vision.Abstraction;
+using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Motion;
 using Chishiki.Vision.Abstraction.Monitors;
 using NSubstitute;
@@ -25,7 +26,7 @@ public sealed class VideoSourceMonitorTests
         var source = new SequenceVideoSource("camera-1", [new TestImage(), new TestImage(isEmpty: true)]);
         var detector = Substitute.For<IMotionDetector>();
         _ = detector.DetectAsync(Arg.Any<IImage>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => Task.FromResult(new MotionDetectionResult((IImage)callInfo[0]!, detections: [new MotionDetection(1, 1, 4, 4)])));
+            .Returns(callInfo => Task.FromResult<DetectionResult<MotionDetection>>(new MotionDetectionResult((IImage)callInfo[0]!, detections: [new MotionDetection(1, 1, 4, 4)])));
 
         await using var monitor = new TestVideoSourceMonitor(source, detector, new VideoSourceMonitorOptions
         {
@@ -74,7 +75,7 @@ public sealed class VideoSourceMonitorTests
         var source = new SequenceVideoSource("camera-3", [new TestImage(), new TestImage(isEmpty: true)]);
         var detector = Substitute.For<IMotionDetector>();
         _ = detector.DetectAsync(Arg.Any<IImage>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => Task.FromResult(new MotionDetectionResult((IImage)callInfo[0]!)));
+            .Returns(callInfo => Task.FromResult<DetectionResult<MotionDetection>>(new MotionDetectionResult((IImage)callInfo[0]!)));
 
         await using var monitor = new TestVideoSourceMonitor(source, detector, new VideoSourceMonitorOptions
         {
