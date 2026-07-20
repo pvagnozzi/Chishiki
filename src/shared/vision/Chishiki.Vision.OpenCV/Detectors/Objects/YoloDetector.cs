@@ -133,8 +133,8 @@ public sealed partial class YoloDetector(OnnxObjectDetectorOptions options, ILog
             }
 
             // Convert from center coords to top-left coords
-            var x1 = (int)(xCenter - width / 2);
-            var y1 = (int)(yCenter - height / 2);
+            var x1 = (int)(xCenter - (width / 2));
+            var y1 = (int)(yCenter - (height / 2));
             var w = (int)width;
             var h = (int)height;
 

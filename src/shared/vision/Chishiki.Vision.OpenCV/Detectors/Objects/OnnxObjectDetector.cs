@@ -33,10 +33,6 @@ public abstract partial class OnnxObjectDetector : OpenCVDetector<ObjectDetectio
     /// </summary>
     protected InferenceSession Session { get; init; }
 
-    /// <inheritdoc/>
-    public new OnnxObjectDetectorOptions Options => (OnnxObjectDetectorOptions)base.Options;
-    DetectorOptions IDetector<ObjectDetection, DetectorOptions>.Options => Options;
-
     /// <summary>
     /// Initialises a new <see cref="OnnxObjectDetector"/> with the supplied options and logger.
     /// </summary>

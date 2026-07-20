@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+ <OutputType>Exe</OutputType>
+ <TargetFramework>net10.0</TargetFramework>
+ <ImplicitUsings>enable</ImplicitUsings>
+ <Nullable>enable</Nullable>
+ <GenerateDocumentationFile>true</GenerateDocumentationFile>
+ <AssemblyName>chishiki</AssemblyName>
+ <RootNamespace>Chishiki.Agent.Tui</RootNamespace>
+ </PropertyGroup>
+
+ <ItemGroup>
+ <PackageReference Include="Spectre.Console"/>
+ <PackageReference Include="Spectre.Console.Cli"/>
+ <PackageReference Include="Microsoft.Extensions.Hosting"/>
+ <PackageReference Include="Microsoft.Extensions.Http"/>
+ </ItemGroup>
+
+ <ItemGroup>
+ <ProjectReference Include="..\Chishiki.Agent.Abstractions\Chishiki.Agent.Abstractions.csproj" />
+ <ProjectReference Include="..\Chishiki.Agent.Core\Chishiki.Agent.Core.csproj" />
+ <ProjectReference Include="..\Chishiki.Agent.Providers\Chishiki.Agent.Providers.csproj" />
+ </ItemGroup>
+
+</Project>

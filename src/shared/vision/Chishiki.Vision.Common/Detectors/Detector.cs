@@ -22,7 +22,7 @@ namespace Chishiki.Vision.Common.Detectors;
 /// <typeparam name="TDetection">Detection type.</typeparam>
 /// <typeparam name="TOptions">Options type.</typeparam>
 public abstract class Detector<TDetection, TOptions>(TOptions options, ILogger logger) :
-    Disposable(logger), IDetector<TDetection, TOptions>
+    Disposable(logger), IDetector<TDetection>
     where TDetection : Detection
     where TOptions : DetectorOptions
 {

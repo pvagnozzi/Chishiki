@@ -19,9 +19,4 @@ namespace Chishiki.Vision.Common.Detectors.Cardplates;
 /// <param name="options">The detector options.</param>
 /// <param name="logger">The logger for the detector.</param>
 public abstract class CardplateDetector(CardplateDetectorOptions options, ILogger logger)
-    : Detector<CardplateDetection, CardplateDetectorOptions>(options, logger), ICardplateDetector
-{
-    /// <summary>Gets the strongly typed options for this detector.</summary>
-    public new CardplateDetectorOptions Options => (CardplateDetectorOptions)base.Options;
-    CardplateDetectorOptions IDetector<CardplateDetection, CardplateDetectorOptions>.Options => Options;
-}
+    : Detector<CardplateDetection, CardplateDetectorOptions>(options, logger), ICardplateDetector;

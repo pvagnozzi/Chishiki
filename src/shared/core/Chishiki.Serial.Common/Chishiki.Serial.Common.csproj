@@ -1,22 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>
-      net10.0;
-      net10.0-android;      
-      net10.0-windows
-    </TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+ <PropertyGroup>
+ <TargetFrameworks>
+ net10.0;
+ net10.0-android; 
+ net10.0-windows
+ </TargetFrameworks>
+ <ImplicitUsings>enable</ImplicitUsings>
+ <Nullable>enable</Nullable>
+ </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.IO.Ports" Version="10.0.9" />
-  </ItemGroup>
+ <ItemGroup>
+ <PackageReference Include="System.IO.Ports"/>
+ </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Chishiki.Core\Chishiki.Core.csproj" />
-    <ProjectReference Include="..\Chishiki.Serial.Abstractions\Chishiki.Serial.Abstractions.csproj" />
-  </ItemGroup>
+ <ItemGroup>
+ <ProjectReference Include="..\Chishiki.Core\Chishiki.Core.csproj" />
+ <ProjectReference Include="..\Chishiki.Serial.Abstractions\Chishiki.Serial.Abstractions.csproj" />
+ </ItemGroup>
 
 </Project>

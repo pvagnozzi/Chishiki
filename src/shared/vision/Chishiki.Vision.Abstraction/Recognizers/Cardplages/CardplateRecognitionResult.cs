@@ -9,8 +9,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
-using Chishiki.Vision.Abstraction.Recognizers;
-
 namespace Chishiki.Vision.Abstraction.Recognizers.Cardplages;
 
 /// <summary>Represents the outcome of a cardplate text recognition attempt.</summary>

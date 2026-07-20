@@ -3,7 +3,7 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: Covers deterministic registration and orchestration behavior for the video source monitor manager.
 // Created:     2026-06-10
-// Modified:    2026-06-11
+// Modified:    2026-07-20
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
@@ -106,9 +106,11 @@ public sealed class VideoSourceMonitorManagerTests
 
         Assert.That(manager.CameraIds, Is.EqualTo(ExpectedCamera6Ids));
         factory.Received(1).Create(Arg.Is<ManagedVideoSourceOptions>(options =>
-            options.VideoSourceId == "camera-6"
+            options != null
+            && options.VideoSourceId == "camera-6"
             && options.SourceType == "Camera"
             && options.CameraIndex == 0
+            && options.MonitorOptions != null
             && Math.Abs(options.MonitorOptions.FramesPerSecond - 2d) < 0.001));
     }
 

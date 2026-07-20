@@ -10,7 +10,6 @@
 // -----------------------------------------------------------------------------
 
 using Chishiki.Vision.Abstraction;
-using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Cardplates;
 using Microsoft.Extensions.Logging;
 using OpenCvSharp;
@@ -29,45 +28,12 @@ public partial class OpenCVCardplateDetector : OpenCVDetector<CardplateDetection
 {
     private readonly Mat _closeKernel;
 
-    private readonly ICardplateRecognizer _recognizer;
-
-    private readonly bool _ownsRecognizer;
-
-    /// <summary>Initializes a new <see cref="OpenCVCardplateDetector"/> with the default OpenCV template-based recognizer.</summary>
-    /// <param name="options">Detector configuration options.</param>
-    /// <param name="logger">Logger used for diagnostics.</param>
-    public OpenCVCardplateDetector(OpenCVCardplateDetectorOptions options, ILogger<OpenCVCardplateDetector> logger)
-        : this(
-            options,
-            new OpenCVTemplateCardplateRecognizer(options.RecognizerOptions, logger),
-            logger,
-            ownsRecognizer: true)
-    {
-    }
-
-    /// <summary>Initializes a new <see cref="OpenCVCardplateDetector"/> with an explicit cardplate recognizer.</summary>
-    /// <param name="options">Detector configuration options.</param>
-    /// <param name="recognizer">Recognizer used to enrich candidate detections with text.</param>
-    /// <param name="logger">Logger used for diagnostics.</param>
-    public OpenCVCardplateDetector(OpenCVCardplateDetectorOptions options, ICardplateRecognizer recognizer, ILogger<OpenCVCardplateDetector> logger)
-        : this(options, recognizer, logger, ownsRecognizer: false)
-    {
-    }
-
-    private OpenCVCardplateDetector(OpenCVCardplateDetectorOptions options, ICardplateRecognizer recognizer, ILogger<OpenCVCardplateDetector> logger, bool ownsRecognizer)
+    private OpenCVCardplateDetector(OpenCVCardplateDetectorOptions options, ILogger<OpenCVCardplateDetector> logger)
         : base(options, logger)
     {
-        ArgumentNullException.ThrowIfNull(recognizer);
         _closeKernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(Math.Max(1, options.MorphologyKernelWidth), Math.Max(1, options.MorphologyKernelHeight)));
-        _recognizer = recognizer;
-        _ownsRecognizer = ownsRecognizer;
     }
 
-    /// <summary>Gets the strongly typed detector options.</summary>
-    public new OpenCVCardplateDetectorOptions Options => (OpenCVCardplateDetectorOptions)base.Options;
-    CardplateDetectorOptions IDetector<CardplateDetection, CardplateDetectorOptions>.Options => Options;
-
-    /// <inheritdoc/>
 
     /// <inheritdoc/>
     public override void Reset() => CheckDisposed();
@@ -76,7 +42,7 @@ public partial class OpenCVCardplateDetector : OpenCVDetector<CardplateDetection
     protected override CardplateDetectionResult CreateEmptyResult(IImage image) => new(image);
 
     /// <inheritdoc/>
-    protected override async Task<CardplateDetectionResult> ProcessFrameAsync(IImage originalImage, Mat image, CancellationToken cancellationToken = default)
+    protected override Task<CardplateDetectionResult> ProcessFrameAsync(IImage originalImage, Mat image, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         CheckDisposed();
@@ -117,24 +83,14 @@ public partial class OpenCVCardplateDetector : OpenCVDetector<CardplateDetection
             foreach (var candidate in candidates)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
-                var recognition = await RecognizeCandidateAsync(image, candidate.Region, cancellationToken);
-                if (Options.RequireRecognition && !recognition.HasRecognition)
-                {
-                    continue;
-                }
-
                 detections.Add(new CardplateDetection(
                     new VisionRect(candidate.Region.X, candidate.Region.Y, candidate.Region.Width, candidate.Region.Height),
-                    candidate.DetectionScore,
-                    recognition.Text,
-                    recognition.HasRecognition ? recognition.Score : null,
-                    candidate.Area));
+                    candidate.DetectionScore));
             }
 
             var recognizedCount = detections.Count(static detection => detection.HasRecognition);
             LogDetectionCompleted(Logger, detections.Count, recognizedCount);
-            return new CardplateDetectionResult(originalImage, detections: detections);
+            return Task.FromResult(new CardplateDetectionResult(originalImage, detections: detections));
         }
         catch (OperationCanceledException)
         {
@@ -174,11 +130,6 @@ public partial class OpenCVCardplateDetector : OpenCVDetector<CardplateDetection
     protected override void DisposeManaged()
     {
         _closeKernel.Dispose();
-        if (_ownsRecognizer)
-        {
-            _recognizer.Dispose();
-        }
-
         base.DisposeManaged();
     }
 
@@ -212,26 +163,6 @@ public partial class OpenCVCardplateDetector : OpenCVDetector<CardplateDetection
         var paddedRect = rect.ExpandRect(imageSize, Options.CandidatePaddingFactor);
         return new CandidateDetection(paddedRect, area, aspectRatio.CalculateDetectionScore(rectangularity));
     }
-
-    private async Task<CardplateRecognitionResult> RecognizeCandidateAsync(Mat image, OpenCvRect region, CancellationToken cancellationToken)
-    {
-        try
-        {
-            using var cardplate = new Mat(image, region);
-            using var cardplateImage = new OpenCVImage(cardplate.Clone());
-            return await _recognizer.RecognizeAsync(cardplateImage, cancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            LogCandidateRecognitionFailed(Logger, region.X, region.Y, region.Width, region.Height, ex);
-            return new CardplateRecognitionResult();
-        }
-    }
-
 
     private readonly record struct CandidateDetection(OpenCvRect Region, double Area, float DetectionScore);
     #endregion

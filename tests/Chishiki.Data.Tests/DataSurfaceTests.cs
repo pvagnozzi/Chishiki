@@ -203,13 +203,13 @@ public sealed class DataSurfaceTests
         await unitOfWork.UpdateAsync<int, TestEntity>(incoming, existing);
 
         await repository.Received(1).AddRangeAsync(
-            Arg.Is<IEnumerable<TestEntity>>(entities => entities.Select(x => x.Id).SequenceEqual(second)),
+            Arg.Is<IEnumerable<TestEntity>>(entities => entities != null && entities.Select(x => x.Id).SequenceEqual(second)),
             Arg.Any<CancellationToken>());
         await repository.Received(1).UpdateRangeAsync(
-            Arg.Is<IEnumerable<TestEntity>>(entities => entities.Select(x => x.Id).SequenceEqual(secondArray)),
+            Arg.Is<IEnumerable<TestEntity>>(entities => entities != null && entities.Select(x => x.Id).SequenceEqual(secondArray)),
             Arg.Any<CancellationToken>());
         await repository.Received(1).DeleteRangeAsync(
-            Arg.Is<IEnumerable<TestEntity>>(entities => entities.Select(x => x.Id).SequenceEqual(secondArray0)),
+            Arg.Is<IEnumerable<TestEntity>>(entities => entities != null && entities.Select(x => x.Id).SequenceEqual(secondArray0)),
             Arg.Any<CancellationToken>());
     }
 

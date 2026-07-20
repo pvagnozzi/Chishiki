@@ -38,6 +38,16 @@
     <Project Path="src/mcp/Chishiki.MCP.Host/Chishiki.MCP.Host.csproj" Id="d99ae567-f48e-46e3-87bc-14ae40f35dc2" />
   </Folder>
   <Folder Name="/src/" />
+  <Folder Name="/src/agents/">
+    <Project Path="src/agents/Chishiki.Agent.Abstractions/Chishiki.Agent.Abstractions.csproj" Id="a1000001-0000-0000-0000-000000000001" />
+    <Project Path="src/agents/Chishiki.Agent.Core/Chishiki.Agent.Core.csproj" Id="a1000002-0000-0000-0000-000000000002" />
+    <Project Path="src/agents/Chishiki.Agent.Providers/Chishiki.Agent.Providers.csproj" Id="a1000003-0000-0000-0000-000000000003" />
+    <Project Path="src/agents/Chishiki.Agent.Plugins.Sdk/Chishiki.Agent.Plugins.Sdk.csproj" Id="a1000004-0000-0000-0000-000000000004" />
+    <Project Path="src/agents/Chishiki.Agent.Plugins.CodeAnalysis/Chishiki.Agent.Plugins.CodeAnalysis.csproj" Id="a1000005-0000-0000-0000-000000000005" />
+    <Project Path="src/agents/Chishiki.Agent.WebApi/Chishiki.Agent.WebApi.csproj" Id="a1000006-0000-0000-0000-000000000006" />
+    <Project Path="src/agents/Chishiki.Agent.Tui/Chishiki.Agent.Tui.csproj" Id="a1000007-0000-0000-0000-000000000007" />
+    <Project Path="src/agents/Chishiki.Agent.Host/Chishiki.Agent.Host.csproj" Id="a1000008-0000-0000-0000-000000000008" />
+  </Folder>
   <Folder Name="/src/cluster/" />
 
   <!-- ── src/infrastructure ── Aspire AppHost + ServiceDefaults ──────── -->
@@ -69,6 +79,7 @@
   <Folder Name="/src/shared/orleans/">
     <Project Path="src/shared/orleans/Chishiki.Orleans.Silo/Chishiki.Orleans.Silo.csproj" Id="eaf53b03-befa-4374-bc27-f360dacf14c8" />
   </Folder>
+  <Folder Name="/src/shared/training/" />
   <Folder Name="/src/shared/vision/">
     <Project Path="src/shared/vision/Chishiki.Vision.Abstraction/Chishiki.Vision.Abstraction.csproj" Id="829c151a-5761-486c-8c04-f9fde6ec8ea2" />
     <Project Path="src/shared/vision/Chishiki.Vision.Common/Chishiki.Vision.Common.csproj" Id="845e4b43-cf57-4764-92b8-8d5d0e46d193" />

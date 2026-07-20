@@ -1,0 +1,18 @@
+<Project>
+
+  <!--
+    ══════════════════════════════════════════════════════════════════════════
+    Chishiki — Directory.Build.props
+    Proprietà condivise da tutti i progetti (override consentito per progetto).
+    Le versioni dei pacchetti NuGet sono centralizzate in Directory.Packages.props.
+    ══════════════════════════════════════════════════════════════════════════
+  -->
+
+  <PropertyGroup>
+    <!-- Analisi aggiuntive Roslyn abilitate su tutti i progetti -->
+    <AnalysisMode>Minimum</AnalysisMode>
+    <!-- Impedisce l'uso accidentale di BinaryFormatter (obsoleto) -->
+    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+  </PropertyGroup>
+
+</Project>

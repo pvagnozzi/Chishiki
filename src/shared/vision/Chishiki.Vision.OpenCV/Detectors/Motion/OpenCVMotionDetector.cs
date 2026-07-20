@@ -10,7 +10,6 @@
 // -----------------------------------------------------------------------------
 
 using Chishiki.Vision.Abstraction;
-using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Motion;
 using Microsoft.Extensions.Logging;
 using OpenCvSharp;
@@ -46,31 +45,19 @@ public partial class OpenCVMotionDetector(OpenCVMotionDetectorOptions options, I
             MorphShapes.Rect,
             new Size(options.DilateKernelSize, options.DilateKernelSize));
 
-    /// <summary>
-    /// Gets the strongly-typed options for this motion detector, allowing access to specific configuration parameters defined in <see cref="OpenCVMotionDetectorOptions"/> without needing to cast from the base <see cref="DetectorOptions"/> type. This property provides convenient access to the motion detector's settings, such as Gaussian kernel size, background history, MOG2 threshold, and morphological operation parameters, enabling derived classes and internal methods to easily reference these options when processing frames and performing motion detection logic.
-    /// </summary>
-    public new OpenCVMotionDetectorOptions Options => (OpenCVMotionDetectorOptions)base.Options;
-    MotionDetectorOptions IDetector<MotionDetection, MotionDetectorOptions>.Options => Options;
-
-    /// <summary>
-    /// Gets the name of the motion detector, which is used for logging and identification purposes. This property returns a string that uniquely identifies this specific implementation of a motion detector, allowing it to be distinguished from other detectors in logs, diagnostics, and when managing multiple detectors within the application.
-    /// </summary>
-
     /// <inheritdoc/>
     public override void Reset()
     {
         CheckDisposed();
-        _subtractor.Dispose();
         LogBackgroundReset();
     }
 
     /// <summary>
-    /// Creates an empty motion detection result for the given image. This method is called when the detector is unable to process the frame or when no motion is detected, allowing it to return a consistent result object with an empty list of motion regions and a flag indicating that no motion was found. The implementation of this method is currently not provided and will throw a <see cref="NotImplementedException"/> if called, indicating that it needs to be implemented to return a valid <see cref="MotionDetectionResult"/> instance based on the input image.
+    /// Creates an empty motion detection result for the given image. This method is called when no motion is detected in the processed frame, returning a result with an empty list of detections. The returned <see cref="MotionDetectionResult"/> contains the original image and indicates that no motion regions were found.
     /// </summary>
-    /// <param name="image">The input image for which to create the empty result.</param>
+    /// <param name="image">The image for which to create an empty result.</param>
     /// <returns>An empty motion detection result.</returns>
-    /// <exception cref="NotImplementedException"></exception>
-    protected override MotionDetectionResult CreateEmptyResult(IImage image) => new(image);
+    protected override MotionDetectionResult CreateEmptyResult(IImage image) => new(image, detections: []);
 
     /// <inheritdoc/>
     protected override void DisposeManaged()

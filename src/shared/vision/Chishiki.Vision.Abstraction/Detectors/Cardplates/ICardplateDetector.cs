@@ -12,4 +12,4 @@
 namespace Chishiki.Vision.Abstraction.Detectors.Cardplates;
 
 /// <summary>Defines a detector that locates vehicle cardplates and optionally enriches detections with recognized text.</summary>
-public interface ICardplateDetector : IDetector<CardplateDetection, CardplateDetectorOptions>;
+public interface ICardplateDetector : IDetector<CardplateDetection>;

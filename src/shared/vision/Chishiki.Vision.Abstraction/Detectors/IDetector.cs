@@ -15,14 +15,9 @@ namespace Chishiki.Vision.Abstraction.Detectors;
 /// Defines a detector that can analyze video frames and detect specific features or objects based on a background model.
 /// </summary>
 /// <typeparam name="TDetection">The type of the detection.</typeparam>
-/// <typeparam name="TOptions">The type of the detector options.</typeparam>
-public interface IDetector<TDetection, TOptions> : IDisposable
+public interface IDetector<TDetection> : IDisposable
     where TDetection : Detection
-    where TOptions : DetectorOptions
 {
-    /// <summary> Gets the detector options </summary>
-    TOptions Options { get; }
-
     /// <summary>Analyses the supplied <paramref name="frame"/> against the accumulated background model and returns a <see cref="TResult"/> with annotated image and detected regions.</summary>
     /// <param name="frame">The current video frame to analyze.</param>
     /// <param name="cancellationToken">Token to observe for cancellation.</param>

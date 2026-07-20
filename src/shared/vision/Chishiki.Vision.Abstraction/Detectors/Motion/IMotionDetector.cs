@@ -12,4 +12,4 @@
 namespace Chishiki.Vision.Abstraction.Detectors.Motion;
 
 /// <summary>Defines a stateful motion detector that analyses sequential video frames, applies noise reduction, and highlights areas of detected motion.</summary>
-public interface IMotionDetector : IDetector<MotionDetection, MotionDetectorOptions>;
+public interface IMotionDetector : IDetector<MotionDetection>;

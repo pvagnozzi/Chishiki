@@ -3,14 +3,13 @@
 // Author:      Piergiorgio Vagnozzi
 // Description: OpenCV-based detector for faces with optional identity recognition.
 // Created:     2026-06-07
-// Modified:    2026-06-07
+// Modified:    2026-07-16
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // -----------------------------------------------------------------------------
 
 using Chishiki.Vision.Abstraction;
-using Chishiki.Vision.Abstraction.Detectors;
 using Chishiki.Vision.Abstraction.Detectors.Faces;
 using Chishiki.Vision.Abstraction.Recognizers;
 using Microsoft.Extensions.Logging;
@@ -28,7 +27,9 @@ namespace Chishiki.Vision.OpenCV.Detectors.Faces;
 public partial class OpenCVFaceDetector : OpenCVDetector<FaceDetectionResult, FaceDetection, OpenCVFaceDetectorOptions>, IFaceDetector
 {
     private readonly CascadeClassifier _cascadeClassifier;
-    private readonly IRecognizer? _recognizer;
+
+    private readonly IRecognizer<RecognizerOptions, RecognitionResult>? _recognizer;
+
     private readonly bool _ownsRecognizer;
 
     /// <summary>Initializes a new <see cref="OpenCVFaceDetector"/> with a default LBPH recognizer when configured.</summary>
@@ -43,15 +44,25 @@ public partial class OpenCVFaceDetector : OpenCVDetector<FaceDetectionResult, Fa
     /// <param name="options">Detector configuration options.</param>
     /// <param name="recognizer">Recognizer used to enrich candidate detections with identities.</param>
     /// <param name="logger">Logger used for diagnostics.</param>
-    public OpenCVFaceDetector(OpenCVFaceDetectorOptions options, IRecognizer recognizer, ILogger<OpenCVFaceDetector> logger)
+    public OpenCVFaceDetector(
+        OpenCVFaceDetectorOptions options,
+        IRecognizer<RecognizerOptions, RecognitionResult>? recognizer,
+        ILogger<OpenCVFaceDetector> logger)
         : this(options, recognizer, logger, ownsRecognizer: false)
     {
     }
 
-    private OpenCVFaceDetector(OpenCVFaceDetectorOptions options, IRecognizer? recognizer, ILogger<OpenCVFaceDetector> logger, bool ownsRecognizer)
+    private OpenCVFaceDetector(
+        OpenCVFaceDetectorOptions options,
+        IRecognizer<RecognizerOptions, RecognitionResult>? recognizer,
+        ILogger<OpenCVFaceDetector> logger,
+        bool ownsRecognizer)
         : base(options, logger)
     {
         ArgumentNullException.ThrowIfNull(options);
+
+        _recognizer = recognizer;
+        _ownsRecognizer = ownsRecognizer;
 
         var cascadeModelPath = Path.GetFullPath(options.CascadeModelPath);
         if (!File.Exists(cascadeModelPath))
@@ -64,20 +75,7 @@ public partial class OpenCVFaceDetector : OpenCVDetector<FaceDetectionResult, Fa
         {
             throw new InvalidOperationException($"The face cascade model '{cascadeModelPath}' could not be loaded.");
         }
-
-        _recognizer = recognizer;
-        _ownsRecognizer = ownsRecognizer;
-        if (_recognizer is null)
-        {
-            LogRecognitionDisabled(Logger!);
-        }
     }
-
-    /// <summary>Gets the strongly typed detector options.</summary>
-    FaceDetectorOptions IDetector<FaceDetection, FaceDetectorOptions>.Options => Options;
-
-    /// <inheritdoc/>
-    public override void Reset() => CheckDisposed();
 
     /// <inheritdoc/>
     protected override FaceDetectionResult CreateEmptyResult(IImage image) => new(image);
@@ -238,5 +236,6 @@ public partial class OpenCVFaceDetector : OpenCVDetector<FaceDetectionResult, Fa
     /// <summary>Emitted when the detector fails unexpectedly while processing a frame.</summary>
     [LoggerMessage(Level = LogLevel.Error, Message = "Face detection failed.")]
     private static partial void LogDetectionFailed(ILogger logger, Exception exception);
+    public override void Reset() => throw new NotImplementedException();
     #endregion
 }

@@ -36,7 +36,6 @@ public abstract partial class OpenCVDetector<TResult, TDetection, TOptions>(TOpt
     where TOptions : DetectorOptions
     where TDetection : Detection
 {
-
     /// <inheritdoc/>
     public override async Task<DetectionResult<TDetection>> DetectAsync(IImage frame, CancellationToken cancellationToken = default)
     {

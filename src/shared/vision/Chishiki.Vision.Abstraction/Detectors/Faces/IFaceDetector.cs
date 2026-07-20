@@ -12,4 +12,4 @@
 namespace Chishiki.Vision.Abstraction.Detectors.Faces;
 
 /// <summary>Defines a detector that locates and optionally recognizes faces within a video frame.</summary>
-public interface IFaceDetector : IDetector<FaceDetection, FaceDetectorOptions>;
+public interface IFaceDetector : IDetector<FaceDetection>;

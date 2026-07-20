@@ -19,9 +19,4 @@ namespace Chishiki.Vision.Common.Detectors.Faces;
 /// <param name="options">The detector options.</param>
 /// <param name="logger">The logger for the detector.</param>
 public abstract class FaceDetector(FaceDetectorOptions options, ILogger logger)
-    : Detector<FaceDetection, FaceDetectorOptions>(options, logger), IFaceDetector
-{
-    /// <summary>Gets the strongly typed options for this detector.</summary>
-    public new FaceDetectorOptions Options => (FaceDetectorOptions)base.Options;
-    FaceDetectorOptions IDetector<FaceDetection, FaceDetectorOptions>.Options => Options;
-}
+    : Detector<FaceDetection, FaceDetectorOptions>(options, logger), IFaceDetector;

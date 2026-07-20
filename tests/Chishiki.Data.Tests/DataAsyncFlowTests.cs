@@ -203,11 +203,15 @@ public sealed class DataAsyncFlowTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.Select(entity => entity.Id), Is.EqualTo([1, 2]));
-            Assert.That(result[0].Name, Is.EqualTo("Ada"));
-            Assert.That(result[1].Name, Is.EqualTo("Grace"));
+            Assert.That(result, Is.Not.Null);
+            var seeded = result!;
+            Assert.That(seeded.Select(entity => entity.Id), Is.EqualTo([1, 2]));
+            Assert.That(seeded[0].Name, Is.EqualTo("Ada"));
+            Assert.That(seeded[1].Name, Is.EqualTo("Grace"));
         });
-        await repository.Received(1).AddAsync(Arg.Is<SeedEntity>(entity => entity.Id == 2), Arg.Any<CancellationToken>());
+        await repository.Received(1).AddAsync(
+            Arg.Is<SeedEntity>(entity => entity != null && entity.Id == 2),
+            Arg.Any<CancellationToken>());
         await unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 

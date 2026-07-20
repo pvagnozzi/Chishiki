@@ -30,15 +30,3 @@ public interface IRecognizer<TOptions, TResult> : IDisposable
     Task<TResult> RecognizeAsync(IImage image, CancellationToken cancellationToken = default);
 }
 
-/// <summary>
-/// Defines a recognizer that identifies objects from a cropped image region, using the default recognition result type.
-/// </summary>
-/// <typeparam name="TOptions">The type of the recognizer options.</typeparam>
-public interface IRecognizer<TOptions> : IRecognizer<TOptions, RecognitionResult>
-    where TOptions : RecognizerOptions;
-
-/// <summary>
-/// Defines a recognizer that identifies objects from a cropped image region, using the default options and recognition result types.
-/// </summary>
-public interface IRecognizer : IRecognizer<RecognizerOptions>;
-
