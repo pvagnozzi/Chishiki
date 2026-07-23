@@ -1,0 +1,44 @@
+  Individuazione dei progetti da ripristinare...
+  Tutti i progetti sono aggiornati per il ripristino.
+  Chishiki.Serial.Abstractions -> C:\work\personal\Chishiki\src\shared\core\Chishiki.Serial.Abstractions\bin\Debug\net10.0\Chishiki.Serial.Abstractions.dll
+  Chishiki.Orleans.Silo -> C:\work\personal\Chishiki\src\shared\orleans\Chishiki.Orleans.Silo\bin\Debug\net10.0\Chishiki.Orleans.Silo.dll
+  Chishiki.AI.LLM.Abstractions -> C:\work\personal\Chishiki\src\shared\ai\Chishiki.AI.LLM.Abstractions\bin\Debug\net10.0\Chishiki.AI.LLM.Abstractions.dll
+  Chishiki.Core -> C:\work\personal\Chishiki\src\shared\core\Chishiki.Core\bin\Debug\net10.0\Chishiki.Core.dll
+  Chishiki.Web.Client -> C:\work\personal\Chishiki\src\shared\core\Chishiki.Web.Client\bin\Debug\net10.0\Chishiki.Web.Client.dll
+  Chishiki.Vision.Abstraction -> C:\work\personal\Chishiki\src\shared\vision\Chishiki.Vision.Abstraction\bin\Debug\net10.0\Chishiki.Vision.Abstraction.dll
+  Chishiki.Infrastructure.Aspire.ServiceDefaults -> C:\work\personal\Chishiki\src\infrastructure\aspire\Chishiki.Infrastructure.Aspire.ServiceDefaults\bin\Debug\net10.0\Chishiki.Infrastructure.Aspire.ServiceDefaults.dll
+  Chishiki.AI.LLM.Abstractions.Tests -> C:\work\personal\Chishiki\tests\Chishiki.AI.LLM.Abstractions.Tests\bin\Debug\net10.0\Chishiki.AI.LLM.Abstractions.Tests.dll
+  Chishiki.ESPTool -> C:\work\personal\Chishiki\src\shared\iot\Chishiki.ESPTool\bin\Debug\net10.0\Chishiki.ESPTool.dll
+  Chishiki.Core.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Core.Tests\bin\Debug\net10.0\Chishiki.Core.Tests.dll
+  Chishiki.Serial.Common -> C:\work\personal\Chishiki\src\shared\core\Chishiki.Serial.Common\bin\Debug\net10.0-windows\Chishiki.Serial.Common.dll
+  Chishiki.Vision.Common -> C:\work\personal\Chishiki\src\shared\vision\Chishiki.Vision.Common\bin\Debug\net10.0\Chishiki.Vision.Common.dll
+  Chishiki.Serial.Common -> C:\work\personal\Chishiki\src\shared\core\Chishiki.Serial.Common\bin\Debug\net10.0\Chishiki.Serial.Common.dll
+  Chishiki.Mapping -> C:\work\personal\Chishiki\src\shared\core\Chishiki.Mapping\bin\Debug\net10.0\Chishiki.Mapping.dll
+  Chishiki.Serial.Abstractions.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Serial.Abstractions.Tests\bin\Debug\net10.0\Chishiki.Serial.Abstractions.Tests.dll
+  Chishiki.ESPTool.Tests -> C:\work\personal\Chishiki\tests\Chishiki.ESPTool.Tests\bin\Debug\net10.0\Chishiki.ESPTool.Tests.dll
+  Chishiki.Vision.Abstraction.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Vision.Abstraction.Tests\bin\Debug\net10.0\Chishiki.Vision.Abstraction.Tests.dll
+  Chishiki.AI.LLM.SemanticKernel -> C:\work\personal\Chishiki\src\shared\ai\Chishiki.AI.LLM.SemanticKernel\bin\Debug\net10.0\Chishiki.AI.LLM.SemanticKernel.dll
+  Chishiki.Infrastructure.Aspire.ServiceDefaults.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Infrastructure.Aspire.ServiceDefaults.Tests\bin\Debug\net10.0\Chishiki.Infrastructure.Aspire.ServiceDefaults.Tests.dll
+  Chishiki.Serial.Common -> C:\work\personal\Chishiki\src\shared\core\Chishiki.Serial.Common\bin\Debug\net10.0-android\Chishiki.Serial.Common.dll
+  Chishiki.MCP.Host -> C:\work\personal\Chishiki\src\mcp\Chishiki.MCP.Host\bin\Debug\net10.0\Chishiki.MCP.Host.dll
+  Chishiki.Vision.OpenCV -> C:\work\personal\Chishiki\src\shared\vision\Chishiki.Vision.OpenCV\bin\Debug\net10.0\Chishiki.Vision.OpenCV.dll
+  Chishiki.Vision.Common.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Vision.Common.Tests\bin\Debug\net10.0\Chishiki.Vision.Common.Tests.dll
+  Chishiki.Serial.Common.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Serial.Common.Tests\bin\Debug\net10.0\Chishiki.Serial.Common.Tests.dll
+  Chishiki.Data -> C:\work\personal\Chishiki\src\shared\core\Chishiki.Data\bin\Debug\net10.0\Chishiki.Data.dll
+  Chishiki.Mapping.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Mapping.Tests\bin\Debug\net10.0\Chishiki.Mapping.Tests.dll
+  Chishiki.Data.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Data.Tests\bin\Debug\net10.0\Chishiki.Data.Tests.dll
+  Chishiki.Vision.OpenCV.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Vision.OpenCV.Tests\bin\Debug\net10.0\Chishiki.Vision.OpenCV.Tests.dll
+  Chishiki.Messaging -> C:\work\personal\Chishiki\src\shared\core\Chishiki.Messaging\bin\Debug\net10.0\Chishiki.Messaging.dll
+  Chishiki.Data.EFCore -> C:\work\personal\Chishiki\src\shared\core\Chishiki.Data.EFCore\bin\Debug\net10.0\Chishiki.Data.EFCore.dll
+  Chishiki.AI.LLM.SemanticKernel.Tests -> C:\work\personal\Chishiki\tests\Chishiki.AI.LLM.SemanticKernel.Tests\bin\Debug\net10.0\Chishiki.AI.LLM.SemanticKernel.Tests.dll
+  Chishiki.Infrastructure.Aspire.AppHost -> C:\work\personal\Chishiki\src\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppHost\bin\Debug\net10.0\Chishiki.Infrastructure.Aspire.AppHost.dll
+  Chishiki.MCP.Host.Tests -> C:\work\personal\Chishiki\tests\Chishiki.MCP.Host.Tests\bin\Debug\net10.0\Chishiki.MCP.Host.Tests.dll
+  Chishiki.Messaging.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Messaging.Tests\bin\Debug\net10.0\Chishiki.Messaging.Tests.dll
+  Chishiki.Data.EFCore.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Data.EFCore.Tests\bin\Debug\net10.0\Chishiki.Data.EFCore.Tests.dll
+  Chishiki.Infrastructure.Aspire.AppHost.Tests -> C:\work\personal\Chishiki\tests\Chishiki.Infrastructure.Aspire.AppHost.Tests\bin\Debug\net10.0\Chishiki.Infrastructure.Aspire.AppHost.Tests.dll
+
+Compilazione completata.
+    Avvisi: 0
+    Errori: 0
+
+Tempo trascorso 00:00:07.00

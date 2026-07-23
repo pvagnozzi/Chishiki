@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+ <TargetFramework>net10.0</TargetFramework>
+ <ImplicitUsings>enable</ImplicitUsings>
+ <Nullable>enable</Nullable>
+ </PropertyGroup>
+
+ <ItemGroup>
+ <PackageReference Include="Microsoft.ML.OnnxRuntime"/>
+ <PackageReference Include="OpenCvSharp4"/>
+ <PackageReference Include="OpenCvSharp4.runtime.win"/>
+ <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
+ </ItemGroup>
+
+ <ItemGroup>
+ <ProjectReference Include="..\..\core\Chishiki.Core\Chishiki.Core.csproj" />
+ <ProjectReference Include="..\Chishiki.Vision.Abstraction\Chishiki.Vision.Abstraction.csproj" />
+ <ProjectReference Include="..\Chishiki.Vision.Common\Chishiki.Vision.Common.csproj" />
+ </ItemGroup>
+
+</Project>

@@ -1,0 +1,90 @@
+{
+  "name": "chishiki-agent",
+  "displayName": "Chishiki Agent",
+  "description": "AI coding assistant powered by the Chishiki Agent — multi-provider orchestrator with plugin support.",
+  "version": "1.0.0",
+  "publisher": "chishiki",
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["AI", "Chat", "Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "chishiki.openChat",
+        "title": "Chishiki: Open Chat",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "chishiki.analyzeFile",
+        "title": "Chishiki: Analyse Current File"
+      },
+      {
+        "command": "chishiki.startAgent",
+        "title": "Chishiki: Start Agent Server"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "chishiki.analyzeFile",
+          "when": "editorLangId == csharp",
+          "group": "navigation"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "chishiki-sidebar",
+          "title": "Chishiki Agent",
+          "icon": "media/chishiki-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "chishiki-sidebar": [
+        {
+          "type": "webview",
+          "id": "chishiki.chatView",
+          "name": "Chat"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Chishiki Agent",
+      "properties": {
+        "chishiki.agentUrl": {
+          "type": "string",
+          "default": "http://localhost:5100",
+          "description": "URL of the running Chishiki Agent server."
+        },
+        "chishiki.defaultModel": {
+          "type": "string",
+          "default": "local",
+          "description": "Default model alias to use for completions."
+        },
+        "chishiki.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically start the Chishiki Agent process when VS Code opens."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "webpack --mode production",
+    "watch": "webpack --mode development --watch",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "webpack": "^5.90.0",
+    "webpack-cli": "^5.1.0",
+    "ts-loader": "^9.5.0",
+    "@vscode/vsce": "^2.26.0"
+  }
+}

@@ -63,28 +63,24 @@
          ┌───────────────┼───────────────┐
          ▼               ▼               ▼
 ┌──────────────┐ ┌──────────────┐ ┌──────────────────┐
-│ Chishiki     │ │ Chishiki     │ │  Infrastructure  │
-│ API Web      │ │ Host         │ │                  │
-│ (ASP.NET     │ │ (Orleans     │ │  • PostgreSQL    │
-│  Core)       │ │  Silo)       │ │  • Redis         │
-│              │ │              │ │  • Keycloak      │
-│ OpenAPI ✓    │ │ Grains ✓     │ │  • Qdrant        │
-│ Auth ✓       │ │ Streams ✓    │ │  • Ollama        │
-│ OTel ✓       │ │ Reminders ✓  │ │  • Prometheus    │
-└──────┬───────┘ └──────┬───────┘ │  • Grafana       │
-       │                │          └──────────────────┘
-       └────────────────┘
-              │ Redis Clustering
-              │ (ClusterId: chishiki-cluster)
+│ Chishiki MCP │ │ Shared       │ │  Infrastructure  │
+│ Host         │ │ Libraries    │ │                  │
+│              │ │              │ │  • PostgreSQL    │
+│ /mcp ✓       │ │  • ai        │ │  • Redis         │
+│ Tools ✓      │ │  • core      │ │  • Keycloak      │
+│ Prompts ✓    │ │  • orleans   │ │  • Qdrant        │
+│ OTel ✓       │ │  • vision    │ │  • Ollama        │
+└──────┬───────┘ └──────┬───────┘ │  • Prometheus    │
+       │                │          │  • Grafana       │
+       └────────────────┴──────────┴──────────────────┘
 ```
 
 ### Service Ports
 
 | Service | Port | Protocol |
 |---|---|---|
-| **API Web** | `8080` | HTTP |
-| **Orleans Silo** | `11111` | TCP (Silo) |
-| **Orleans Gateway** | `30000` | TCP (Client) |
+| **Aspire Dashboard** | `15888` | HTTP |
+| **MCP Host** | `5010` | HTTP |
 | **PostgreSQL** | `5432` | TCP |
 | **Redis** | `6379` | TCP |
 | **Keycloak** | `8180` | HTTP |
@@ -119,32 +115,29 @@ cd chishiki
 dotnet run --project .\src\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppHost\Chishiki.Infrastructure.Aspire.AppHost.csproj
 ```
 
-The Aspire Dashboard will be available at **http://localhost:15888** and will show real-time logs, traces, and health for all services.
+The Aspire Dashboard will be available at **http://localhost:15888** and will show real-time logs, traces, and health for the MCP host and supporting infrastructure.
 
 ### 3️⃣ Verify Services
 
-```powershell
-# Health check
-curl http://localhost:8080/health
+After the AppHost starts, verify the main local entry points:
 
-# OpenAPI docs (development only)
-# Navigate to http://localhost:8080/swagger
+- **Aspire Dashboard** — `http://localhost:15888`
+- **MCP endpoint** — `http://localhost:5010/mcp`
+- **Grafana** — `http://localhost:3000`
+- **Keycloak** — `http://localhost:8180`
+- **Qdrant** — `http://localhost:6333`
 
-# Metrics
-curl http://localhost:8080/metrics
-```
-
-### 4️⃣ Individual Services
+### 4️⃣ Individual Entry Points
 
 ```powershell
-# API only
-dotnet run --project .\src\api\Chishiki.API.Web\Chishiki.API.Web.csproj
-
-# Orleans Silo only
-dotnet run --project .\src\engine\Chishiki.Host\Chishiki.Host.csproj
+# MCP host only
+dotnet run --project .\src\mcp\Chishiki.MCP.Host\Chishiki.MCP.Host.csproj
 
 # Build entire solution
 dotnet build .\Chishiki.slnx
+
+# Run all tests
+dotnet test .\Chishiki.slnx
 ```
 
 ---
@@ -154,52 +147,26 @@ dotnet build .\Chishiki.slnx
 ```
 chishiki/
 ├── 📂 src/
-│   ├── 📂 api/
-│   │   └── Chishiki.API.Web/              # ASP.NET Core Minimal API
-│   ├── 📂 engine/
-│   │   ├── Chishiki.Host/                 # Orleans Silo Host
-│   │   └── 📂 clustering/
-│   │       ├── Chishiki.Clustering/           # Grain interface contracts
-│   │       ├── Chishiki.Clustering.Client/    # Orleans client extensions
-│   │       ├── Chishiki.Clustering.Server/    # Silo-side grain registration
-│   │       ├── Chishiki.Hub/                  # Developer Hub MCP server
-│   │       └── Chishiki.Hub.Contracts/        # Hub DTOs + IHubResourceService
-│   ├── 📂 security/
-│   │   └── Chishiki.Security.Contracts/   # Security finding types + IScannerService
-│   ├── 📂 shared/
-│   │   ├── Chishiki.Abstractions/         # Result<T>, Error, PagedResult<T>
-│   │   └── Chishiki.Core/                 # DDD primitives (Entity, AggregateRoot…)
-│   └── 📂 infrastructure/
-│       └── aspire/
-│           ├── AppHost/                   # Aspire orchestration root
-│           └── ServiceDefaults/           # Shared OTel / health / resilience
+│   ├── 📂 infrastructure/
+│   │   └── aspire/
+│   │       ├── Chishiki.Infrastructure.Aspire.AppHost/         # Aspire orchestration root
+│   │       └── Chishiki.Infrastructure.Aspire.ServiceDefaults/ # Shared OTel / health / resilience
+│   ├── 📂 mcp/
+│   │   └── Chishiki.MCP.Host/                                  # MCP host
+│   └── 📂 shared/
+│       ├── ai/                                                 # AI abstractions and Semantic Kernel integrations
+│       ├── core/                                               # Core, data, mapping, and messaging libraries
+│       ├── orleans/                                            # Shared Orleans-related libraries
+│       └── vision/                                             # Vision abstractions and implementations
 │
-├── 📂 tests/                              # Mirrors src/ topic layout
-│   ├── api/
-│   ├── engine/clustering/
-│   ├── security/
-│   ├── shared/
-│   └── infrastructure/
-│
-├── 📂 containers/                         # Docker images & configs
-│   ├── grafana/                           # Dashboards + provisioning
-│   ├── keycloak/                          # Realm + custom theme
-│   ├── ollama/                            # LLM entrypoint script
-│   ├── postgresql/                        # pgvector init scripts
-│   ├── prometheus/                        # Scrape config
-│   ├── qdrant/                            # Vector DB config
-│   └── redis/                             # AOF + RDB config
-│
-├── 📂 docs/                               # Architecture & ADRs
-├── 📂 hub/                                # Hub seed data & templates
-│   ├── seed/
-│   └── templates/
-│
-├── .editorconfig                          # Coding standards
-├── .gitattributes                         # Line ending rules
-├── .gitignore                             # Build & secret exclusions
-├── .mcp.json                              # MCP server configuration
-├── Chishiki.slnx                          # Solution file (.NET 10 format)
+├── 📂 tests/                                                   # Test projects
+├── 📂 containers/                                              # Docker images & configs
+├── 📂 docs/                                                    # Architecture & ADRs
+├── 📂 scripts/                                                 # Build and operational scripts
+├── 📂 .github/                                                 # Copilot instructions and related assets
+├── 📂 skills/                                                  # Repo-local Pi skills and project conventions
+├── .mcp.json                                                   # MCP server configuration for local tooling
+├── Chishiki.slnx                                               # Solution file (.NET 10 format)
 └── README.md
 ```
 
@@ -275,6 +242,16 @@ Contributions, issues, and feature requests are welcome!
 3. Commit your changes: `git commit -m 'feat: add amazing feature'`
 4. Push to the branch: `git push origin feat/amazing-feature`
 5. Open a Pull Request
+
+### Pi project guidance
+
+If you are working with Pi in this repository, start from:
+
+- `skills/chishiki-repo-conventions/SKILL.md`
+- `skills/chishiki-repo-conventions/references/architecture-layout-and-build.md`
+- `skills/chishiki-repo-conventions/references/csharp-conventions.md`
+
+These files are the Pi-compatible conversion of the repository's Copilot guidance and capture the current Chishiki-specific layout, build flow, file header convention, and XML documentation expectations.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 

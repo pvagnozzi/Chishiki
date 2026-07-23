@@ -1,0 +1,91 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build: Chishiki Solution",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["build", "${workspaceFolder}\\Chishiki.slnx"],
+            "group": { "kind": "build", "isDefault": true },
+            "problemMatcher": "$msCompile",
+            "presentation": { "reveal": "always", "panel": "shared" }
+        },
+        {
+            "label": "Test: Chishiki Full Suite",
+            "type": "process",
+            "command": "dotnet",
+            "args": [
+                "test",
+                "${workspaceFolder}\\Chishiki.slnx",
+                "--logger",
+                "console;verbosity=normal"
+            ],
+            "group": { "kind": "test", "isDefault": true },
+            "problemMatcher": "$msCompile",
+            "presentation": { "reveal": "always", "panel": "shared" }
+        },
+        {
+            "label": "Test: With Coverage",
+            "type": "process",
+            "command": "dotnet",
+            "args": [
+                "test",
+                "${workspaceFolder}\\Chishiki.slnx",
+                "--collect:XPlat Code Coverage"
+            ],
+            "group": "test",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Run: MCP Host Standalone",
+            "type": "process",
+            "command": "dotnet",
+            "args": [
+                "run",
+                "--project",
+                "${workspaceFolder}\\src\\mcp\\Chishiki.MCP.Host\\Chishiki.MCP.Host.csproj"
+            ],
+            "group": "none",
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": { "regexp": "." },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "Building\\.\\.\\.",
+                    "endsPattern": "Now listening on"
+                }
+            },
+            "presentation": { "reveal": "always", "panel": "shared" }
+        },
+        {
+            "label": "Run: Full Stack via Aspire",
+            "type": "process",
+            "command": "dotnet",
+            "args": [
+                "run",
+                "--project",
+                "${workspaceFolder}\\src\\infrastructure\\aspire\\Chishiki.Infrastructure.Aspire.AppHost\\Chishiki.Infrastructure.Aspire.AppHost.csproj"
+            ],
+            "group": "none",
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": { "regexp": "." },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "Building\\.\\.\\.",
+                    "endsPattern": "Aspire Dashboard:"
+                }
+            },
+            "presentation": { "reveal": "always", "panel": "shared" }
+        },
+        {
+            "label": "Clean: Solution",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["clean", "${workspaceFolder}\\Chishiki.slnx"],
+            "group": "none",
+            "problemMatcher": "$msCompile",
+            "presentation": { "reveal": "always", "panel": "shared" }
+        }
+    ]
+}

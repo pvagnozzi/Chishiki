@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+ <TargetFramework>net10.0</TargetFramework>
+ <ImplicitUsings>enable</ImplicitUsings>
+ <Nullable>enable</Nullable>
+ </PropertyGroup>
+
+ <ItemGroup>
+ <PackageReference Include="Aspire.Hosting.Redis"/>
+ <PackageReference Include="CsvHelper"/>
+ <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+ <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions"/>
+ <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions"/>
+ <PackageReference Include="Microsoft.Extensions.Http.Resilience"/>
+ <PackageReference Include="Serilog"/>
+ </ItemGroup>
+
+ <ItemGroup>
+ <ProjectReference Include="..\Daikin.Services\Daikin.Services.csproj" />
+ </ItemGroup>
+
+</Project>
+
+
+
+
+
+
+
+
+
+
+
+
+

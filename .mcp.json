@@ -4,14 +4,24 @@
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/"
     },
-    "hub": {
+    "chishiki": {
       "type": "http",
       "url": "http://localhost:5010/mcp"
+    },
+    "fetch": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
     },
     "context7": {
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
     }
   }
 }

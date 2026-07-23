@@ -2,26 +2,45 @@
 
 > **Chishiki** (知識 — *knowledge* in Japanese) is a cloud-native, distributed **RAG platform** exposed as a
 > **Model Context Protocol (MCP) server**, built on **.NET 10**, **Microsoft Orleans**, **.NET Aspire**,
-> and **Microsoft Kernel Memory**. Designed for on-premises or Azure deployment, including **Kubernetes**.
+> and shared AI/core/vision libraries for local and self-hosted workflows.
+
+> Pi users should start from the repo-local guidance in `skills/chishiki-repo-conventions/SKILL.md` and its
+> reference files. Those Pi resources are the maintained conversion of these repository conventions for Pi-based
+> workflows.
 
 ---
 
 ## 📋 Table of Contents
 
+- [🤖 Pi Guidance](#-pi-guidance)
 - [🏗️ Architecture](#-architecture)
 - [🗂️ Repository Layout](#-repository-layout)
 - [🔨 Build, Test and Run](#-build-test-and-run)
 - [📐 Design Principles](#-design-principles)
 - [📁 File Header Convention](#-file-header-convention)
+- [📝 XML Documentation](#-xml-documentation)
 - [🧩 MCP Tool Conventions](#-mcp-tool-conventions)
 - [🌾 Orleans Grain Conventions](#-orleans-grain-conventions)
+- [👷 Worker Pattern: External Long-Running Services](#-worker-pattern-external-long-running-services)
 - [📚 Kernel Memory Integration](#-kernel-memory-integration)
 - [🪵 Logging](#-logging)
 - [💉 Dependency Injection](#-dependency-injection)
 - [⚡ Async](#-async)
 - [🎨 Code Style](#-code-style)
 - [🧪 Testing](#-testing)
-- [☸️ Kubernetes](#-kubernetes)
+
+---
+
+## 🤖 Pi Guidance
+
+If you are working in this repository with Pi, prefer these repo-local resources first:
+
+- `skills/chishiki-repo-conventions/SKILL.md`
+- `skills/chishiki-repo-conventions/references/architecture-layout-and-build.md`
+- `skills/chishiki-repo-conventions/references/csharp-conventions.md`
+
+They capture the Pi-compatible version of the repository conventions, including the current project layout, build
+commands, file header format, and XML documentation expectations.
 
 ---
 
@@ -30,23 +49,21 @@
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        .NET Aspire AppHost                          │
-│                    (Local & Kubernetes Orchestration)               │
+│                       (Local Orchestration)                         │
 └──────────────────────────────┬──────────────────────────────────────┘
                                │
           ┌────────────────────┼────────────────────┐
           ▼                    ▼                    ▼
 ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────────┐
-│  MCP Server     │  │  Orleans Silo   │  │    Infrastructure    │
-│  (ASP.NET Core) │  │  (Engine Host)  │  │                      │
+│  MCP Host       │  │ Shared          │  │    Infrastructure    │
+│  (ASP.NET Core) │  │ Libraries       │  │                      │
 │                 │  │                 │  │  • PostgreSQL+pgvec  │
-│  /mcp  :5010   │  │  Grains         │  │  • Qdrant            │
-│  StreamableHTTP │  │  Streams        │  │  • Redis             │
-│  Tools/Prompts  │  │  Reminders      │  │  • Keycloak (OIDC)   │
-└────────┬────────┘  └────────┬────────┘  │  • Ollama (LLM)      │
-         │                    │           │  • Prometheus+Grafana │
-         └────────────────────┘           └──────────────────────┘
-                    │ Orleans Redis Clustering
-                    │ Kernel Memory RAG Pipeline
+│  /mcp  :5010    │  │  • ai           │  │  • Qdrant            │
+│  Tools/Prompts  │  │  • core         │  │  • Redis             │
+│  StreamableHTTP │  │  • orleans      │  │  • Keycloak (OIDC)   │
+└────────┬────────┘  │  • vision       │  │  • Ollama (LLM)      │
+         │           └────────┬────────┘  │  • Prometheus+Grafana │
+         └────────────────────┴───────────┴──────────────────────┘
 ```
 
 ### Key Technology Choices
@@ -55,12 +72,12 @@
 |---|---|
 | RAG pipeline | Microsoft Kernel Memory |
 | Actor model | .NET Orleans 10 (virtual actors / grains) |
-| Orchestration | .NET Aspire 9.x (local + K8s) |
+| Orchestration | .NET Aspire 9.x (local) |
 | MCP transport | `ModelContextProtocol.AspNetCore` — StreamableHTTP at `/mcp` |
 | Vector store | Qdrant (primary) + PostgreSQL pgvector (secondary) |
 | Embedding / LLM | Ollama (`nomic-embed-text` default) |
 | Caching / clustering | Redis 7 |
-| Identity | Keycloak 26 — realm `chishiki`, client `chishiki-api` |
+| Identity | Keycloak 26 |
 | Observability | OpenTelemetry → Prometheus → Grafana |
 
 ---
@@ -69,57 +86,44 @@
 
 ```
 /
-├── src/                                    # All runnable services
+├── src/
+│   ├── infrastructure/
+│   │   └── aspire/
+│   │       ├── Chishiki.Infrastructure.Aspire.AppHost/
+│   │       └── Chishiki.Infrastructure.Aspire.ServiceDefaults/
 │   ├── mcp/
-│   │   └── Chishiki.MCP.Host/             # MCP server — tools auto-discovered via assembly scan
-│   ├── engine/
-│   │   ├── Chishiki.Host/                 # Orleans Silo host
-│   │   └── clustering/
-│   │       ├── Chishiki.Clustering/           # Grain interface contracts (no impl)
-│   │       ├── Chishiki.Clustering.Client/    # Orleans client extensions
-│   │       └── Chishiki.Clustering.Server/    # Silo-side grain registration
-│   ├── api/
-│   │   └── Chishiki.API.Web/              # ASP.NET Core Minimal API (planned)
-│   ├── ingestion/                          # Ingestion pipeline services (planned)
-│   ├── rag/                               # RAG query services (planned)
-│   └── security/                          # Security scanning services (planned)
-│
-├── shared/                                # Cross-cutting libraries — NO back-refs into src/
-│   └── core/
-│       ├── Chishiki.Core/                 # DDD primitives: Entity, AggregateRoot, Disposable
-│       ├── Chishiki.Data/                 # Repository + UoW abstractions
-│       └── Chishiki.Data.EFCore/          # EF Core implementation
-│
-├── infrastructure/
-│   └── aspire/
-│       ├── Chishiki.Infrastructure.Aspire.AppHost/         # Aspire orchestration root
-│       └── Chishiki.Infrastructure.Aspire.ServiceDefaults/ # Shared OTel / health / resilience
-│
-├── tests/                                 # Mirrors src/ + shared/ layout
-├── containers/                            # Per-service Dockerfiles + configs
-├── k8s/                                   # Kubernetes manifests / Helm charts
-├── docs/                                  # Architecture Decision Records (ADRs)
-└── scripts/                               # Build, deploy, seed scripts
+│   │   └── Chishiki.MCP.Host/
+│   └── shared/
+│       ├── ai/
+│       ├── core/
+│       ├── orleans/
+│       └── vision/
+├── tests/
+├── containers/
+├── docs/
+├── scripts/
+├── skills/
+├── .mcp.json
+└── Chishiki.slnx
 ```
 
 ### Dependency Rules
 
 ```
-shared/core
+src/shared/core
   Chishiki.Core          — no project refs (BCL only)
   Chishiki.Data          — may ref Chishiki.Core
   Chishiki.Data.EFCore   — may ref Core + Data
 
-infrastructure/aspire/ServiceDefaults
+src/infrastructure/aspire/Chishiki.Infrastructure.Aspire.ServiceDefaults
   — may ref BCL + Aspire SDK only
 
-src/ services
-  — may reference shared/core + ServiceDefaults
-  — must NOT reference other service projects directly
-    (communicate via Orleans grains or HTTP service discovery)
+src/mcp and other runnable hosts
+  — may reference shared libraries + ServiceDefaults
+  — should not couple unrelated hosts directly when an abstraction or contract fits better
 ```
 
-> ⚠️ `shared/core` projects are reusable across solutions — keep them free of any Chishiki-specific service layer.
+> ⚠️ Shared libraries under `src/shared/` should remain reusable and should not take unnecessary dependencies on runnable hosts.
 
 ---
 
@@ -142,26 +146,26 @@ dotnet test .\Chishiki.slnx --filter "FullyQualifiedName~MethodName_Scenario"
 dotnet test .\Chishiki.slnx --collect:"XPlat Code Coverage"
 
 # Run — full stack via Aspire (requires Docker)
-dotnet run --project .\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppHost\Chishiki.Infrastructure.Aspire.AppHost.csproj
+dotnet run --project .\src\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppHost\Chishiki.Infrastructure.Aspire.AppHost.csproj
 
 # Run — MCP server standalone
 dotnet run --project .\src\mcp\Chishiki.MCP.Host\Chishiki.MCP.Host.csproj
 
 # Run — with security scanner profile
 $env:CHISHIKI_SECURITY_PROFILE = "true"
-dotnet run --project .\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppHost\Chishiki.Infrastructure.Aspire.AppHost.csproj
+dotnet run --project .\src\infrastructure\aspire\Chishiki.Infrastructure.Aspire.AppHost\Chishiki.Infrastructure.Aspire.AppHost.csproj
 ```
 
 | Endpoint | URL |
 |---|---|
 | Aspire Dashboard | http://localhost:15888 |
 | MCP endpoint | http://localhost:5010/mcp |
-| API | http://localhost:8080 |
 | Grafana | http://localhost:3000 |
 | Keycloak | http://localhost:8180 |
+| Qdrant | http://localhost:6333 |
 
-> 💡 Infrastructure containers use `builder.AddDockerfile("name", "../../../../containers/<name>")` in `AppHost.cs` —
-> not Aspire built-in helpers. The root `.mcp.json` registers the MCP server for VS 2026 / GitHub Copilot.
+> 💡 Infrastructure containers use `builder.AddDockerfile("name", '../../../../containers/<name>')` in `AppHost.cs`.
+> The root `.mcp.json` registers the MCP server for local MCP-aware tooling.
 
 ---
 
@@ -198,6 +202,8 @@ src/mcp/Chishiki.MCP.Host/
 
 ## 📁 File Header Convention
 
+> 🚫 **Mandatory** — every `.cs` file without exception must start with this header. PRs missing it will be rejected.
+
 Every `.cs` file **must** begin with this exact header:
 
 ```csharp
@@ -216,8 +222,62 @@ Every `.cs` file **must** begin with this exact header:
 **Rules:**
 - `File:` matches the physical filename including extension.
 - `Description:` is a single clear sentence — never blank, never "TODO".
-- `Modified:` is updated on every meaningful change.
+- `Modified:` is updated on every meaningful change to the file.
+- All text is in **English** — no other languages.
 - The three copyright lines are verbatim — do not alter them.
+- Auto-generated files under `obj/` are exempt.
+
+### Standardization of File Headers
+
+- All files in **Chishiki.Core** and **Chishiki.Data** must adhere to the standard file header format.
+- Ensure XML documentation is complete for all members in these files.
+
+---
+
+## 📝 XML Documentation
+
+> 🚫 **Mandatory** — every type, member, and parameter **must** carry an XML doc comment. No exceptions.
+
+### Rules
+
+| Target | Requirement |
+|---|---|
+| Classes / interfaces / records / enums | `<summary>` — one clear sentence describing purpose |
+| Public & internal methods | `<summary>` + `<param>` for every parameter + `<returns>` if non-void |
+| Private methods (incl. `[LoggerMessage]` partials) | `<summary>` — one sentence |
+| Properties | `<summary>` — one sentence |
+| Constructor parameters (primary constructors) | Document on the class `<summary>` if self-evident; otherwise add `<param>` |
+| Exceptions thrown | `<exception cref="ExType">` when explicitly thrown |
+| `CancellationToken` parameters | `<param name="cancellationToken">Token to observe for cancellation.</param>` |
+
+### Examples
+
+```csharp
+/// <summary>Provides a disposable base class with structured logging for managed and unmanaged resource cleanup.</summary>
+public abstract partial class Disposable : IDisposable
+{
+    /// <summary>Gets the logger used to emit disposal diagnostics.</summary>
+    protected ILogger Logger { get; }
+
+    /// <summary>Releases managed resources. Override to dispose owned <see cref="IDisposable"/> members.</summary>
+    protected virtual void DisposeManaged() { }
+
+    /// <summary>Releases unmanaged resources. Override only when holding raw OS handles.</summary>
+    protected virtual void DisposeUnmanaged() { }
+}
+```
+
+```csharp
+/// <summary>Returns version and build metadata for the running Chishiki MCP server.</summary>
+/// <param name="cancellationToken">Token to observe for cancellation.</param>
+/// <returns>JSON object with <c>name</c>, <c>version</c>, <c>framework</c>, and <c>buildTime</c> fields.</returns>
+public Task<string> GetServerInfoAsync(CancellationToken cancellationToken = default) { ... }
+```
+
+- All doc text is in **English**.
+- `<summary>` must be a complete sentence ending with a period.
+- Never leave `<summary>` empty or with placeholder text such as "TODO".
+- Use `<see cref="..."/>` to cross-reference types and members.
 
 ---
 
@@ -244,7 +304,7 @@ Tools and prompts are auto-discovered via `WithToolsFromAssembly()` + `WithPromp
 // -----------------------------------------------------------------------------
 // Copyright (c) Piergiorgio Vagnozzi. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------- 
 
 using System.ComponentModel;
 using System.Text.Json;
@@ -304,31 +364,252 @@ internal sealed partial class RagQueryTools(
 
 ## 🌾 Orleans Grain Conventions
 
+### Architecture: Distributed Event-Driven Streaming
+
+The system follows a strict streaming-first architecture:
+
+```
+Client → Orleans Grain → (trigger worker) → Worker (Ollama) → Kafka topic (llm-tokens)
+  → Orleans Streams (Kafka provider) → Grain (subscriber) → Client
+```
+
+**Core principles:**
+- Orleans grains are **orchestration and state holders only**
+- Long-running I/O (LLM calls) **MUST NOT** execute inside grains
+- All worker ↔ grain communication uses **Orleans Streams backed by Kafka**
+- System is **streaming-first** (token-by-token), not batch-based
+
+### Grain Rules
+
 - **Grain interfaces** in `Chishiki.Clustering` — no implementation, no infra dependencies.
 - **Implementations** in `Chishiki.Clustering.Server`.
 - **Client helpers** (`IGrainFactory` extensions) in `Chishiki.Clustering.Client`.
 - Use `IGrainWithStringKey` or `IGrainWithGuidKey` — choose one per domain, never mix.
-- All grain methods: `Task<T>` or `ValueTask<T>` — no synchronous grain methods.
+- **All grain methods: `Task<T>` or `ValueTask<T>`** — no synchronous grain methods.
+- Grains that receive stream events **MUST be marked with `[Reentrant]`**.
 - Grain state stored in Redis (`[StorageName("Default")]`).
 - Cluster: `ClusterId = "chishiki-cluster"`, `ServiceId = "chishiki"`, Silo `11111`, Gateway `30000`.
 
+### Streaming Configuration
+
+```csharp
+// In grain OnActivateAsync:
+var streamProvider = GetStreamProvider("kafka-stream");
+var stream = streamProvider.GetStream<LlmToken>("llm-tokens", this.GetPrimaryKeyAsGuid());
+await stream.SubscribeAsync<LlmToken>(OnTokenReceivedAsync);
+```
+
+**Grain token buffer:**
+```csharp
+private Dictionary<Guid, StringBuilder> _tokenBuffers = new();
+
+private Task OnTokenReceivedAsync(LlmToken token)
+{
+    if (!_tokenBuffers.ContainsKey(token.JobId))
+        _tokenBuffers[token.JobId] = new();
+
+    _tokenBuffers[token.JobId].Append(token.Text);
+    return Task.CompletedTask;
+}
+
+public Task<string> GetResultAsync(Guid jobId) => 
+    Task.FromResult(_tokenBuffers.GetValueOrDefault(jobId)?.ToString() ?? "");
+```
+
+### Message Contract
+
+```csharp
+/// <summary>Represents a single LLM token streamed from Ollama via Kafka.</summary>
+public record LlmToken
+{
+    /// <summary>Gets the grain ID that requested this token.</summary>
+    public Guid GrainId { get; init; }
+
+    /// <summary>Gets the unique job ID for this streaming session.</summary>
+    public Guid JobId { get; init; }
+
+    /// <summary>Gets the token text content.</summary>
+    public string Text { get; init; }
+}
+```
+
+### Example Grain Implementation
+
 ```csharp
 // Grain interface — Chishiki.Clustering
-public interface IDocumentGrain : IGrainWithStringKey
+public interface ILlmJobGrain : IGrainWithGuidKey
 {
-    Task<DocumentStatus> GetStatusAsync();
-    Task IngestAsync(IngestDocumentRequest request, CancellationToken ct = default);
+    Task<Guid> StartJobAsync(string prompt, CancellationToken ct = default);
+    Task<string> GetResultAsync(Guid jobId);
 }
 
 // Grain implementation — Chishiki.Clustering.Server
-internal sealed partial class DocumentGrain(
-    [PersistentState("document")] IPersistentState<DocumentState> state,
-    IKernelMemory memory,
-    ILogger<DocumentGrain> logger) : Grain, IDocumentGrain
+[Reentrant]
+internal sealed partial class LlmJobGrain(
+    [PersistentState("llm-job")] IPersistentState<LlmJobState> state,
+    ILogger<LlmJobGrain> logger) : Grain, ILlmJobGrain
 {
-    // ...
+    private Dictionary<Guid, StringBuilder> _tokenBuffers = new();
+
+    public override async Task OnActivateAsync(CancellationToken cancellationToken)
+    {
+        var streamProvider = GetStreamProvider("kafka-stream");
+        var stream = streamProvider.GetStream<LlmToken>("llm-tokens", this.GetPrimaryKeyAsGuid());
+        await stream.SubscribeAsync<LlmToken>(OnTokenReceivedAsync);
+        await base.OnActivateAsync(cancellationToken);
+    }
+
+    public Task<Guid> StartJobAsync(string prompt, CancellationToken ct = default)
+    {
+        var jobId = Guid.NewGuid();
+        _tokenBuffers[jobId] = new();
+        Log.JobStarted(Logger, jobId);
+        // Trigger worker via separate grain call or event
+        return Task.FromResult(jobId);
+    }
+
+    public Task<string> GetResultAsync(Guid jobId) =>
+        Task.FromResult(_tokenBuffers.GetValueOrDefault(jobId)?.ToString() ?? "");
+
+    private Task OnTokenReceivedAsync(LlmToken token)
+    {
+        if (!_tokenBuffers.ContainsKey(token.JobId))
+            _tokenBuffers[token.JobId] = new();
+        _tokenBuffers[token.JobId].Append(token.Text);
+        return Task.CompletedTask;
+    }
 }
 ```
+
+### Kafka Configuration Rules
+
+- Topic name: **`llm-tokens`**
+- Message key **MUST be `GrainId`** to preserve per-grain ordering
+- Expect **at-least-once delivery** → handle duplicates safely via idempotent token buffering
+- Configure `PubSubStore` (required for Orleans Streams)
+
+---
+
+## 👷 Worker Pattern: External Long-Running Services
+
+Workers execute **outside Orleans grains** and handle heavy I/O workloads (Ollama calls, processing, etc.).
+
+### Architecture
+
+```
+Job Request (Grain)
+    ↓
+Worker Service (BackgroundService)
+    ├─ Poll/listen for job requests
+    ├─ Call Ollama (OllamaSharp) with streaming
+    ├─ Emit each token to Kafka immediately
+    └─ (Optional) Grain gets notified when complete
+```
+
+### Worker Implementation Rules
+
+- **Do NOT inherit from `Grain`** — use `BackgroundService` or separate service class.
+- **Must be fully async** — no `.Wait()`, `.Result`, or `Thread.Sleep`.
+- **Communicate with grains via:**
+  - Kafka (primary for token streaming)
+  - Orleans `IGrainFactory` for metadata/state updates
+  - Never direct grain calls for heavy work
+- **Stream tokens incrementally** — emit each LLM token to Kafka immediately, not aggregated.
+- **Inject dependencies via primary constructor** — `ILogger<T>`, `IKernelMemory`, Ollama client, `IProducer<>`, etc.
+- **Handle backpressure** — implement exponential backoff if Kafka is slow.
+
+### Example Worker Implementation
+
+```csharp
+// Worker interface — Chishiki.Clustering (message contract)
+public record LlmJobRequest
+{
+    public Guid GrainId { get; init; }
+    public Guid JobId { get; init; }
+    public string Prompt { get; init; }
+    public string Model { get; init; } = "llama2";
+}
+
+// Worker implementation — Chishiki.Engine (or separate service)
+internal sealed partial class OllamaStreamingWorker(
+    ILogger<OllamaStreamingWorker> logger,
+    OllamaApiClient ollamaClient,
+    IProducer<Guid, LlmToken> kafkaProducer,
+    IChannel<LlmJobRequest> jobQueue) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await foreach (var request in jobQueue.Reader.ReadAllAsync(stoppingToken))
+        {
+            try
+            {
+                Log.ProcessingJob(logger, request.JobId);
+
+                var response = ollamaClient.GenerateStreamAsync(
+                    request.Model,
+                    request.Prompt,
+                    cancellationToken: stoppingToken);
+
+                var tokenCount = 0;
+                await foreach (var chunk in response)
+                {
+                    var token = new LlmToken
+                    {
+                        GrainId = request.GrainId,
+                        JobId = request.JobId,
+                        Text = chunk.Response
+                    };
+
+                    var message = new Message<Guid, LlmToken>
+                    {
+                        Key = request.GrainId,
+                        Value = token
+                    };
+
+                    await kafkaProducer.ProduceAsync("llm-tokens", message, stoppingToken);
+                    tokenCount++;
+                    Log.TokenEmitted(logger, request.JobId, tokenCount);
+                }
+
+                Log.JobCompleted(logger, request.JobId, tokenCount);
+            }
+            catch (Exception ex)
+            {
+                Log.JobFailed(logger, request.JobId, ex);
+            }
+        }
+    }
+}
+```
+
+### Worker Configuration in Aspire
+
+```csharp
+// In AppHost.cs:
+var chishiki = builder.AddProject<Chishiki.Host>("chishiki-engine")
+    .WithReference(kafka)
+    .WithReference(ollama)
+    .WithExternalHttpEndpoints();
+
+var worker = builder.AddProject<Chishiki.Worker>("chishiki-worker")
+    .WithReference(kafka)
+    .WithReference(ollama)
+    .WithReference(chishiki);
+
+var mcp = builder.AddProject<Chishiki.MCP.Host>("chishiki-mcp")
+    .WithReference(chishiki);
+```
+
+### Worker Constraints (Strict)
+
+- ✅ Use `IChannel<T>` or Kafka topic for job requests
+- ✅ Emit each token to Kafka immediately (no buffering)
+- ✅ Use `await foreach` for streaming responses
+- ✅ Always forward `CancellationToken`
+- ✅ Log job lifecycle (start, token emission, completion, failure)
+- ❌ Never call grain methods inside token loop
+- ❌ Never buffer full response before emitting
+- ❌ Never use synchronous I/O
 
 ---
 
@@ -412,6 +693,7 @@ internal static partial class Log
 ## 🎨 Code Style
 
 - Follow `.editorconfig` — max line length **120**.
+- All comments and documentation are written in **English**.
 - File-scoped namespaces: `namespace Chishiki.MCP.Host.Tools;`
 - Primary constructors for DI.
 - Expression-bodied members for single-line implementations.
@@ -419,6 +701,10 @@ internal static partial class Log
 - Prefer `System.Text.Json` over `Newtonsoft.Json` everywhere.
 - `System` usings sorted first (`dotnet_sort_system_directives_first = true`).
 - No `this.` qualifier unless required for disambiguation.
+
+### Namespace Standardization
+
+- All namespaces must follow the format `Chishiki.<Layer>.<Subdomain>` (e.g., `Chishiki.Data.Abstractions`, `Chishiki.Data.Specifications`, `Chishiki.Core`).
 
 ---
 
@@ -439,9 +725,7 @@ dotnet test .\Chishiki.slnx --filter "FullyQualifiedName~RagQueryTools"
 
 ## ☸️ Kubernetes
 
-- Kubernetes manifests and Helm charts: `k8s/`.
-- Use Aspire's `PublishingContext` to generate initial K8s manifests — avoid hand-authoring what Aspire can generate.
-- All secrets are Kubernetes `Secret` objects — never in `ConfigMap` or image layers.
-- Orleans clustering on K8s uses the Redis provider.
-- Health probes: `/health` (readiness) and `/alive` (liveness) — wired by `ServiceDefaults`, referenced in every deployment manifest.
-- Resource naming: `chishiki-<service>` (e.g., `chishiki-mcp`, `chishiki-engine`, `chishiki-api`).
+There is no first-class top-level `k8s/` directory in the current repository layout.
+If Kubernetes deployment assets are introduced later, prefer generated Aspire artifacts where possible and keep secrets out of source control.
+
+---

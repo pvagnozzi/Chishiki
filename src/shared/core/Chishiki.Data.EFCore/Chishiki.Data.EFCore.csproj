@@ -1,9 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+ <PropertyGroup>
+ <TargetFramework>net10.0</TargetFramework>
+ <ImplicitUsings>enable</ImplicitUsings>
+ <Nullable>enable</Nullable>
+ </PropertyGroup>
+
+ <ItemGroup>
+ <ProjectReference Include="..\Chishiki.Data\Chishiki.Data.csproj" />
+ </ItemGroup>
+
+ <ItemGroup>
+ <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+ <PackageReference Include="Microsoft.EntityFrameworkCore.Relational"/>
+ <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
+ <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
+ </ItemGroup>
 
 </Project>
